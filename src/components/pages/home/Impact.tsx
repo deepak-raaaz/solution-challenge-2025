@@ -213,7 +213,7 @@ const Impact: FC = () => {
                   <p className="text-sm text-gray-500 dark:text-gray-400">{testimonial.title}</p>
                 </div>
               </div>
-              <p className="text-gray-600 dark:text-gray-300 italic">"{testimonial.quote}"</p>
+              <p className="text-gray-600 dark:text-gray-300 italic">&quot;{testimonial.quote}&quot;</p>
             </div>
           ))}
         </div>
