@@ -80,93 +80,90 @@ const Features: FC = () => {
   ];
 
   return (
-    <section id="features" className="py-20 bg-gray-50 dark:bg-[#0A0A1B]">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <div className="inline-block p-2 bg-blue-100/50 dark:bg-blue-900/20 rounded-full mb-4">
-            <svg className="w-8 h-8 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-            </svg>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4 bg-gradient-to-b from-blue-400 to-blue-600 font-pp-neue-montreal bg-clip-text text-transparent">
-            Powerful Platform Features
-          </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
-            Discover the innovative tools that make learning accessible, personalized, and effective for everyone.
-          </p>
+    <div className="max-container py-16">
+      <div className="text-center mb-12">
+        <div className="inline-block p-2 bg-blue-100/50 dark:bg-blue-900/20 rounded-full mb-4">
+          <svg className="w-8 h-8 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+          </svg>
         </div>
+        <h2 className="text-3xl sm:text-4xl font-bold mb-4 bg-gradient-to-b from-blue-400 to-blue-600 font-pp-neue-montreal bg-clip-text text-transparent">
+          Powerful Platform Features
+        </h2>
+        <p className="text-lg text-gray-600 dark:text-gray-300">
+          Discover the innovative tools that make learning accessible, personalized, and effective for everyone.
+        </p>
+      </div>
 
-        {/* Platform Features */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {platformFeatures.map((feature) => (
-            <div key={feature.title} className="bg-white dark:bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl shadow-lg dark:shadow-gray-900/30 hover:shadow-xl dark:hover:shadow-gray-900/50 transition-shadow">
-              <div className={`w-14 h-14 ${feature.bgColor} rounded-full flex items-center justify-center mb-5`}>
-                <svg className={`w-7 h-7 ${feature.iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={feature.iconPath} />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">{feature.description}</p>
-              <ul className="space-y-2 text-gray-600 dark:text-gray-300">
-                {feature.subItems.map((item) => (
-                  <li key={item} className="flex items-center">
-                    <svg className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+      {/* Platform Features */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        {platformFeatures.map((feature) => (
+          <div key={feature.title} className="bg-white dark:bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl shadow-lg dark:shadow-gray-900/30 hover:shadow-xl dark:hover:shadow-gray-900/50 transition-shadow">
+            <div className={`w-14 h-14 ${feature.bgColor} rounded-full flex items-center justify-center mb-5`}>
+              <svg className={`w-7 h-7 ${feature.iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={feature.iconPath} />
+              </svg>
             </div>
-          ))}
-        </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">{feature.description}</p>
+            <ul className="space-y-2 text-gray-600 dark:text-gray-300">
+              {feature.subItems.map((item) => (
+                <li key={item} className="flex items-center">
+                  <svg className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
 
-        {/* Educator Features */}
-        <div className="bg-white dark:bg-gray-800/50 backdrop-blur-sm p-8 rounded-xl shadow-lg dark:shadow-gray-900/30">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">For Educators</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">Empower your teaching with our platform&apos;s tools designed specifically for educators.</p>
-              <div className="space-y-4">
-                {educatorFeatures.map((feature) => (
-                  <div key={feature.title} className="flex items-start">
-                    <div className="flex-shrink-0 mt-1">
-                      <div className={`w-8 h-8 ${feature.bgColor} rounded-full flex items-center justify-center`}>
-                        <svg className={`w-4 h-4 ${feature.iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={feature.iconPath} />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="ml-4">
-                      <h4 className="font-semibold text-gray-900 dark:text-white">{feature.title}</h4>
-                      <p className="text-gray-600 dark:text-gray-300">{feature.description}</p>
+      {/* Educator Features */}
+      <div className="bg-white dark:bg-gray-800/50 backdrop-blur-sm p-8 rounded-xl shadow-lg dark:shadow-gray-900/30">
+        <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">For Educators</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">Empower your teaching with our platform&apos;s tools designed specifically for educators.</p>
+            <div className="space-y-4">
+              {educatorFeatures.map((feature) => (
+                <div key={feature.title} className="flex items-start">
+                  <div className="flex-shrink-0 mt-1">
+                    <div className={`w-8 h-8 ${feature.bgColor} rounded-full flex items-center justify-center`}>
+                      <svg className={`w-4 h-4 ${feature.iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={feature.iconPath} />
+                      </svg>
                     </div>
                   </div>
-                ))}
-              </div>
-              <div className="mt-6">
-                <Link href="#cta" className="inline-flex items-center text-blue-500 dark:text-blue-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 transition-colors">
-                  Join as an educator
-                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </Link>
-              </div>
+                  <div className="ml-4">
+                    <h4 className="font-semibold text-gray-900 dark:text-white">{feature.title}</h4>
+                    <p className="text-gray-600 dark:text-gray-300">{feature.description}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="relative w-full aspect-[3/2]">
-              <Image
-                src="https://placehold.co/600x400.png/4361EE/FFFFFF?text=Educator+Dashboard"
-                alt="Educator using the platform dashboard to create custom learning roadmaps"
-                fill
-                className="rounded-lg object-cover shadow-lg"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
+            <div className="mt-6">
+              <Link href="#cta" className="inline-flex items-center text-blue-500 dark:text-blue-400 font-medium hover:text-blue-600 dark:hover:text-blue-300 transition-colors">
+                Join as an educator
+                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </Link>
             </div>
+          </div>
+          <div className="relative w-full aspect-[3/2]">
+            <Image
+              src="https://placehold.co/600x400.png/4361EE/FFFFFF?text=Educator+Dashboard"
+              alt="Educator using the platform dashboard to create custom learning roadmaps"
+              fill
+              className="rounded-lg object-cover shadow-lg"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

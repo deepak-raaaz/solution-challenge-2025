@@ -50,7 +50,7 @@ export default function Navbar() {
           end: "+=150",
           scrub: true,
         },
-        maxWidth: 600,
+        maxWidth: 800,
         backgroundColor: "var(--backdrop)",
         backdropFilter: "blur(12px)",
         outline: "1px solid var(--bg-700)",
@@ -69,7 +69,7 @@ export default function Navbar() {
     <header className="pointer-events-none sticky left-0 right-0 top-0 z-50 w-full px-0 py-4 md:flex md:justify-center">
       <nav
         ref={navRef}
-        className="pointer-events-auto flex w-full items-center justify-between gap-6 rounded-full px-6 py-1 transition-colors sm:pr-4"
+        className="pointer-events-auto flex w-full items-center justify-between gap-6 rounded-full px-2  py-1 transition-colors sm:pr-4"
         style={{
           maxWidth: "1280px",
           backgroundColor: "transparent",
@@ -239,7 +239,7 @@ export default function Navbar() {
             </div>
             <span className="sr-only">Toggle theme</span>
           </button>
-          <Button>Get Started</Button>
+          <Button className="rounded-full font-semibold">Get Started</Button>
         </div>
       </nav>
     </header>

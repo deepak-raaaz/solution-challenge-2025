@@ -37,7 +37,7 @@ const Problem: FC = () => {
 
   return (
     <section id="problem" className="py-20 ">
-      <div className="container mx-auto px-4">
+      <div className="max-container">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold  dark:text-white mb-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
