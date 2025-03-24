@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { FC } from 'react';
+import SectionHeading from '@/components/shared/SectionHeading';
 
 const Features: FC = () => {
   const platformFeatures = [
@@ -80,37 +81,35 @@ const Features: FC = () => {
   ];
 
   return (
-    <div className="max-container py-16">
-      <div className="text-center mb-12">
-        <div className="inline-block p-2 bg-blue-100/50 dark:bg-blue-900/20 rounded-full mb-4">
-          <svg className="w-8 h-8 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+    <div className="max-container myy-24">
+      <SectionHeading
+        title="Powerful Platform Features"
+        subtitle="We're committed to making education accessible to all."
+        icon={
+          <svg className="w-10 h-10 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
-        </div>
-        <h2 className="text-3xl sm:text-4xl font-bold mb-4 bg-gradient-to-b from-blue-400 to-blue-600 font-pp-neue-montreal bg-clip-text text-transparent">
-          Powerful Platform Features
-        </h2>
-        <p className="text-lg text-gray-600 dark:text-gray-300">
-          Discover the innovative tools that make learning accessible, personalized, and effective for everyone.
-        </p>
-      </div>
+        }
+      />
 
-      {/* Platform Features */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
         {platformFeatures.map((feature) => (
-          <div key={feature.title} className="bg-white dark:bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl shadow-lg dark:shadow-gray-900/30 hover:shadow-xl dark:hover:shadow-gray-900/50 transition-shadow">
-            <div className={`w-14 h-14 ${feature.bgColor} rounded-full flex items-center justify-center mb-5`}>
-              <svg className={`w-7 h-7 ${feature.iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div
+            key={feature.title}
+            className="bg-white dark:bg-gray-800/50 backdrop-blur-sm p-8 rounded-2xl shadow-xl dark:shadow-gray-900/30 transform hover:scale-[1.02] transition-all duration-300"
+          >
+            <div className={`w-14 h-14 ${feature.bgColor} rounded-xl flex items-center justify-center mb-6`}>
+              <svg className={`w-8 h-8 ${feature.iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={feature.iconPath} />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">{feature.description}</p>
-            <ul className="space-y-2 text-gray-600 dark:text-gray-300">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{feature.title}</h3>
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">{feature.description}</p>
+            <ul className="space-y-3">
               {feature.subItems.map((item) => (
-                <li key={item} className="flex items-center">
-                  <svg className="w-4 h-4 mr-2 text-blue-500 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                <li key={item} className="flex items-center text-gray-600 dark:text-gray-300">
+                  <svg className={`w-6 h-6 mr-3 ${feature.iconColor}`} fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   <span>{item}</span>
                 </li>
@@ -121,7 +120,7 @@ const Features: FC = () => {
       </div>
 
       {/* Educator Features */}
-      <div className="bg-white dark:bg-gray-800/50 backdrop-blur-sm p-8 rounded-xl shadow-lg dark:shadow-gray-900/30">
+      <div className="bg-white mt-16 dark:bg-gray-800/50 backdrop-blur-sm p-8 rounded-xl shadow-lg dark:shadow-gray-900/30">
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div>
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">For Educators</h3>

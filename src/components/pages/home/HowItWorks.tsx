@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { FC } from 'react';
+import SectionHeading from '@/components/shared/SectionHeading';
 
 const HowItWorks: FC = () => {
   const steps = [
@@ -68,55 +69,51 @@ const HowItWorks: FC = () => {
   ];
 
   return (
-    <div className="max-container py-16">
-      <div className="text-center mb-12">
-        <div className="inline-block p-2 bg-blue-100/50 dark:bg-blue-900/20 rounded-full mb-4">
-          <svg className="w-8 h-8 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div className="max-container py-24 ">
+      <SectionHeading
+        title="How It Works"
+        subtitle="Getting started is simple. Follow these steps to begin your personalized learning journey."
+        icon={
+          <svg className="w-10 h-10 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
-        </div>
-        <h2 className="text-3xl sm:text-4xl font-bold mb-4 bg-gradient-to-b from-blue-400 to-blue-600 font-pp-neue-montreal bg-clip-text text-transparent">
-          How It Works
-        </h2>
-        <p className="text-lg text-gray-600 dark:text-gray-300">
-          Getting started is simple. Follow these steps to begin your personalized learning journey.
-        </p>
-      </div>
+        }
+      />
 
       {/* Process Steps */}
       <div className="relative">
         {/* Connection Line */}
-        <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-blue-100/50 dark:bg-blue-900/20 transform -translate-x-1/2" />
+        <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-100/50 via-purple-100/50 to-blue-100/50 dark:from-blue-900/20 dark:via-purple-900/20 dark:to-blue-900/20 transform -translate-x-1/2" />
 
         {steps.map((step) => (
-          <div key={step.number} className="relative mb-16">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div key={step.number} className="relative mb-24 last:mb-0">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className={`order-${step.reverse ? 1 : 2} md:order-${step.reverse ? 1 : 2}`}>
                 <div className="relative">
-                  <div className={`mx-auto md:${step.reverse ? 'mr-0' : 'ml-0'} w-24 h-24 ${step.circleColor} rounded-full flex items-center justify-center text-white text-3xl font-bold mb-8 md:mb-0 z-10 relative`}>
+                  <div className={`mx-auto md:${step.reverse ? 'mr-0' : 'ml-0'} w-28 h-28 ${step.circleColor} rounded-full flex items-center justify-center text-white text-4xl font-bold mb-10 md:mb-0 z-10 relative shadow-lg transform hover:scale-105 transition-transform duration-300`}>
                     {step.number}
                   </div>
-                  <div className="relative w-full aspect-[5/3]">
+                  <div className="relative w-full aspect-[5/3] rounded-xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
                     <Image
                       src={step.imageUrl}
                       alt={step.alt}
                       fill
-                      className="rounded-lg shadow-lg object-cover"
+                      className="object-cover"
                       sizes="(max-width: 768px) 100vw, 50vw"
                     />
                   </div>
                 </div>
               </div>
               <div className={`md:text-${step.reverse ? 'left' : 'right'} order-${step.reverse ? 2 : 1} md:order-${step.reverse ? 2 : 1}`}>
-                <div className={`${step.bgColor} backdrop-blur-sm p-6 rounded-xl shadow-lg dark:shadow-gray-900/30 md:${step.reverse ? 'mr-auto md:ml-0' : 'ml-auto md:mr-0'} max-w-md`}>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{step.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">{step.description}</p>
-                  <ul className={`space-y-2 md:text-${step.reverse ? 'left' : 'right'}`}>
+                <div className={`${step.bgColor} backdrop-blur-sm p-8 rounded-2xl shadow-xl dark:shadow-gray-900/30 md:${step.reverse ? 'mr-auto md:ml-0' : 'ml-auto md:mr-0'} max-w-lg transform hover:scale-[1.02] transition-transform duration-300`}>
+                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{step.title}</h3>
+                  <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">{step.description}</p>
+                  <ul className={`space-y-3 md:text-${step.reverse ? 'left' : 'right'}`}>
                     {step.items.map((item) => (
-                      <li key={item} className={`flex items-center ${step.reverse ? '' : 'md:justify-end'} text-gray-600 dark:text-gray-300`}>
+                      <li key={item} className={`flex items-center ${step.reverse ? '' : 'md:justify-end'} text-gray-600 dark:text-gray-300 text-lg`}>
                         {step.reverse ? (
                           <>
-                            <svg className={`w-5 h-5 mr-2 ${step.checkColor}`} fill="currentColor" viewBox="0 0 20 20">
+                            <svg className={`w-6 h-6 mr-3 ${step.checkColor}`} fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                             </svg>
                             <span>{item}</span>
@@ -124,7 +121,7 @@ const HowItWorks: FC = () => {
                         ) : (
                           <>
                             <span>{item}</span>
-                            <svg className={`w-5 h-5 ml-2 ${step.checkColor}`} fill="currentColor" viewBox="0 0 20 20">
+                            <svg className={`w-6 h-6 ml-3 ${step.checkColor}`} fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                             </svg>
                           </>
@@ -140,9 +137,9 @@ const HowItWorks: FC = () => {
       </div>
 
       {/* Final CTA */}
-      <div className="mt-20 text-center">
-        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Ready to Transform Your Learning Experience?</h3>
-        <Link href="#cta" className="inline-block bg-blue-500 dark:bg-blue-400 hover:bg-blue-600 dark:hover:bg-blue-300 text-white font-medium py-3 px-8 rounded-lg transition-colors">
+      <div className="mt-32 text-center">
+        <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Ready to Transform Your Learning Experience?</h3>
+        <Link href="#cta" className="inline-block bg-blue-500 dark:bg-blue-400 hover:bg-blue-600 dark:hover:bg-blue-300 text-white font-semibold py-4 px-10 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
           Start Your Journey Now
         </Link>
       </div>

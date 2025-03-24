@@ -3,6 +3,7 @@
 
 import Image from 'next/image';
 import { FC } from 'react';
+import SectionHeading from '@/components/shared/SectionHeading';
 
 const About: FC = () => {
   const avatars = [
@@ -20,19 +21,14 @@ const About: FC = () => {
   ];
 
   return (
-    <div className="max-container relative z-10">
+    <div className="max-container relative z-10 max-sm:px-10">
       <div className="grid md:grid-cols-2 gap-8 items-center">
         {/* Left Content */}
         <div className="text-gray-900 dark:text-white">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium leading-wider font-pp-neue-montreal mb-4   text-transparent">
-            <span className='bg-gradient-to-b from-blue-400 to-blue-600 bg-clip-text  '>AI-Powered</span> {" "}
-            <span className='bg-gradient-to-b from-neutral-200 to-neutral-400 bg-clip-text  '>Learning For Everyone</span>
-             
-          </h1>
-          <p className="text-xl mb-8 text-gray-600 dark:text-blue-100">
-            Bridging educational gaps with personalized AI learning paths that
-            adapt to every student&apos;s unique needs and circumstances.
-          </p>
+          <SectionHeading
+            title="AI-Powered Learning For Everyone"
+            subtitle="Bridging educational gaps with personalized AI learning paths that adapt to every student's unique needs and circumstances."
+          />
           
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">

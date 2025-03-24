@@ -50,7 +50,7 @@ const Testimonial: FC = () => {
   };
 
   return (
-    <section id="testimonials" className="py-16 bg-gray-50 dark:bg-[#0A0A1B]">
+    <section id="testimonials" className="py-16 ">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
