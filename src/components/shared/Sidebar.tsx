@@ -102,6 +102,7 @@ export default function Sidebar() {
       </div>
 
       {/* User profile section */}
+      <Link href="/profile">
       <div className="border-t border-gray-200 dark:border-gray-700 p-4">
         <div className="flex items-center">
           <img
@@ -115,6 +116,7 @@ export default function Sidebar() {
           </div>
         </div>
       </div>
+      </Link>
     </nav>
   );
 }
