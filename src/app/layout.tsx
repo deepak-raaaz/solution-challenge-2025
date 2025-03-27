@@ -1,22 +1,36 @@
-import type { Metadata } from "next";
+"use client"
 import { DM_Sans} from "next/font/google";
 import "./globals.css";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import { useEffect } from "react";
+import Sidebar from "@/components/shared/Sidebar";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-DMSans",
 });
 
-export const metadata: Metadata = {
-  title: "Solution Challegnge 2025",
-  description: "Solution Challegnge 2025",
-};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  useEffect(() => {
+    AOS.init({
+      once: true,
+      offset: 0,
+    });
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const LocomotiveScroll = (await import("locomotive-scroll")).default;
+      new LocomotiveScroll();
+    })();
+  }, []);
   return (
     <html lang="en" className="dark">
       <body

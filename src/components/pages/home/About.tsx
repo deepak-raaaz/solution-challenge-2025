@@ -28,10 +28,12 @@ const About: FC = () => {
           <SectionHeading
             title="AI-Powered Learning For Everyone"
             subtitle="Bridging educational gaps with personalized AI learning paths that adapt to every student's unique needs and circumstances."
+            headingClassName='text-start'
+            subheadingClassName='text-start !mx-0'
           />
           
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 mt-8 ">
             <a
               href="#cta"
               className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600 font-semibold py-3 px-8 rounded-lg transition-colors text-center"
@@ -67,14 +69,25 @@ const About: FC = () => {
         {/* Right Image Section */}
         <div className="relative">
           <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-xl">
-            <Image
-              src="https://placehold.co/600x400.png/4361EE/FFFFFF?text=AI+Learning+Platform"
-              alt="AI learning platform interface showing personalized education path"
-              width={600}
-              height={400}
-              className="rounded-lg w-full"
-              priority
-            />
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">About Our Platform</h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                Our AI learning platform offers personalized education paths tailored to your needs.
+              </p>
+              <video
+                preload="auto"
+                loop
+                autoPlay
+                muted
+                className="rounded-lg w-full"
+                width="600"
+                height="400"
+                src="/videos/eduai.mp4" // Replace with your video URL
+                // alt="AI learning platform interface showing personalized education path"
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
 
             {/* Feature Card 1 */}
             <div className="absolute -bottom-6 -left-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">

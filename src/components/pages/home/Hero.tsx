@@ -9,8 +9,8 @@ const Hero = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      const cleanQuery = query.trim().replace(/\s+/g, '-');
-      router.push(`/login?query=${cleanQuery}`);
+      
+      router.push(`/login?query=${encodeURIComponent(query)}`);
     }
   };
 

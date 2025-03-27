@@ -92,7 +92,7 @@ const Features: FC = () => {
         }
       />
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 my-10">
         {platformFeatures.map((feature) => (
           <div
             key={feature.title}

@@ -102,7 +102,7 @@ const Solution: FC = () => {
       />
 
       {/* Main Content */}
-      <div className="grid md:grid-cols-2 gap-12 items-center">
+      <div className="grid md:grid-cols-2 gap-12 items-center my-8">
         <div className="relative w-full aspect-[3/2]">
           <Image
             src="https://placehold.co/600x400.png/4361EE/FFFFFF?text=AI+Learning+Solution"

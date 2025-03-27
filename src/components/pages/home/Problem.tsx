@@ -49,7 +49,7 @@ const Problem: FC = () => {
       />
 
       {/* Barriers Section */}
-      <div className="grid md:grid-cols-2 gap-12 items-center mb-12">
+      <div className="grid md:grid-cols-2 gap-12 items-center my-12">
         <div className="relative w-full aspect-[3/2]">
           <Image
             src={placeholderImage}

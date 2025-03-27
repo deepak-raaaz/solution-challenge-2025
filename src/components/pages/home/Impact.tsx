@@ -103,7 +103,7 @@ const Impact: FC = () => {
       />
 
       {/* Stats Section */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-8 my-16 ">
         {stats.map((stat) => (
           <div
             key={stat.label}

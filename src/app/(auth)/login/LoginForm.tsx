@@ -56,7 +56,7 @@ export default function LoginForm() {
 
         // Redirect to test page with the query if it exists
         if (learningQuery) {
-          router.push(`/test?query=${learningQuery.toLowerCase().replace(/\s+/g, '-')}`);
+          router.push(`/test?query=${encodeURIComponent(learningQuery)}`);
         } else {
           router.push('/test');
         }

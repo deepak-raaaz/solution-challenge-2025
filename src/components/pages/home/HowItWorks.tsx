@@ -81,7 +81,7 @@ const HowItWorks: FC = () => {
       />
 
       {/* Process Steps */}
-      <div className="relative">
+      <div className="relative my-10">
         {/* Connection Line */}
         <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-100/50 via-purple-100/50 to-blue-100/50 dark:from-blue-900/20 dark:via-purple-900/20 dark:to-blue-900/20 transform -translate-x-1/2" />
 

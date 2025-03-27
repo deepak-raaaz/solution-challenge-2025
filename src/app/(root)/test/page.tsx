@@ -1,7 +1,11 @@
+"use client"
 import React from 'react';
 import SectionHeading from '@/components/shared/SectionHeading';
+import { useRouter } from 'next/navigation';
 
 const Test: React.FC = () => {
+  const router = useRouter();
+
   return (
     <section
       id="cta"
@@ -48,12 +52,20 @@ const Test: React.FC = () => {
 
             {/* Buttons */}
             <div className="flex flex-wrap gap-4">
-              <a
-                href="#test-form"
+              <button
+                onClick={() => {
+                  const searchParams = new URLSearchParams(window.location.search);
+                  const query = searchParams.get('query');
+                  if (query) {
+                    router.push(`/test/test-customization?query=${query}`);
+                  } else {
+                    router.push('/test/test-customization');
+                  }
+                }}
                 className="bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-500 dark:to-blue-300 text-white hover:from-blue-700 hover:to-blue-500 px-8 py-3 rounded-lg font-semibold shadow-lg transition-all duration-300"
               >
                 Create Your First Test
-              </a>
+              </button>
               <a
                 href="#"
                 className="bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 px-8 py-3 rounded-lg font-semibold border border-gray-200 dark:border-gray-700 transition-all duration-300"
