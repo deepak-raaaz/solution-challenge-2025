@@ -331,7 +331,7 @@ export default function LearningRoadmap() {
               </div>
               <div className="mb-4">
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-3">
-                  <p className="text-sm text-gray-600 dark:text-gray-300">I notice you're making good progress with JavaScript! Would you like help with any specific concepts?</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">I notice you&apos;re making good progress with JavaScript! Would you like help with any specific concepts?</p>
                   <div className="text-right text-xs text-gray-500 dark:text-gray-400 mt-1">2 hours ago</div>
                 </div>
               </div>
@@ -383,7 +383,7 @@ export default function LearningRoadmap() {
                   </div>
                   <div className="flex items-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
                     <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
-                    <p className="text-gray-600 dark:text-gray-300">Earned "JS Fundamentals" badge</p>
+                    <p className="text-gray-600 dark:text-gray-300">Earned &apos;JS Fundamentals&apos; badge</p>
                     <span className="ml-auto text-gray-500 dark:text-gray-400 text-xs">1d ago</span>
                   </div>
                 </div>

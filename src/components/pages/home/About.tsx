@@ -1,7 +1,6 @@
 // components/About.tsx
 'use client';
 
-import Image from 'next/image';
 import { FC } from 'react';
 import SectionHeading from '@/components/shared/SectionHeading';
 

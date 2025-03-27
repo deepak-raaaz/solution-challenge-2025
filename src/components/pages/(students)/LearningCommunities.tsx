@@ -213,7 +213,7 @@ export default function LearningCommunities() {
           <div className="absolute inset-0 bg-black/10" />
           <div className="relative z-10 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-white max-w-2xl">
-              <h3 className="text-2xl font-bold mb-2">Can't find what you're looking for?</h3>
+              <h3 className="text-2xl font-bold mb-2">Can&apos;t find what you&apos;re looking for?</h3>
               <p className="text-indigo-100">Create your own learning community and invite peers with similar interests. Lead discussions, share resources, and grow together.</p>
             </div>
             <button className="whitespace-nowrap px-6 py-3 bg-white hover:bg-gray-100 text-indigo-700 font-bold rounded-lg shadow-md transition">

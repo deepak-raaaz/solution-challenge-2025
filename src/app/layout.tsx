@@ -4,7 +4,6 @@ import "./globals.css";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { useEffect } from "react";
-import Sidebar from "@/components/shared/Sidebar";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],

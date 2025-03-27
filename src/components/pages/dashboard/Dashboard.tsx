@@ -272,7 +272,7 @@ export default function Dashboard() {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Based on your recent progress</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">You've been making great progress with JavaScript fundamentals! I see you excelled in the arrays and functions modules. To further enhance your skills, I recommend focusing on these areas:</p>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">You&apos;ve been making great progress with JavaScript fundamentals! I see you excelled in the arrays and functions modules. To further enhance your skills, I recommend focusing on these areas:</p>
               <ul className="space-y-3 mb-4">
                 {[
                   "Complete the <span class='font-medium'>Advanced DOM Manipulation</span> lesson to strengthen your web skills",
