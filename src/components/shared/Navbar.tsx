@@ -1,4 +1,3 @@
-// components/Navbar.tsx
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -17,10 +16,24 @@ export default function Navbar() {
     animationType: ThemeAnimationType.BLUR_CIRCLE,
     blurAmount: 0,
     duration: 700,
+    // Set dark mode as the default
+    isDarkMode: true, // Add this if supported by useModeAnimation
   });
 
-  // Apply the theme class to the <html> element
+  // Apply the theme class to the <html> element and set default to dark mode
   useEffect(() => {
+    // Check localStorage first; if no preference exists, default to dark
+    const storedTheme = localStorage.getItem("theme");
+    if (!storedTheme) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else if (storedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+
+    // Sync with isDarkMode changes
     if (isDarkMode) {
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
@@ -30,7 +43,7 @@ export default function Navbar() {
     }
   }, [isDarkMode]);
 
-  // GSAP scroll animation
+  // GSAP scroll animation (unchanged)
   useEffect(() => {
     const navElement = navRef.current;
     if (!navElement) return;
@@ -69,7 +82,7 @@ export default function Navbar() {
     <header className="pointer-events-none sticky left-0 right-0 top-0 z-50 w-full px-0 py-4 md:flex md:justify-center">
       <nav
         ref={navRef}
-        className="pointer-events-auto flex w-full items-center justify-between gap-6 rounded-full px-2  py-1 transition-colors sm:pr-4"
+        className="pointer-events-auto flex w-full items-center justify-between gap-6 rounded-full px-2 py-1 transition-colors sm:pr-4"
         style={{
           maxWidth: "1280px",
           backgroundColor: "transparent",
@@ -83,7 +96,7 @@ export default function Navbar() {
           href="/"
           className="font-dm-sans text-2xl font-semibold text-text-primary sm:text-xl flex items-center gap-2 h-10"
         >
-          <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center ">
+          <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
             <svg
               className="w-8 h-8 text-white"
               viewBox="0 0 24 24"
@@ -92,10 +105,7 @@ export default function Navbar() {
               <path d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <span className="nowrap">
-          Edu Ai
-
-          </span>
+          <span className="nowrap">Edu Ai</span>
         </Link>
         <ul className="hidden gap-6 text-sm text-text-secondary sm:flex font-satoshi">
           <li className="group relative">
