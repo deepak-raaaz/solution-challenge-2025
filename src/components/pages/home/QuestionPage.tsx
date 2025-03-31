@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import SectionHeading from '@/components/shared/SectionHeading';
 import { MultiStepLoader as Loader } from "@/components/ui/multi-step-loader";
@@ -41,6 +42,7 @@ interface Question {
 }
 
 export default function QuestionsPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
@@ -72,14 +74,78 @@ export default function QuestionsPage() {
     setTestConfig(config);
 
     // Generate mock questions
-    const mockQuestions: Question[] = Array.from({ length: config.questionCount }, (_, i) => ({
-      id: `q${i + 1}`,
-      question: `Sample question ${i + 1} about ${config.query || 'the topic'}?`,
-      options: ['Option A', 'Option B', 'Option C', 'Option D'],
-      correctAnswer: 'Option A',
-      explanation: 'This is a detailed explanation of why this is the correct answer.'
-    }));
-
+    const mockQuestions: Question[] = [
+      {
+        id: 'q1',
+        question: 'Which of the following is NOT a type of Machine Learning?',
+        options: ['Supervised Learning', 'Reinforcement Learning', 'Unsupervised Learning', 'Evolutionary Learning'],
+        correctAnswer: 'Evolutionary Learning',
+        explanation: 'Evolutionary Learning is not a standard type of Machine Learning.'
+      },
+      {
+        id: 'q2',
+        question: 'What is the purpose of feature scaling in Machine Learning?',
+        options: ['To reduce overfitting', 'To make different features comparable', 'To increase model accuracy', 'To remove redundant data'],
+        correctAnswer: 'To make different features comparable',
+        explanation: 'Feature scaling ensures that all features contribute equally to the model.'
+      },
+      {
+        id: 'q3',
+        question: 'Which algorithm is best suited for classification problems?',
+        options: ['K-Means Clustering', 'Linear Regression', 'Decision Tree', 'Principal Component Analysis (PCA)'],
+        correctAnswer: 'Decision Tree',
+        explanation: 'Decision trees are commonly used for classification tasks.'
+      },
+      {
+        id: 'q4',
+        question: 'What does "overfitting" mean in the context of Machine Learning?',
+        options: ['A model that performs well on both training and test data', 'A model that captures too much noise and performs poorly on new data', 'A model that ignores important features', 'A model with high bias and low variance'],
+        correctAnswer: 'A model that captures too much noise and performs poorly on new data',
+        explanation: 'Overfitting occurs when a model learns patterns that are too specific to training data.'
+      },
+      {
+        id: 'q5',
+        question: 'Which of the following techniques helps prevent overfitting?',
+        options: ['Increasing model complexity', 'Using a small dataset', 'Regularization (L1/L2)', 'Ignoring outliers'],
+        correctAnswer: 'Regularization (L1/L2)',
+        explanation: 'Regularization techniques help control model complexity to prevent overfitting.'
+      },
+      // {
+      //   id: 'q6',
+      //   question: 'In Neural Networks, what is the primary role of an activation function?',
+      //   options: ['To introduce non-linearity into the model', 'To decrease computational complexity', 'To reduce the number of neurons', 'To normalize input data'],
+      //   correctAnswer: 'To introduce non-linearity into the model',
+      //   explanation: 'Activation functions enable neural networks to learn complex patterns.'
+      // },
+      // {
+      //   id: 'q7',
+      //   question: 'Which of the following is a dimensionality reduction technique?',
+      //   options: ['K-Means', 'Support Vector Machine (SVM)', 'Principal Component Analysis (PCA)', 'Naive Bayes'],
+      //   correctAnswer: 'Principal Component Analysis (PCA)',
+      //   explanation: 'PCA is widely used for reducing the number of features in a dataset.'
+      // },
+      // {
+      //   id: 'q8',
+      //   question: 'In reinforcement learning, what is the term for an entity that interacts with the environment?',
+      //   options: ['Agent', 'Reward', 'Action', 'State'],
+      //   correctAnswer: 'Agent',
+      //   explanation: 'An agent is the decision-making entity in reinforcement learning.'
+      // },
+      // {
+      //   id: 'q9',
+      //   question: 'Which evaluation metric is best suited for imbalanced classification problems?',
+      //   options: ['Accuracy', 'Mean Squared Error', 'F1-Score', 'R-Squared'],
+      //   correctAnswer: 'F1-Score',
+      //   explanation: 'F1-Score balances precision and recall, making it useful for imbalanced datasets.'
+      // },
+      // {
+      //   id: 'q10',
+      //   question: 'What is the primary objective of a loss function in a neural network?',
+      //   options: ['To measure the difference between predicted and actual values', 'To increase training speed', 'To improve computational efficiency', 'To adjust learning rate dynamically'],
+      //   correctAnswer: 'To measure the difference between predicted and actual values',
+      //   explanation: 'Loss functions help quantify model errors for optimization.'
+      // }
+    ];
     setQuestions(mockQuestions);
     setLoading(false);
   }, [searchParams]);
@@ -102,31 +168,21 @@ export default function QuestionsPage() {
       setIsTestComplete(true);
       setLoading(true);
       
-      // Simulate API call delay
-    //   setTimeout(() => {
-    //     // TODO: Navigate to results page with score and test data
-    //     router.push('/test/results');
-    //   }, 2000);
+      // Start loading timer and redirect after 5 seconds
+      const timer = setTimeout(() => {
+        router.push('/learning-roadmap');
+      }, 5000);
+
+      return () => clearTimeout(timer);
     }
   };
 
-  if (loading) {
+  // Show loading state while questions are being loaded
+  if (loading || questions.length === 0) {
     return (
-        <div className="w-full h-[60vh] flex items-center justify-center">
+      <div className="w-full h-[60vh] flex items-center justify-center">
         {/* Core Loader Modal */}
-        <Loader loadingStates={loadingStates} loading={loading} duration={2000} />
-  
-        {/* The buttons are for demo only, remove it in your actual code ⬇️ */}
-       
-  
-        {/* {loading && (
-          <button
-            className="fixed top-4 right-4 text-black dark:text-white z-[120]"
-            onClick={() => setLoading(false)}
-          >
-            <IconSquareRoundedX className="h-10 w-10" />
-          </button>
-        )} */}
+        <Loader loadingStates={loadingStates} loading={loading} duration={700} />
       </div>
     );
   }

@@ -52,7 +52,7 @@ const Problem: FC = () => {
       <div className="grid md:grid-cols-2 gap-12 items-center my-12">
         <div className="relative w-full aspect-[3/2]">
           <Image
-            src={placeholderImage}
+            src="/images/students.jpg"
             alt="Students in underserved communities with limited educational resources"
             fill
             className="rounded-lg shadow-lg object-cover"

@@ -29,64 +29,76 @@ interface Achievement {
   earned: boolean;
 }
 
+
 const roadmapSteps: RoadmapStep[] = [
   {
     id: 1,
-    title: 'HTML & CSS Fundamentals',
-    description: 'Learn the basics of HTML structure and CSS styling to create well-designed web pages.',
+    title: 'Introduction to Machine Learning',
+    description: 'Understand the basics of machine learning, its applications, and key terminologies.',
     level: 'Beginner Level',
-    status: 'Completed',
-    lessons: 6,
-    duration: '3.5 hours',
-    tags: ['HTML5', 'CSS3', 'Responsive Design'],
+    status: 'In Progress',
+    lessons: 4,
+    duration: '3 hours',
+    tags: ['Supervised Learning', 'Unsupervised Learning', 'AI Basics'],
   },
   {
     id: 2,
-    title: 'JavaScript Basics',
-    description: 'Master JavaScript fundamentals to create interactive web applications.',
+    title: 'Data Preprocessing & Feature Engineering',
+    description: 'Learn how to clean, preprocess, and extract meaningful features from data.',
     level: 'Beginner-Intermediate Level',
     status: 'In Progress',
-    lessons: 8,
-    duration: '5.5 hours',
-    tags: ['JavaScript', 'DOM Manipulation', 'Events'],
-    progress: 65,
+    lessons: 6,
+    duration: '4.5 hours',
+    tags: ['Data Cleaning', 'Feature Scaling', 'Dimensionality Reduction'],
+    // progress: 60,
   },
   {
     id: 3,
-    title: 'Front-end Frameworks',
-    description: 'Learn React, Vue.js, or Angular to build modern, component-based web applications.',
+    title: 'Supervised & Unsupervised Learning',
+    description: 'Explore the core types of machine learning algorithms and their applications.',
     level: 'Intermediate Level',
     status: 'Locked',
-    lessons: 10,
-    duration: '7 hours',
-    tags: ['React', 'Vue.js', 'State Management'],
+    lessons: 8,
+    duration: '6 hours',
+    tags: ['Regression', 'Classification', 'Clustering'],
   },
   {
     id: 4,
-    title: 'Backend Development',
-    description: 'Explore server-side programming with Node.js, Express, and databases.',
+    title: 'Neural Networks & Deep Learning',
+    description: 'Dive into deep learning concepts, including neural networks and backpropagation.',
     level: 'Intermediate-Advanced Level',
     status: 'Locked',
-    lessons: 12,
-    duration: '8 hours',
-    tags: ['Node.js', 'Express', 'MongoDB'],
+    lessons: 10,
+    duration: '7 hours',
+    tags: ['Neural Networks', 'TensorFlow', 'PyTorch'],
   },
   {
     id: 5,
-    title: 'Full-Stack Project',
-    description: 'Build a complete web application from scratch, showcasing all your acquired skills.',
+    title: 'Model Evaluation & Optimization',
+    description: 'Learn techniques for evaluating and optimizing machine learning models.',
     level: 'Advanced Level',
     status: 'Locked',
-    lessons: 'Final project',
-    duration: 'Capstone',
-    tags: ['Authentication', 'API Integration', 'Deployment'],
+    lessons: 6,
+    duration: '5 hours',
+    tags: ['Cross-Validation', 'Hyperparameter Tuning', 'Bias-Variance Tradeoff'],
   },
+  {
+    id: 6,
+    title: 'ML Deployment & Ethics',
+    description: 'Understand model deployment strategies and ethical considerations in AI.',
+    level: 'Expert Level',
+    status: 'Locked',
+    lessons: 5,
+    duration: '4 hours',
+    tags: ['MLOps', 'Fairness in AI', 'Production Deployment'],
+  }
 ];
+
 
 const resources: Resource[] = [
   {
-    title: 'JavaScript Cheatsheet',
-    description: 'Quick reference guide for common JavaScript methods and syntax',
+    title: 'Machine Learning Cheatsheet',
+    description: 'Quick reference guide for common Machine Learning methods and syntax',
     linkText: 'Download PDF',
     link: '#',
     icon: <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" /></svg>,
@@ -145,7 +157,7 @@ const RoadmapStepCard: React.FC<{ step: RoadmapStep; isLast: boolean }> = ({ ste
         </div>
         {!isLast && <div className="w-px h-full bg-gray-300 dark:bg-gray-600 mt-2" />}
       </div>
-      <div className={`bg-white dark:bg-gray-700 rounded-lg shadow-sm p-5 border border-gray-200/30 dark:border-gray-600/30 flex-1 ${step.status === 'Locked' ? 'opacity-75' : ''}`}>
+      <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5 border border-gray-200/30 dark:border-gray-600/30 flex-1 ${step.status === 'Locked' ? 'opacity-75' : ''}`}>
         <div className="flex items-center justify-between mb-4">
           <div>
             <h4 className="text-lg font-semibold text-gray-900 dark:text-white">{step.title}</h4>
@@ -225,19 +237,19 @@ export default function LearningRoadmap() {
       <div className="container mx-auto px-4">
         <div className="mb-8 lg:mb-12">
           <div className="flex items-center gap-4 mb-6">
-            <button className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+            <button className="p-2 rounded-full bg-gray-100 dark:bg-gray-800/50 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
             </button>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Web Development Learning Roadmap</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Machine Learning Roadmap</h2>
           </div>
-          <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+          {/* <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
             <div className="flex items-center">
               <img src="https://placehold.co/40x40" alt="Mentor Avatar" className="h-10 w-10 rounded-full mr-3 border-2 border-white dark:border-gray-800" />
               <div>
                 <p className="font-medium text-gray-900 dark:text-white">Sarah Johnson</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Certified Web Development Mentor</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Certified Machine Learning Mentor</p>
               </div>
             </div>
             <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 ml-0 md:ml-auto">
@@ -261,13 +273,13 @@ export default function LearningRoadmap() {
                 <span>24 hours total</span>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           <div className="lg:col-span-2">
             {/* Roadmap Ladder */}
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 md:p-8 mb-8">
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 md:p-8 mb-8">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Your Learning Path</h3>
               <div className="space-y-8">
                 {roadmapSteps.map((step, index) => (
@@ -280,7 +292,7 @@ export default function LearningRoadmap() {
             <div className="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800/30 rounded-xl p-6 md:p-8 mb-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Ready to test your JavaScript knowledge?</h3>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Ready to test your Machine Learning knowledge?</h3>
                   <p className="text-gray-600 dark:text-gray-300">Take a quick assessment to measure your understanding and get personalized recommendations.</p>
                 </div>
                 <button className="flex-shrink-0 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition flex items-center justify-center">
@@ -293,7 +305,7 @@ export default function LearningRoadmap() {
             </div>
 
             {/* Course Resources */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 md:p-8 border border-gray-200/30 dark:border-gray-700/30">
+            <div className="bg-white dark:bg-gray-800/50 rounded-xl shadow-sm p-6 md:p-8 border border-gray-200/30 dark:border-gray-700/30">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Course Resources</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {resources.map((resource) => (
@@ -317,7 +329,7 @@ export default function LearningRoadmap() {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             {/* AI Mentor */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200/30 dark:border-gray-700/30 mb-6">
+            <div className="bg-white dark:bg-gray-800/50 rounded-xl shadow-sm p-6 border border-gray-200/30 dark:border-gray-700/30 mb-6">
               <div className="flex items-center mb-4">
                 <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mr-3">
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -331,7 +343,7 @@ export default function LearningRoadmap() {
               </div>
               <div className="mb-4">
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-3">
-                  <p className="text-sm text-gray-600 dark:text-gray-300">I notice you&apos;re making good progress with JavaScript! Would you like help with any specific concepts?</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">I notice you&apos;re making good progress with Machine Learning! Would you like help with any specific concepts?</p>
                   <div className="text-right text-xs text-gray-500 dark:text-gray-400 mt-1">2 hours ago</div>
                 </div>
               </div>
@@ -352,24 +364,24 @@ export default function LearningRoadmap() {
             </div>
 
             {/* Progress Stats */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200/30 dark:border-gray-700/30 mb-6">
+            <div className="bg-white dark:bg-gray-800/50 rounded-xl shadow-sm p-6 border border-gray-200/30 dark:border-gray-700/30 mb-6">
               <h3 className="font-bold text-gray-900 dark:text-white mb-4">Your Progress Stats</h3>
               <div className="mb-5">
                 <div className="flex justify-between mb-1">
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Overall Course Progress</span>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">32%</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">0%</span>
                 </div>
                 <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5">
-                  <div className="bg-indigo-600 h-2.5 rounded-full" style={{ width: '32%' }} />
+                  <div className="bg-indigo-600 h-2.5 rounded-full" style={{ width: '0%' }} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-3 text-center">
-                  <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">14/36</div>
+                  <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">0/36</div>
                   <div className="text-xs text-gray-600 dark:text-gray-400">Lessons Completed</div>
                 </div>
                 <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 text-center">
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">9</div>
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">0</div>
                   <div className="text-xs text-gray-600 dark:text-gray-400">Hours Spent</div>
                 </div>
               </div>
@@ -378,12 +390,12 @@ export default function LearningRoadmap() {
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
                     <div className="w-2 h-2 bg-blue-500 rounded-full mr-2" />
-                    <p className="text-gray-600 dark:text-gray-300">Completed DOM Manipulation lesson</p>
+                    <p className="text-gray-600 dark:text-gray-300">Completed Data Preprocessing lesson</p>
                     <span className="ml-auto text-gray-500 dark:text-gray-400 text-xs">2h ago</span>
                   </div>
                   <div className="flex items-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
                     <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
-                    <p className="text-gray-600 dark:text-gray-300">Earned &apos;JS Fundamentals&apos; badge</p>
+                    <p className="text-gray-600 dark:text-gray-300">Earned &apos;ML Fundamentals&apos; badge</p>
                     <span className="ml-auto text-gray-500 dark:text-gray-400 text-xs">1d ago</span>
                   </div>
                 </div>
@@ -398,7 +410,7 @@ export default function LearningRoadmap() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
               <div className="relative z-10">
                 <h3 className="font-bold text-xl mb-2">Join Discussion Group</h3>
-                <p className="text-purple-100 mb-4 text-sm">Connect with 326 peers learning JavaScript. Ask questions and share your progress!</p>
+                <p className="text-purple-100 mb-4 text-sm">Connect with 326 peers learning Machine Learning. Ask questions and share your progress!</p>
                 <button className="bg-white text-purple-700 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition">
                   Join Now
                 </button>
@@ -406,7 +418,7 @@ export default function LearningRoadmap() {
             </div>
 
             {/* Learning Achievements */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200/30 dark:border-gray-700/30">
+            <div className="bg-white dark:bg-gray-800/50 rounded-xl shadow-sm p-6 border border-gray-200/30 dark:border-gray-700/30">
               <h3 className="font-bold text-gray-900 dark:text-white mb-4">Your Achievements</h3>
               <div className="grid grid-cols-3 gap-2 mb-4">
                 {achievements.map((achievement) => (

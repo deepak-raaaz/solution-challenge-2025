@@ -18,12 +18,12 @@ interface QuestionType {
 }
 
 const subjects: Subject[] = [
-  { id: 'math', name: 'Mathematics', icon: '📐' },
-  { id: 'physics', name: 'Physics', icon: '⚡' },
-  { id: 'chemistry', name: 'Chemistry', icon: '🧪' },
-  { id: 'biology', name: 'Biology', icon: '🧬' },
-  { id: 'computer', name: 'Computer Science', icon: '💻' },
-  { id: 'english', name: 'English', icon: '📚' },
+  { id: 'ml_intro', name: 'Introduction to Machine Learning', icon: '🤖' },
+  { id: 'data_preprocessing', name: 'Data Preprocessing & Feature Engineering', icon: '📊' },
+  { id: 'ml_types', name: 'Supervised & Unsupervised Learning', icon: '📈' },
+  { id: 'deep_learning', name: 'Neural Networks & Deep Learning', icon: '🧠' },
+  { id: 'model_evaluation', name: 'Model Evaluation & Optimization', icon: '✅' },
+  { id: 'ml_deployment', name: 'ML Deployment & Ethics', icon: '🚀' },
 ];
 
 const questionTypes: QuestionType[] = [
@@ -123,7 +123,7 @@ export default function TestCustomization() {
         <SectionHeading
           title="Customize Your Test"
           subtitle="Tailor your test experience by selecting your preferences below"
-          className="text-center"
+          className="text-center !mb-10"
         />
 
         <form onSubmit={handleSubmit} className="space-y-4">

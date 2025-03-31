@@ -217,7 +217,7 @@ export default function ProgressTracking() {
   ];
 
   return (
-    <section className="bg-gradient-to-b from-gray-900 to-gray-950 text-white py-12 px-4 sm:px-6 lg:px-8 min-h-screen">
+    <section className="  text-white py-12 px-4 sm:px-6 lg:px-8 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500">
