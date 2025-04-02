@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeAnimationType, useModeAnimation } from "react-theme-switch-animation";
 import { Button } from "../ui/button";
+import Image from "next/image";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Navbar() {
@@ -96,16 +97,8 @@ export default function Navbar() {
           href="/"
           className="font-dm-sans text-2xl font-semibold text-text-primary sm:text-xl flex items-center gap-2 h-10"
         >
-          <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-white"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </div>
-          <span className="nowrap">Edu Ai</span>
+          <Image src="/images/eduai.png" alt="Logo" width={50} height={50} />
+          <span className="nowrap font-pp-neue-montreal text-2xl font-semibold text-text-primary">Edu Ai</span>
         </Link>
         <ul className="hidden gap-6 text-sm text-text-secondary sm:flex font-satoshi">
           <li className="group relative">
@@ -150,40 +143,40 @@ export default function Navbar() {
           </li>
           <li className="group relative">
             <Link
-              href="/projects"
+              href="/how-it-works"
               className={`flex items-center gap-2 ${
-                pathname === "/projects" ? "active-link" : ""
+                pathname === "/how-it-works" ? "active-link" : ""
               }`}
             >
-              {pathname === "/projects" && (
+              {pathname === "/how-it-works" && (
                 <span className="w-2 h-2 bg-highlight rounded-full"></span>
               )}
               <span className="relative inline-flex overflow-hidden">
                 <div className="translate-y-0 skew-y-0 transform-gpu transition-transform duration-500 group-hover:-translate-y-[110%] group-hover:skew-y-12">
-                  Projects
+                  How it works
                 </div>
                 <div className="absolute translate-y-[110%] skew-y-12 transform-gpu text-text-primary transition-transform duration-500 group-hover:translate-y-0 group-hover:skew-y-0">
-                  Projects
+                  How it works
                 </div>
               </span>
             </Link>
           </li>
           <li className="group relative">
             <Link
-              href="/contact"
+              href="/resources"
               className={`flex items-center gap-2 ${
-                pathname === "/contact" ? "active-link" : ""
+                pathname === "/resources" ? "active-link" : ""
               }`}
             >
-              {pathname === "/contact" && (
+              {pathname === "/resources" && (
                 <span className="w-2 h-2 bg-highlight rounded-full"></span>
               )}
               <span className="relative inline-flex overflow-hidden">
                 <div className="translate-y-0 skew-y-0 transform-gpu transition-transform duration-500 group-hover:-translate-y-[110%] group-hover:skew-y-12">
-                  Contact
+                  Resources
                 </div>
                 <div className="absolute translate-y-[110%] skew-y-12 transform-gpu text-text-primary transition-transform duration-500 group-hover:translate-y-0 group-hover:skew-y-0">
-                  Contact
+                  Resources
                 </div>
               </span>
             </Link>
@@ -249,7 +242,9 @@ export default function Navbar() {
             </div>
             <span className="sr-only">Toggle theme</span>
           </button>
-          <Button className="rounded-full font-semibold">Get Started</Button>
+          <Link href="/dashboard" className="!cursor-pointer">
+            <Button className="rounded-full font-semibold cursor-pointer">Get Started</Button>
+          </Link>
         </div>
       </nav>
     </header>

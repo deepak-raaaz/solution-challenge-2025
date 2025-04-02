@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const Hero = () => {
   const router = useRouter();
@@ -18,15 +19,9 @@ const Hero = () => {
     <div className="min-h-screen dark:text-white flex items-center justify-center">
       <div className="max-container py-20">
         <div className="flex flex-col items-center justify-center text-center space-y-8">
-          <div className="w-20 h-20 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center mb-8">
-            <svg
-              className="w-12 h-12 text-white"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </div>
+          
+            <Image src="/images/eduai.png" alt="Logo" width={100} height={100} />
+
           
           <h1 className="text-5xl md:text-7xl font-medium font-pp-neue-montreal tracking-wide bg-gradient-to-b from-blue-300 py-1 to-blue-500 bg-clip-text text-transparent">
             So, what are we learning today?
