@@ -153,10 +153,10 @@ const Features: FC = () => {
           </div>
           <div className="relative w-full aspect-[3/2]">
             <Image
-              src="https://placehold.co/600x400.png/4361EE/FFFFFF?text=Educator+Dashboard"
+              src="/images/educator-dash.png"
               alt="Educator using the platform dashboard to create custom learning roadmaps"
               fill
-              className="rounded-lg object-cover shadow-lg"
+              className="rounded-lg object-cover shadow-l aspect-video"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>

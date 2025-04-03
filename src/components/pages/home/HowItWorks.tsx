@@ -10,7 +10,7 @@ const HowItWorks: FC = () => {
       number: 1,
       title: 'Sign Up & Assessment',
       description: 'Create your account and complete a quick assessment that helps our AI understand your learning style, goals, and current knowledge level.',
-      imageUrl: 'https://placehold.co/500x300.png/4361EE/FFFFFF?text=Sign+Up+%26+Assessment',
+      imageUrl: '/images/login.png',
       alt: 'User creating an account and taking a skill assessment',
       bgColor: 'bg-blue-100/50 dark:bg-blue-900/20',
       circleColor: 'bg-blue-500 dark:bg-blue-400',
@@ -22,7 +22,7 @@ const HowItWorks: FC = () => {
       number: 2,
       title: 'Receive Your Learning Plan',
       description: 'Our AI generates a tailored learning roadmap based on your assessment, identifying the optimal path for your educational journey.',
-      imageUrl: 'https://placehold.co/500x300.png/4361EE/FFFFFF?text=Personalized+Learning+Plan',
+      imageUrl: '/images/test.png',
       alt: 'AI creating a personalized learning path for a student',
       bgColor: 'bg-purple-100/50 dark:bg-purple-900/20',
       circleColor: 'bg-purple-500 dark:bg-purple-400',
@@ -34,7 +34,7 @@ const HowItWorks: FC = () => {
       number: 3,
       title: 'Learn At Your Own Pace',
       description: 'Access personalized lessons, activities, and assessments that adapt in real-time to your progress and learning style.',
-      imageUrl: 'https://placehold.co/500x300.png/4361EE/FFFFFF?text=Interactive+Learning',
+      imageUrl: '/images/progress.png',
       alt: 'Student engaging with personalized learning content on various devices',
       bgColor: 'bg-pink-100/50 dark:bg-pink-900/20',
       circleColor: 'bg-pink-500 dark:bg-pink-400',
@@ -46,7 +46,7 @@ const HowItWorks: FC = () => {
       number: 4,
       title: 'Get Support When Needed',
       description: 'Access 24/7 AI chatbot assistance and connect with human mentors for more complex topics and personalized guidance.',
-      imageUrl: 'https://placehold.co/500x300.png/4361EE/FFFFFF?text=AI+Mentorship',
+      imageUrl: '/images/aimentor.png',
       alt: 'AI mentor providing guidance to a student',
       bgColor: 'bg-indigo-100/50 dark:bg-indigo-900/20',
       circleColor: 'bg-indigo-500 dark:bg-indigo-400',
@@ -58,7 +58,7 @@ const HowItWorks: FC = () => {
       number: 5,
       title: 'Track Progress & Grow',
       description: 'Monitor your advancement through detailed analytics, earn certificates, and continuously evolve your learning journey.',
-      imageUrl: 'https://placehold.co/500x300.png/4361EE/FFFFFF?text=Progress+Tracking',
+      imageUrl: '/images/leaderboard.png',
       alt: 'Student reviewing learning progress analytics and achievements',
       bgColor: 'bg-blue-100/50 dark:bg-blue-900/20',
       circleColor: 'bg-blue-500 dark:bg-blue-400',
@@ -93,13 +93,13 @@ const HowItWorks: FC = () => {
                   <div className={`mx-auto md:${step.reverse ? 'mr-0' : 'ml-0'} w-28 h-28 ${step.circleColor} rounded-full flex items-center justify-center text-white text-4xl font-bold mb-10 md:mb-0 z-10 relative shadow-lg transform hover:scale-105 transition-transform duration-300`}>
                     {step.number}
                   </div>
-                  <div className="relative w-full aspect-[5/3] rounded-xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
+                  <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
                     <Image
                       src={step.imageUrl}
                       alt={step.alt}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 50vw"
+                      sizes="(max-width: 768px) 100vw, 50vw h-auto "
                     />
                   </div>
                 </div>

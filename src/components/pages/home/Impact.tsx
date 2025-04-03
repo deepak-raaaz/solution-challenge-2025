@@ -144,7 +144,7 @@ const Impact: FC = () => {
       </div>
 
       {/* Case Studies */}
-      <div className="grid md:grid-cols-2 gap-8 mb-16">
+      {/* <div className="grid md:grid-cols-2 gap-8 mb-16">
         {caseStudies.map((study) => (
           <div
             key={study.title}
@@ -186,10 +186,10 @@ const Impact: FC = () => {
             </div>
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* Testimonials */}
-      <div className="bg-white dark:bg-gray-800/50 backdrop-blur-sm p-8 rounded-2xl shadow-xl dark:shadow-gray-900/30">
+      {/* <div className="bg-white dark:bg-gray-800/50 backdrop-blur-sm p-8 rounded-2xl shadow-xl dark:shadow-gray-900/30">
         <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
           Success Stories
         </h3>
@@ -217,7 +217,7 @@ const Impact: FC = () => {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

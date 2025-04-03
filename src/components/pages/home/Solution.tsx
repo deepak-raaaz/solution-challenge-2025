@@ -105,10 +105,10 @@ const Solution: FC = () => {
       <div className="grid md:grid-cols-2 gap-12 items-center my-8">
         <div className="relative w-full aspect-[3/2]">
           <Image
-            src="https://placehold.co/600x400.png/4361EE/FFFFFF?text=AI+Learning+Solution"
+            src="/images/student-dash.png"
             alt="AI personalized learning platform interface showing adaptive learning path"
             fill
-            className="rounded-lg shadow-lg object-cover"
+            className="rounded-lg shadow-lg object-cover border-4 border-gray-200 dark:border-gray-800 aspect-video"
             sizes="(max-width: 768px) 100vw, 50vw"
             priority
           />
@@ -171,7 +171,7 @@ const Solution: FC = () => {
           </div>
           <div className="relative w-full aspect-[5/3]">
             <Image
-              src="https://placehold.co/500x300.png/4361EE/FFFFFF?text=Global+Learning+Access"
+              src="/images/student-dash.png"
               alt="Diverse students accessing education on various devices worldwide"
               fill
               className="rounded-lg object-cover shadow-lg"
