@@ -4,6 +4,8 @@ import "./globals.css";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { useEffect } from "react";
+import { Providers } from "./Provider";
+import { ToastContainer } from "react-toastify";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -35,7 +37,11 @@ export default function RootLayout({
       <body
         className={`${dmSans.variable}  antialiased `}
       >
+        <Providers>
+
        {children}
+       <ToastContainer />
+        </Providers>
       </body>
     </html>
   );
