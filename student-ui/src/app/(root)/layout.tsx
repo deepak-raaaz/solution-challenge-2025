@@ -24,7 +24,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-1 lg:ml-64 max-sm:py-14">
+      <div className="flex-1 lg:ml-64 max-sm:py-0">
         {children}
       </div>
       <BottomNavbar />
