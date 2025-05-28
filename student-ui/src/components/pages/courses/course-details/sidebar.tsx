@@ -26,7 +26,7 @@ const Sidebar: React.FC<SidebarProps> = ({ data, onSectionNavigation }) => {
   return (
     <div className="space-y-6">
       {/* AI Mentor */}
-      <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+      <div className="bg-gray-800/20 border border-gray-700/40 rounded-lg p-6">
         <h3 className="text-lg font-bold text-white mb-4 flex items-center">
           <Cog6ToothIcon className="w-5 h-5 mr-2 text-blue-400" />
           AI Mentor
@@ -45,7 +45,7 @@ const Sidebar: React.FC<SidebarProps> = ({ data, onSectionNavigation }) => {
       </div>
 
       {/* Progress Stats */}
-      <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+      <div className="bg-gray-800/20 border border-gray-700/40 rounded-lg p-6">
         <h3 className="text-lg font-bold text-white mb-4">Your Progress</h3>
         <div className="space-y-4">
           {data.progressStats.map((stat) => (
@@ -54,7 +54,7 @@ const Sidebar: React.FC<SidebarProps> = ({ data, onSectionNavigation }) => {
                 <span className="text-gray-300">{stat.label}</span>
                 <span className={`text-${stat.color}-400 font-semibold`}>{stat.value}</span>
               </div>
-              <div className="w-full bg-gray-700 rounded-full h-2">
+              <div className="w-full bg-gray-700/20 rounded-full h-2">
                 <div
                   className={`bg-${stat.color}-500 h-2 rounded-full`}
                   style={{ width: stat.value }}
@@ -66,14 +66,14 @@ const Sidebar: React.FC<SidebarProps> = ({ data, onSectionNavigation }) => {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+      <div className="bg-gray-800/20 border border-gray-700/40 rounded-lg p-6">
         <h3 className="text-lg font-bold text-white mb-4">Quick Actions</h3>
         <div className="space-y-3">
           {data.quickActions.map((action) => (
             <button
               key={action.label}
               onClick={() => onSectionNavigation(action.section)}
-              className="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 flex items-center"
+              className="w-full px-4 py-3 bg-gray-700/20 hover:bg-gray-600/30 text-white rounded-lg font-semibold transition-colors duration-200 flex items-center"
             >
               {getActionIcon(action.icon)}
               {action.label}
@@ -83,14 +83,14 @@ const Sidebar: React.FC<SidebarProps> = ({ data, onSectionNavigation }) => {
       </div>
 
       {/* Course Resources */}
-      <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+      <div className="bg-gray-800/20 border border-gray-700/40 rounded-lg p-6">
         <h3 className="text-lg font-bold text-white mb-4">Course Resources</h3>
         <div className="space-y-3">
           {data.resources.map((resource) => (
             <a
               key={resource.title}
               href="#"
-              className="block p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors duration-200"
+              className="block p-3 bg-gray-700/20 hover:bg-gray-600/30 rounded-lg transition-colors duration-200"
             >
               <div className="text-white font-semibold text-sm">{resource.title}</div>
               <div className="text-gray-400 text-xs">{resource.description}</div>

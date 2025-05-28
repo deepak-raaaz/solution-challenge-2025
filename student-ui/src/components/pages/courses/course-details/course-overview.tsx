@@ -13,7 +13,7 @@ const CourseOverview: React.FC<CourseOverviewProps> = ({ data}) => {
     { label: 'Python', color: 'blue-600' },
     { label: 'Data Science', color: 'green-600' },
     { label: 'Neural Networks', color: 'purple-600' },
-    { label: 'Beginner Friendly', color: 'orange-600' },
+    { label: 'Beginner Friendly', color: 'blue-400' },
   ];
 
   return (
@@ -28,17 +28,17 @@ const CourseOverview: React.FC<CourseOverviewProps> = ({ data}) => {
             {tags.map((tag) => (
               <span
                 key={tag.label}
-                className={`bg-${tag.color} text-white px-3 py-1 rounded-full text-sm`}
+                className={`bg-${tag.color} bg-slate-700/50 text-white px-3 py-1 rounded-full text-sm`}
               >
                 {tag.label}
               </span>
             ))}
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row gap-4 mt-4 lg:mt-0">
+        <div className="flex flex-row gap-4 mt-4 lg:mt-0">
           <button
             // onClick={onSaveCourse}
-            className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors duration-200 font-semibold"
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-semibold"
           >
             Save Course
           </button>
@@ -65,7 +65,7 @@ const CourseOverview: React.FC<CourseOverviewProps> = ({ data}) => {
           <p className="text-gray-300 text-sm">Duration</p>
         </div>
         <div className="text-center p-4 bg-gray-700/30 rounded-lg">
-          <div className="text-2xl font-bold text-orange-400 mb-1">{data.assessments}</div>
+          <div className="text-2xl font-bold text-blue-400 mb-1">{data.assessments}</div>
           <p className="text-gray-300 text-sm">Assessments</p>
         </div>
       </div>

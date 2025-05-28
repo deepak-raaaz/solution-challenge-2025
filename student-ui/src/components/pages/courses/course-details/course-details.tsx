@@ -33,13 +33,13 @@ const CourseDetails: React.FC = () => {
   };
 
   return (
-    <section id="course-roadmap" className="min-h-screen text-gray-100">
-      <div className="px-6 py-12 lg:px-8">
+    <section id="course-roadmap" className="min-h-screen text-gray-100 max-lg:py-10">
+      <div className="px-6 py-12 lg:px-8 max-md:px-4">
         <div className="mx-auto max-w-7xl">
-          <Header onSaveCourse={handleSaveCourse} onViewDashboard={() => handleSectionNavigation('dashboard')} />
+          {/* <Header onSaveCourse={handleSaveCourse} onViewDashboard={() => handleSectionNavigation('dashboard')} /> */}
+              <CourseOverview data={courseData} />
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <div className="lg:col-span-3">
-              <CourseOverview data={courseData} />
               <ModuleList modules={courseData.modulesList} onSectionNavigation={handleSectionNavigation} />
             </div>
             <Sidebar data={courseData} onSectionNavigation={handleSectionNavigation} />

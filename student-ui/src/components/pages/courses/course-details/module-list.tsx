@@ -42,7 +42,7 @@ const ModuleList: React.FC<ModuleListProps> = ({ modules, onSectionNavigation })
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-md:space-y-3">
       {modules.map((module:any) => (
         <div
           key={module.id}
@@ -102,7 +102,7 @@ const ModuleList: React.FC<ModuleListProps> = ({ modules, onSectionNavigation })
           </button>
           {expandedModules.includes(module.id) && (
             <div className="border-t border-gray-700/40">
-              <div className="p-6 space-y-4">
+              <div className="p-6 space-y-4 max-md:p-3 max-md:space-y-2">
                 {module.lessons.map((lesson:any,index:number) => (
                   <LessonCard
                   index={index}
@@ -116,14 +116,14 @@ const ModuleList: React.FC<ModuleListProps> = ({ modules, onSectionNavigation })
           )}
         </div>
       ))}
-      <div className="text-center py-8">
+      {/* <div className="text-center py-8">
         <div className="text-gray-400 mb-4">7 more modules to unlock...</div>
         <div className="flex justify-center space-x-2">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="w-2 h-2 bg-gray-600 rounded-full"></div>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
