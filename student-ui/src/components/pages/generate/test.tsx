@@ -2,6 +2,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import SectionHeading from '@/components/shared/section-heading';
+import { DialogTitle } from '@/components/ui/dialog';
 
 interface TestProps {
   onOpenChange: (open: boolean) => void;
@@ -23,6 +24,7 @@ const Test: React.FC<TestProps> = ({
         <div className="flex flex-col md:flex-row items-center justify-between gap-10">
           {/* Left Content */}
           <div className="md:w-1/2">
+          <DialogTitle>
             <SectionHeading
               title="Start Creating Custom Tests Today"
               subtitle="Join thousands of students who are accelerating their learning with personalized test creation. Take control of your education journey now."
@@ -30,6 +32,7 @@ const Test: React.FC<TestProps> = ({
               headingClassName='text-2xl md:text-3xl lg:text-4xl'
               subheadingClassName='!text-lg max-md:!text-base'
             />
+          </DialogTitle>
 
             {/* Features List */}
             <div className="flex flex-wrap gap-4 mb-8 mt-4">
