@@ -161,7 +161,7 @@ const Assessment: React.FC = () => {
   const handleProceed = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
-      router.push("/learning-roadmap");
+      router.push("/playlists/id");
     }, 2000);
   }, [router]);
 
@@ -243,7 +243,7 @@ const Assessment: React.FC = () => {
                 className="px-6 py-2.5 bg-blue-500 text-white font-semibold hover:bg-blue-600"
                 aria-label="Proceed to Roadmap"
               >
-                Proceed to Roadmap
+                Proceed to Course
               </Button>
             </div>
           </div>

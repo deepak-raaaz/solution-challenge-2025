@@ -1,0 +1,119 @@
+[
+    {
+      "id": "web-dev-complete",
+      "title": "Complete Web Development Bootcamp",
+      "description": "Master HTML, CSS, JavaScript, React, and Node.js from scratch",
+      "mentor": "Dr. Sarah Johnson",
+      "duration": "12 hours",
+      "level": "Beginner to Advanced",
+      "price": "Free",
+      "modules": [
+        "HTML & CSS Fundamentals",
+        "JavaScript Essentials",
+        "React Framework",
+        "Node.js Backend",
+        "Database Integration",
+        "Deployment & DevOps"
+      ],
+      "image": "https://placehold.co/300x180?text=Web+Development",
+      "featured": true,
+      "stats": { "likes": 2400, "shares": 856, "comments": 342, "enrolled": 1200 },
+      "avatarColors": ["#1E90FF", "#10B981", "#F59E0B"]
+    },
+    {
+      "id": "ml-fundamentals",
+      "title": "Machine Learning Fundamentals",
+      "description": "Learn Python, statistics, and build your first ML models",
+      "mentor": "Prof. Michael Chen",
+      "duration": "18 hours",
+      "level": "Intermediate",
+      "price": "Premium",
+      "modules": [
+        "Python for ML",
+        "Statistics & Probability",
+        "Supervised Learning",
+        "Unsupervised Learning",
+        "Neural Networks",
+        "Model Deployment"
+      ],
+      "image": "https://placehold.co/300x180?text=Machine+Learning",
+      "stats": { "likes": 1800, "shares": 623, "comments": 198, "enrolled": 890 },
+      "avatarColors": ["#8B5CF6", "#EF4444"]
+    },
+    {
+      "id": "data-science",
+      "title": "Data Science Mastery",
+      "description": "Complete guide to data analysis, visualization, and insights",
+      "mentor": "Dr. Emily Rodriguez",
+      "duration": "24 hours",
+      "level": "Beginner to Advanced",
+      "price": "Free",
+      "modules": [
+        "Data Collection & Cleaning",
+        "Exploratory Data Analysis",
+        "Statistical Analysis",
+        "Data Visualization",
+        "Predictive Modeling",
+        "Business Intelligence"
+      ],
+      "image": "https://placehold.co/300x180?text=Data+Science",
+      "stats": { "likes": 3100, "shares": 1200, "comments": 567, "enrolled": 1500 },
+      "avatarColors": ["#06B6D4", "#84CC16", "#F97316"]
+    },
+    {
+      "id": "cybersecurity",
+      "title": "Cybersecurity Essentials",
+      "description": "Learn ethical hacking, network security, and threat analysis",
+      "mentor": "Alex Thompson",
+      "duration": "16 hours",
+      "level": "Intermediate",
+      "price": "Premium",
+      "modules": [
+        "Security Fundamentals",
+        "Network Security",
+        "Ethical Hacking",
+        "Threat Analysis",
+        "Incident Response",
+        "Security Compliance"
+      ],
+      "image": "https://placehold.co/300x180?text=Cybersecurity",
+      "stats": { "likes": 1500, "shares": 445, "comments": 234, "enrolled": 670 },
+      "avatarColors": ["#DC2626", "#7C3AED"]
+    },
+    {
+      "id": "react-advanced",
+      "title": "Advanced React Patterns",
+      "description": "Master hooks, context, and advanced React concepts",
+      "mentor": "Jordan Kim",
+      "duration": "8 hours",
+      "level": "Advanced",
+      "price": "Free",
+      "modules": [
+        "Advanced Hooks",
+        "Context API",
+        "Performance Optimization",
+        "State Management"
+      ],
+      "image": "https://placehold.co/300x180?text=React+Advanced",
+      "stats": { "likes": 987, "shares": 234, "comments": 156, "enrolled": 456 },
+      "avatarColors": ["#3B82F6", "#10B981"]
+    },
+    {
+      "id": "blockchain-basics",
+      "title": "Blockchain Fundamentals",
+      "description": "Understand cryptocurrency, smart contracts, and DeFi",
+      "mentor": "Maria Santos",
+      "duration": "14 hours",
+      "level": "Beginner",
+      "price": "Premium",
+      "modules": [
+        "Blockchain Basics",
+        "Cryptocurrency",
+        "Smart Contracts",
+        "DeFi Applications"
+      ],
+      "image": "https://placehold.co/300x180?text=Blockchain+Basics",
+      "stats": { "likes": 756, "shares": 189, "comments": 98, "enrolled": 345 },
+      "avatarColors": ["#F59E0B", "#8B5CF6"]
+    }
+  ]

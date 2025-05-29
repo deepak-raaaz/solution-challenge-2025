@@ -9,6 +9,7 @@ import SaveCourseModal from './save-course-model';
 import { courseData } from './course-data';
 import Sidebar from './sidebar';
 
+
 const CourseDetails: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();

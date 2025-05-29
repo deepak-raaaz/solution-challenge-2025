@@ -1,0 +1,41 @@
+[
+    {
+      "id": "1",
+      "title": "Complete Machine Learning Bootcamp",
+      "description": "Master ML algorithms, neural networks, and real-world applications",
+      "mentor": "Dr. Sarah Chen",
+      "duration": "12 hours",
+      "type": "FREE",
+      "image": "https://placehold.co/400x225?text=Machine+Learning",
+      "mentorAvatar": "https://avatar.iran.liara.run/public/1",
+      "likes": 2400,
+      "shares": 856,
+      "comments": 342
+    },
+    {
+      "id": "2",
+      "title": "Full Stack Web Development",
+      "description": "Build modern web apps with React, Node.js, and MongoDB",
+      "mentor": "Mark Johnson",
+      "duration": "18 hours",
+      "type": "PAID",
+      "image": "https://placehold.co/400x225?text=Web+Development",
+      "mentorAvatar": "https://avatar.iran.liara.run/public/2",
+      "likes": 3100,
+      "shares": 1200,
+      "comments": 567
+    },
+    {
+      "id": "3",
+      "title": "Cybersecurity Fundamentals",
+      "description": "Learn ethical hacking, network security, and threat analysis",
+      "mentor": "Alex Rodriguez",
+      "duration": "15 hours",
+      "type": "FREE",
+      "image": "https://placehold.co/400x225?text=Cybersecurity",
+      "mentorAvatar": "https://avatar.iran.liara.run/public/3",
+      "likes": 1800,
+      "shares": 923,
+      "comments": 234
+    }
+  ]
