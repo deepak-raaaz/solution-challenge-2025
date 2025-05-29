@@ -1,0 +1,104 @@
+{
+    "courses": [
+      {
+        "id": 1,
+        "title": "Advanced JavaScript Concepts",
+        "image": "https://placehold.co/40x40?text=JS",
+        "completedModules": 8,
+        "totalModules": 12,
+        "progressColor": "#1E90FF"
+      },
+      {
+        "id": 2,
+        "title": "Machine Learning Fundamentals",
+        "image": "https://placehold.co/40x40?text=ML",
+        "completedModules": 4,
+        "totalModules": 10,
+        "progressColor": "#10B981"
+      },
+      {
+        "id": 3,
+        "title": "Data Science with Python",
+        "image": "https://placehold.co/40x40?text=DS",
+        "completedModules": 3,
+        "totalModules": 8,
+        "progressColor": "#F59E0B"
+      },
+      {
+        "id": 4,
+        "title": "React Development Mastery",
+        "image": "https://placehold.co/40x40?text=React",
+        "completedModules": 6,
+        "totalModules": 6,
+        "progressColor": "#10B981"
+      }
+    ],
+    "goals": [
+      {
+        "id": 1,
+        "title": "Complete 3 Courses",
+        "current": 2,
+        "target": 3,
+        "progressColor": "#1E90FF"
+      },
+      {
+        "id": 2,
+        "title": "Study 40 Hours",
+        "current": 32,
+        "target": 40,
+        "progressColor": "#10B981"
+      },
+      {
+        "id": 3,
+        "title": "Earn 5 Badges",
+        "current": 3,
+        "target": 5,
+        "progressColor": "#F59E0B"
+      }
+    ],
+    "achievements": [
+      {
+        "id": 1,
+        "title": "React Master",
+        "time": "2 hours ago",
+        "color": "#F59E0B"
+      },
+      {
+        "id": 2,
+        "title": "Week Warrior",
+        "time": "1 day ago",
+        "color": "#10B981"
+      },
+      {
+        "id": 3,
+        "title": "JavaScript Expert",
+        "time": "3 days ago",
+        "color": "#8B5CF6"
+      }
+    ],
+    "streak": {
+      "days": [
+        {"date": "2025-05-10", "count": 0},
+        {"date": "2025-05-11", "count": 0},
+        {"date": "2025-05-12", "count": 0},
+        {"date": "2025-05-13", "count": 1},
+        {"date": "2025-05-14", "count": 1},
+        {"date": "2025-05-15", "count": 1},
+        {"date": "2025-05-16", "count": 1},
+        {"date": "2025-05-17", "count": 0},
+        {"date": "2025-05-18", "count": 1},
+        {"date": "2025-05-19", "count": 1},
+        {"date": "2025-05-20", "count": 1},
+        {"date": "2025-05-21", "count": 1},
+        {"date": "2025-05-22", "count": 1},
+        {"date": "2025-05-23", "count": 1},
+        {"date": "2025-05-24", "count": 1},
+        {"date": "2025-05-25", "count": 1},
+        {"date": "2025-05-26", "count": 1},
+        {"date": "2025-05-27", "count": 1},
+        {"date": "2025-05-28", "count": 1},
+        {"date": "2025-05-29", "count": 2}
+      ],
+      "currentStreak": 7
+    }
+  }

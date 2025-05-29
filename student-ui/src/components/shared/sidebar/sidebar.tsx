@@ -83,9 +83,9 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <nav className="hidden lg:flex  lg:flex-col lg:w-64 h-screen bg-white border-r border-gray-200 dark:bg-gray-800/20 dark:border-gray-700 overflow-y-auto shadow-sm fixed">
+    <nav className="hidden lg:flex  lg:flex-col lg:w-64 h-screen bg-white border-r border-gray-200 dark:bg-gray-800/20 dark:border-gray-700/40 overflow-y-auto shadow-sm fixed">
       {/* Logo and app name */}
-      <div className="p-4 flex items-center border-b border-gray-200 dark:border-gray-700">
+      <div className="p-4 flex items-center border-b border-gray-200 dark:border-gray-700/40">
         <Image src="/images/eduai.png" alt="Edu Ai" width={32} height={32} />
         <span className="ml-2 text-xl font-semibold text-gray-800 dark:text-gray-200">Edu Ai</span>
       </div>
@@ -110,7 +110,7 @@ export default function Sidebar() {
 
       {/* User profile section */}
       <Link href="/profile">
-      <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+      <div className="border-t border-gray-200 dark:border-gray-700/40 p-4">
         <div className="flex items-center">
           <img
             className="h-8 w-8 rounded-full"
