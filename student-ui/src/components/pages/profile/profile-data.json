@@ -1,0 +1,192 @@
+{
+    "user": {
+      "name": "John Doe",
+      "avatar": "https://avatar.iran.liara.run/public/65",
+      "jobTitle": "Full Stack Developer",
+      "level": 12,
+      "verified": true,
+      "courses": 24,
+      "badge": 156,
+      "avgScore": "89%",
+      "rank": 15,
+      "streak": 15,
+      "socialLinks": [
+        {
+          "platform": "LinkedIn",
+          "username": "john.doe.dev",
+          "connected": true,
+          "icon": "linkedin"
+        },
+        {
+          "platform": "GitHub",
+          "username": "Not connected",
+          "connected": false,
+          "icon": "github"
+        }
+      ],
+      "personalInfo": {
+        "fullName": "John Doe",
+        "email": "john.doe@example.com",
+        "jobTitle": "Full Stack Developer",
+        "location": "San Francisco, CA",
+        "bio": "Passionate full-stack developer with 5+ years of experience in React, Node.js, and cloud technologies. Always eager to learn new technologies and share knowledge with the community."
+      },
+      "learningGoals": [
+        {
+          "title": "Master Machine Learning",
+          "description": "Complete advanced ML course by end of year",
+          "progress": 75,
+          "timeLeft": "3 months left",
+          "icon": "computer",
+          "color": "blue-600"
+        },
+        {
+          "title": "Learn Blockchain Development",
+          "description": "Build 3 DeFi applications",
+          "progress": 45,
+          "timeLeft": "6 months left",
+          "icon": "link",
+          "color": "green-600"
+        },
+        {
+          "title": "Cybersecurity Certification",
+          "description": "Obtain CISSP certification",
+          "progress": 20,
+          "timeLeft": "12 months left",
+          "icon": "lock",
+          "color": "purple-600"
+        }
+      ],
+      "recentActivity": [
+        {
+          "description": "Completed 'Advanced React Patterns' course",
+          "time": "2 hours ago",
+          "icon": "check",
+          "color": "green-600"
+        },
+        {
+          "description": "Earned 'React Master' badge",
+          "time": "1 day ago",
+          "icon": "star",
+          "color": "blue-600"
+        },
+        {
+          "description": "Posted in 'Machine Learning' discussion",
+          "time": "2 days ago",
+          "icon": "chat",
+          "color": "purple-600"
+        }
+      ],
+      "skillLevels": [
+        {
+          "skill": "JavaScript",
+          "level": "Advanced",
+          "progress": 85,
+          "color": "green-600"
+        },
+        {
+          "skill": "React",
+          "level": "Advanced",
+          "progress": 90,
+          "color": "green-600"
+        },
+        {
+          "skill": "Machine Learning",
+          "level": "Intermediate",
+          "progress": 65,
+          "color": "blue-600"
+        },
+        {
+          "skill": "Blockchain",
+          "level": "Beginner",
+          "progress": 35,
+          "color": "yellow-600"
+        },
+        {
+          "skill": "Cybersecurity",
+          "level": "Beginner",
+          "progress": 25,
+          "color": "red-600"
+        }
+      ],
+      "studyTime": {
+        "totalHours": "42h",
+        "activeDays": 18,
+        "dailyAverage": "2.3h"
+      },
+      "badges": [
+        {
+          "title": "First Course",
+          "description": "Completed your first course",
+          "icon": "star",
+          "color": "yellow-600"
+        },
+        {
+          "title": "Streak Master",
+          "description": "15-day learning streak",
+          "icon": "flame",
+          "color": "green-600"
+        },
+        {
+          "title": "React Master",
+          "description": "Mastered React framework",
+          "icon": "code",
+          "color": "blue-600"
+        },
+        {
+          "title": "Community Helper",
+          "description": "Helped 50+ learners",
+          "icon": "users",
+          "color": "purple-600"
+        }
+      ],
+      "certificates": [
+        {
+          "title": "React Developer Certification",
+          "issuer": "SkillForge AI",
+          "date": "Dec 2023",
+          "color": "blue-600"
+        },
+        {
+          "title": "JavaScript Fundamentals",
+          "issuer": "SkillForge AI",
+          "date": "Nov 2023",
+          "color": "green-600"
+        }
+      ],
+      "rankings": [
+        {
+          "category": "Global Rank",
+          "rank": 15,
+          "color": "yellow-600"
+        },
+        {
+          "category": "Web Development",
+          "rank": 3,
+          "color": "blue-600"
+        },
+        {
+          "category": "Community Helper",
+          "rank": 8,
+          "color": "green-600"
+        }
+      ],
+      "preferences": {
+        "learningStyle": "Visual (Videos & Diagrams)",
+        "difficulty": "Intermediate",
+        "dailyStudyGoal": 120,
+        "languages": ["English"],
+        "notifications": {
+          "courseUpdates": true,
+          "studyReminders": true,
+          "communityActivity": false,
+          "achievements": true
+        },
+        "privacy": {
+          "publicProfile": true,
+          "showProgress": true,
+          "leaderboardParticipation": true
+        }
+      }
+    }
+  }
