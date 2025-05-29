@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
@@ -24,8 +24,7 @@ interface Platform {
 
 const Personalize: React.FC = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const selectedTopic = useSelector((state: RootState) => state.localStorage.query) || searchParams.get("topic") || "Build a Machine Learning Course";
+  const selectedTopic = useSelector((state: RootState) => state.localStorage.query) || "Build a Machine Learning Course";
   
   const [topics, setTopics] = useState<Topic[]>([
     { name: "Python Fundamentals", level: "Beginner", checked: true },
