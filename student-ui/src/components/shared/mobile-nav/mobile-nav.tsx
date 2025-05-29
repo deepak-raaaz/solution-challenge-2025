@@ -15,11 +15,11 @@ const MobileNav = () => {
             href: '/generate',
             label: 'Generate',
             icon: (
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-              </svg>
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
             ),
-          },
+        },
         {
             href: '/dashboard',
             label: 'Dashboard',
@@ -48,8 +48,8 @@ const MobileNav = () => {
             ),
         },
         {
-            href: '/learning-communities',
-            label: 'Discussion Groups',
+            href: '/community',
+            label: 'Community',
             icon: (
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
@@ -131,11 +131,11 @@ const MobileNav = () => {
                         <span className="ml-2 text-xl font-semibold text-gray-800 dark:text-gray-200">Edu Ai</span>
                     </div>
                     <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="p-2 rounded-lg hover:bg-muted transition-colors"
-                >
-                    {isOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="p-2 rounded-lg hover:bg-muted transition-colors"
+                    >
+                        {isOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
                 </div>
                 <div className="flex-1 p-6">
                     <nav className="space-y-2">
