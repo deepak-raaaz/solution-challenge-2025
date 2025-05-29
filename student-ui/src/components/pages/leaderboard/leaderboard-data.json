@@ -1,0 +1,130 @@
+{
+    "categories": [
+      "global",
+      "web-dev",
+      "ml",
+      "blockchain",
+      "data-science",
+      "cybersecurity"
+    ],
+    "users": [
+      {
+        "rank": 1,
+        "name": "Alex Rodriguez",
+        "avatar": "https://avatar.iran.liara.run/public/72",
+        "xp": 15890,
+        "badges": 32,
+        "streak": 25,
+        "level": 20,
+        "location": "London, UK",
+        "isCurrentUser": false
+      },
+      {
+        "rank": 2,
+        "name": "Sarah Chen",
+        "avatar": "https://avatar.iran.liara.run/public/70",
+        "xp": 12450,
+        "badges": 24,
+        "streak": 18,
+        "level": 18,
+        "location": "Shanghai, China",
+        "isCurrentUser": false
+      },
+      {
+        "rank": 3,
+        "name": "Emma Wilson",
+        "avatar": "https://avatar.iran.liara.run/public/75",
+        "xp": 11230,
+        "badges": 18,
+        "streak": 15,
+        "level": 17,
+        "location": "Sydney, Australia",
+        "isCurrentUser": false
+      },
+      {
+        "rank": 4,
+        "name": "Michael Zhang",
+        "avatar": "https://avatar.iran.liara.run/public/78",
+        "xp": 10890,
+        "badges": 15,
+        "streak": 12,
+        "level": 18,
+        "location": "San Francisco, CA",
+        "isCurrentUser": false
+      },
+      {
+        "rank": 5,
+        "name": "Lisa Johnson",
+        "avatar": "https://avatar.iran.liara.run/public/80",
+        "xp": 10234,
+        "badges": 13,
+        "streak": 8,
+        "level": 17,
+        "location": "New York, NY",
+        "isCurrentUser": false
+      },
+      {
+        "rank": 15,
+        "name": "John Doe",
+        "avatar": "https://avatar.iran.liara.run/public/65",
+        "xp": 7890,
+        "badges": 9,
+        "streak": 15,
+        "level": 12,
+        "location": "San Francisco, CA",
+        "isCurrentUser": true
+      },
+      {
+        "rank": 16,
+        "name": "David Park",
+        "avatar": "https://avatar.iran.liara.run/public/85",
+        "xp": 7654,
+        "badges": 8,
+        "streak": 5,
+        "level": 11,
+        "location": "Seoul, South Korea",
+        "isCurrentUser": false
+      }
+    ],
+    "currentUser": {
+      "rank": 15,
+      "xp": 7890,
+      "weeklyXp": 450,
+      "rankChange": 3,
+      "levelProgress": {
+        "current": 650,
+        "total": 1000,
+        "level": 12
+      },
+      "weeklyChallenge": {
+        "completed": 3,
+        "total": 5,
+        "reward": 500
+      },
+      "achievements": [
+        {
+          "title": "Streak Master",
+          "description": "15-day learning streak",
+          "icon": "flame",
+          "color": "yellow-600"
+        },
+        {
+          "title": "React Expert",
+          "description": "Completed advanced React course",
+          "icon": "code",
+          "color": "blue-600"
+        },
+        {
+          "title": "Community Helper",
+          "description": "Helped 25+ learners",
+          "icon": "users",
+          "color": "purple-600"
+        }
+      ],
+      "regionalRankings": [
+        { "region": "United States", "rank": 8, "flag": "🇺🇸" },
+        { "region": "North America", "rank": 12, "flag": "🌎" },
+        { "region": "San Francisco", "rank": 3, "flag": "🏙️" }
+      ]
+    }
+  }
