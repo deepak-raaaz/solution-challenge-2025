@@ -1,10 +1,26 @@
 import React from 'react';
-import { courseData } from './course-data';
-import { ChatBubbleLeftRightIcon, ChatBubbleOvalLeftIcon, UserIcon } from '@heroicons/react/20/solid';
-import { Cog6ToothIcon } from '@heroicons/react/20/solid';
+import { ChatBubbleLeftRightIcon, ChatBubbleOvalLeftIcon, UserIcon, Cog6ToothIcon } from '@heroicons/react/20/solid';
 
 interface SidebarProps {
-  data: typeof courseData;
+  data: {
+    title: string;
+    moduleIds: {
+      _id: string;
+      title: string;
+      description: string;
+      lessonIds: {
+        _id: string;
+        title: string;
+        description: string;
+        resourceIds: {
+          _id: string;
+          type: string;
+          title: string;
+          url: string;
+        }[];
+      }[];
+    }[];
+  };
   onSectionNavigation: (section: string) => void;
 }
 
@@ -23,16 +39,40 @@ const Sidebar: React.FC<SidebarProps> = ({ data, onSectionNavigation }) => {
     }
   };
 
+  // Mock data for mentor tips, progress stats, and quick actions
+  const mentorTips = [
+    { title: 'Start with Basics', description: 'Focus on understanding core concepts before diving into advanced topics.', color: 'blue' },
+    { title: 'Practice Regularly', description: 'Apply what you learn through practical exercises.', color: 'green' },
+  ];
+
+  const progressStats = [
+    { label: 'Lessons Completed', value: '0%', color: 'blue' },
+    { label: 'Modules Completed', value: '0%', color: 'green' },
+  ];
+
+  const quickActions = [
+    { label: 'Ask AI Mentor', section: 'mentor', icon: 'chat' },
+    { label: 'View Profile', section: 'profile', icon: 'user' },
+  ];
+
+  const resources = data.moduleIds.flatMap((module) =>
+    module.lessonIds.flatMap((lesson) =>
+      lesson.resourceIds.map((resource) => ({
+        title: resource.title,
+        description: resource.type === 'youtube' ? `Video from ${resource.url}` : `Article from ${resource.url}`,
+      }))
+    )
+  );
+
   return (
     <div className="space-y-6">
-      {/* AI Mentor */}
       <div className="bg-gray-800/20 border border-gray-700/40 rounded-lg p-6">
         <h3 className="text-lg font-bold text-white mb-4 flex items-center">
           <Cog6ToothIcon className="w-5 h-5 mr-2 text-blue-400" />
           AI Mentor
         </h3>
         <div className="space-y-3">
-          {data.mentorTips.map((tip) => (
+          {mentorTips.map((tip) => (
             <div
               key={tip.title}
               className={`p-3 bg-${tip.color}-900 bg-opacity-30 border border-${tip.color}-700 rounded-lg`}
@@ -44,11 +84,10 @@ const Sidebar: React.FC<SidebarProps> = ({ data, onSectionNavigation }) => {
         </div>
       </div>
 
-      {/* Progress Stats */}
       <div className="bg-gray-800/20 border border-gray-700/40 rounded-lg p-6">
         <h3 className="text-lg font-bold text-white mb-4">Your Progress</h3>
         <div className="space-y-4">
-          {data.progressStats.map((stat) => (
+          {progressStats.map((stat) => (
             <div key={stat.label}>
               <div className="flex justify-between mb-2">
                 <span className="text-gray-300">{stat.label}</span>
@@ -65,11 +104,10 @@ const Sidebar: React.FC<SidebarProps> = ({ data, onSectionNavigation }) => {
         </div>
       </div>
 
-      {/* Quick Actions */}
       <div className="bg-gray-800/20 border border-gray-700/40 rounded-lg p-6">
         <h3 className="text-lg font-bold text-white mb-4">Quick Actions</h3>
         <div className="space-y-3">
-          {data.quickActions.map((action) => (
+          {quickActions.map((action) => (
             <button
               key={action.label}
               onClick={() => onSectionNavigation(action.section)}
@@ -82,13 +120,12 @@ const Sidebar: React.FC<SidebarProps> = ({ data, onSectionNavigation }) => {
         </div>
       </div>
 
-      {/* Course Resources */}
       <div className="bg-gray-800/20 border border-gray-700/40 rounded-lg p-6">
         <h3 className="text-lg font-bold text-white mb-4">Course Resources</h3>
         <div className="space-y-3">
-          {data.resources.map((resource) => (
+          {resources.map((resource,index) => (
             <a
-              key={resource.title}
+              key={resource.title + index }
               href="#"
               className="block p-3 bg-gray-700/20 hover:bg-gray-600/30 rounded-lg transition-colors duration-200"
             >

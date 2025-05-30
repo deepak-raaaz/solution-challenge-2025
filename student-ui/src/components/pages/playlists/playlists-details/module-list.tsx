@@ -3,30 +3,35 @@ import React, { useState } from 'react';
 import LessonCard from './lesson-card';
 
 interface Module {
-  id: string;
+  _id: string;
   title: string;
   description: string;
-  lessons: {
-    id: string;
+  lessonIds: {
+    _id: string;
     title: string;
-    duration: string;
-    progress: number;
-    enabled: boolean;
-    resources: {
+    description: string;
+    duration: number;
+    resourceIds: {
+      _id: string;
       type: string;
       title: string;
-      section: string;
-      enabled: boolean;
-      color: string;
+      url: string;
+      sentiment: {
+        score: string;
+        message: string;
+      };
+      metadata: {
+        channel?: string;
+        source?: string;
+      };
     }[];
+    status: string;
   }[];
-  duration: string;
   status: string;
-  enabled: boolean;
 }
 
 interface ModuleListProps {
-  modules:any;
+  modules: Module[];
   onSectionNavigation: (section: string) => void;
 }
 
@@ -43,25 +48,23 @@ const ModuleList: React.FC<ModuleListProps> = ({ modules, onSectionNavigation })
 
   return (
     <div className="space-y-6 max-md:space-y-3">
-      {modules.map((module:any) => (
+      {modules.map((module, index) => (
         <div
-          key={module.id}
-          className={`bg-gray-800/20 border border-gray-700/40 rounded-lg overflow-hidden ${!module.enabled ? 'opacity-75' : ''}`}
+          key={module._id}
+          className={`bg-gray-800/20 border border-gray-700/40 rounded-lg overflow-hidden ${module.status !== 'draft' ? '' : 'opacity-75'}`}
         >
           <button
-            onClick={() => module.enabled && toggleModule(module.id)}
+            onClick={() => module.status !== 'draft' && toggleModule(module._id)}
             className="w-full p-6 text-left hover:bg-gray-700/30 transition-colors duration-200 disabled:cursor-not-allowed"
-            disabled={!module.enabled}
+            disabled={module.status === 'draft'}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 `}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center mr-4`}
                 >
-                  {module.enabled ? (
-                    <span className="text-white font-bold">
-                      {modules.indexOf(module) + 1}
-                    </span>
+                  {module.status !== 'draft' ? (
+                    <span className="text-white font-bold">{index + 1}</span>
                   ) : (
                     <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                       <path
@@ -74,40 +77,50 @@ const ModuleList: React.FC<ModuleListProps> = ({ modules, onSectionNavigation })
                 </div>
                 <div>
                   <h3
-                    className={`text-xl font-bold ${module.enabled ? 'text-white' : 'text-gray-400'}`}
+                    className={`text-xl font-bold ${module.status !== 'draft' ? 'text-white' : 'text-gray-400'}`}
                   >
                     {module.title}
                   </h3>
-                  <p className={`text-sm ${module.enabled ? 'text-gray-400' : 'text-gray-500'}`}>
+                  <p className={`text-sm ${module.status !== 'draft' ? 'text-gray-400' : 'text-gray-500'}`}>
                     {module.description}
                   </p>
                 </div>
               </div>
               <div className="flex items-center">
                 <div className="text-right mr-4">
-                  <div className={`text-sm ${module.enabled ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {module.duration}
+                  <div className={`text-sm ${module.status !== 'draft' ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {(() => {
+                      const totalSeconds = module.lessonIds.reduce((total, lesson) => total + lesson.duration, 0);
+                      const totalHours = totalSeconds / 3600;
+
+                      return totalHours < 1
+                        ? `${Math.round(totalSeconds / 60)} min`
+                        : `${Math.round(totalHours * 100) / 100} hrs`;
+                    })()}
                   </div>
-                  {/* <div
-                    className={`text-sm font-semibold ${module.enabled ? 'text-green-400' : 'text-gray-500'}`}
-                  >
-                    {module.status}
-                  </div> */}
                 </div>
                 <ChevronDownIcon
-                  className={`w-6 h-6 ${module.enabled ? 'text-gray-400' : 'text-gray-500'} transform transition-transform duration-200 ${expandedModules.includes(module.id) ? 'rotate-180' : ''}`}
+                  className={`w-6 h-6 ${module.status !== 'draft' ? 'text-gray-400' : 'text-gray-500'} transform transition-transform duration-200 ${expandedModules.includes(module._id) ? 'rotate-180' : ''}`}
                 />
               </div>
             </div>
           </button>
-          {expandedModules.includes(module.id) && (
+          {expandedModules.includes(module._id) && (
             <div className="border-t border-gray-700/40">
               <div className="p-6 space-y-4 max-md:p-3 max-md:space-y-2">
-                {module.lessons.map((lesson:any,index:number) => (
+                {module.lessonIds.map((lesson, lessonIndex) => (
                   <LessonCard
-                  index={index}
-                    key={lesson.id}
-                    lesson={lesson}
+                    key={lesson._id}
+                    index={lessonIndex}
+                    lesson={{
+                      id: lesson._id,
+                      title: lesson.title,
+                      duration: lesson.duration,
+                      progress: 0,
+                      status: lesson.status,
+                      enabled: lesson.status !== 'draft',
+                      resources: lesson.resourceIds
+                    }}
                     onSectionNavigation={onSectionNavigation}
                   />
                 ))}
@@ -116,14 +129,6 @@ const ModuleList: React.FC<ModuleListProps> = ({ modules, onSectionNavigation })
           )}
         </div>
       ))}
-      {/* <div className="text-center py-8">
-        <div className="text-gray-400 mb-4">7 more modules to unlock...</div>
-        <div className="flex justify-center space-x-2">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="w-2 h-2 bg-gray-600 rounded-full"></div>
-          ))}
-        </div>
-      </div> */}
     </div>
   );
 };

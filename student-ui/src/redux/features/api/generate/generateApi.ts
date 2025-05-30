@@ -71,6 +71,22 @@ export const generateApi = apiSlice.injectEndpoints({
                     // Handle error if needed
                 }
             },
+        }),
+        getPlaylistById: builder.query({
+            query: (playlistId) => ({
+                url: `playlists/${playlistId}`,
+                method: "GET",
+                credentials: "include" as const,
+            }),
+            async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+                try {
+                    const result = await queryFulfilled;
+                    // Handle successful response if needed
+                } catch (error: any) {
+                    console.log(error);
+                    // Handle error if needed
+                }
+            },
         })
     }),
 });
@@ -79,5 +95,6 @@ export const {
     useEnhancePromptMutation,
     useGenerateTopicsMutation,
     useGenerateAssessmentMutation,
-    useGetAssessmentQuery
+    useGetAssessmentQuery,
+    useGetPlaylistByIdQuery
 } = generateApi;

@@ -5,14 +5,56 @@ import { useRouter } from 'next/navigation';
 import Header from './header';
 import CourseOverview from './course-overview';
 import ModuleList from './module-list';
-import SaveCourseModal from './save-course-model';
-import { courseData } from './course-data';
 import Sidebar from './sidebar';
+import SaveCourseModal from './save-course-model';
+import { useGetPlaylistByIdQuery } from '@/redux/features/api/generate/generateApi';
 
+interface Playlist {
+  _id: string;
+  title: string;
+  description: string;
+  tags: string[];
+  moduleIds: {
+    _id: string;
+    title: string;
+    description: string;
+    lessonIds: {
+      _id: string;
+      title: string;
+      description: string;
+      resourceIds: {
+        _id: string;
+        type: string;
+        title: string;
+        url: string;
+        sentiment: {
+          score: string;
+          message: string;
+        };
+        metadata: {
+          channel?: string;
+          source?: string;
+        };
+      }[];
+      duration: number;
+      status: string;
+    }[];
+    status: string;
+  }[];
+  status: string;
+  modules: number;
+  lessons: number;
+  duration: number;
+}
 
-const CourseDetails: React.FC = () => {
+interface CourseDetailsProps {
+  playlistId: string; // Pass playlistId as a prop
+}
+
+const CourseDetails: React.FC<CourseDetailsProps> = ({ playlistId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
+  const { data, isLoading, error } = useGetPlaylistByIdQuery(playlistId);
 
   const handleSaveCourse = () => {
     setIsModalOpen(true);
@@ -33,17 +75,22 @@ const CourseDetails: React.FC = () => {
     router.push(`/${section}`);
   };
 
+  if (isLoading) return <div className="text-center text-gray-100">Loading...</div>;
+  if (error || !data?.playlist) return <div className="text-center text-red-400">Error loading playlist</div>;
+
+  const playlist: Playlist = data.playlist;
+
   return (
     <section id="course-roadmap" className="min-h-screen text-gray-100 max-lg:py-10">
       <div className="px-6 py-12 lg:px-8 max-md:px-4">
         <div className="mx-auto max-w-7xl">
           {/* <Header onSaveCourse={handleSaveCourse} onViewDashboard={() => handleSectionNavigation('dashboard')} /> */}
-              <CourseOverview data={courseData} />
+          <CourseOverview data={playlist} />
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <div className="lg:col-span-3">
-              <ModuleList modules={courseData.modulesList} onSectionNavigation={handleSectionNavigation} />
+              <ModuleList modules={playlist.moduleIds} onSectionNavigation={handleSectionNavigation} />
             </div>
-            <Sidebar data={courseData} onSectionNavigation={handleSectionNavigation} />
+            <Sidebar data={playlist} onSectionNavigation={handleSectionNavigation} />
           </div>
         </div>
       </div>
