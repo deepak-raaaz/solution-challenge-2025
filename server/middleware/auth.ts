@@ -1,17 +1,18 @@
-import ErrorHandler from "../utlis/ErrorHandler";
+
 import Jwt, { JwtPayload } from "jsonwebtoken";
 import { redis } from "../utlis/redis";
 import { CatchAsyncError } from "./CatchAsyncError";
 import { NextFunction, Request, Response } from "express";
+import { AppError, AuthError, ValidationError } from "../utlis/ErrorHandler";
 
 
 // authenticated user
-export const isAuthenticate = CatchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+export const isAuthenticate = async (req: Request, res: Response, next: NextFunction) => {
+  try {
     const access_token = req.cookies.access_token as string;
 
     if (!access_token) {
-      return next(new ErrorHandler("please login to access the resourse", 400));
+      return next(new ValidationError("Unauthorized! Access token not found!"));
     }
 
     const decoded = Jwt.verify(
@@ -20,30 +21,35 @@ export const isAuthenticate = CatchAsyncError(
     ) as JwtPayload;
 
     if (!decoded) {
-      return next(new ErrorHandler("access token is not valid", 400));
+      return next(new AuthError("Unauthorized! Invalid access token."));
     }
 
     const user = await redis.get(decoded.id);
 
     if (!user) {
-      return next(new ErrorHandler("user not found", 400));
+      return next(new AuthError("Unauthorized! User not found!"));
     }
 
     req.user = JSON.parse(user);
-    next();
+    return next();
+  } catch (error) {
+    return res
+      .status(401)
+      .json({ message: "Unauthorized! Invalid access token." });
   }
-);
+
+}
 
 export const authorizeRoles = (...roles: string[]) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-      if (!roles.includes(req.user?.role || "")) {
-        return next(
-          new ErrorHandler(
-            `Role ${req.user?.role} is not allowed to access this resorce`,
-            403
-          )
-        );
-      }
-      next();
-    };
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!roles.includes(req.user?.role || "")) {
+      return next(
+        new AppError(
+          `Role ${req.user?.role} is not allowed to access this resorce`,
+          403
+        )
+      );
+    }
+    next();
   };
+};

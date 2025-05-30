@@ -3,12 +3,13 @@ import cookieParser from "cookie-parser";
 import express, { NextFunction, Request, Response } from "express";
 export const app = express();
 import cors from "cors";
-import { ErrorMiddleware } from "./middleware/error"; 
+import { errorMiddleware } from "./middleware/error"; 
 import { rateLimit } from "express-rate-limit";
 import userRouter from "./routes/user.route";
 import passport from "passport";
 import './config/google.strategy'
 import { accessTokenOptions,refreshTokenOptions } from "./utlis/jwt";
+import promptRouter from "./routes/prompt.router";
 
 app.use(express.json({ limit: "50mb" }));
 
@@ -32,6 +33,7 @@ const limiter = rateLimit({
 });
 
 app.use("/api/v1", userRouter);
+app.use("/api/v1", promptRouter)
 
 
 //google auth route
@@ -70,4 +72,4 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
 
 // middleware calls
 app.use(limiter);
-app.use(ErrorMiddleware);
+app.use(errorMiddleware);

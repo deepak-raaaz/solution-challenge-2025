@@ -38,7 +38,7 @@ export const refreshTokenOptions: ITokenOptions = {
     path: "/"
 };
 
-export const sendToken = (user: IUser, statusCode: number, res:Response) =>{
+export const sendToken = (user: any, statusCode: number, res:Response) =>{
     const accessToken = user.SignAcessToken();
     const refreshToken = user.SignRefreshToken();
 
@@ -51,9 +51,15 @@ export const sendToken = (user: IUser, statusCode: number, res:Response) =>{
     res.cookie("access_token",accessToken,accessTokenOptions);
     res.cookie("refresh_token",refreshToken,refreshTokenOptions);
 
+    const userData = {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+    }
     res.status(statusCode).json({
         success:true,
-        user,
+        userData,
         accessToken
     })
 }
