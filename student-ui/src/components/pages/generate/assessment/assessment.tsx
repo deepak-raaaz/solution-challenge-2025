@@ -1,15 +1,17 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/redux/store";
+import { setAssessment, setTestResults } from "@/redux/features/local-storage/localStorageSlice";
+import { useGetAssessmentQuery } from "@/redux/features/api/generate/generateApi";
 import { MultiStepLoader as Loader } from "@/components/ui/multi-step-loader";
 import SectionHeading from "@/components/shared/section-heading";
 import { Button } from "@/components/ui/button";
+import { RootState } from "@/redux/store";
 
 interface Question {
-  id: string;
+  type: string;
   question: string;
   options: string[];
   correctAnswer: string;
@@ -36,20 +38,16 @@ const loadingStates = [
   { text: "Finalizing—almost there!" },
 ];
 
-// Predefined test configuration (to be replaced with API later)
-const predefinedTestConfig: TestConfig = {
-  selectedSubjects: ["Python Fundamentals", "Data Preprocessing", "Supervised Learning", "Model Deployment"],
-  difficulty: "Advanced",
-  selectedQuestionTypes: ["Multiple Choice"],
-  questionCount: 5,
-  customTopics: "",
-  query: "Build a Machine Learning Course",
-};
-
 const Assessment: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const selectedTopic = useSelector((state: RootState) => state.localStorage.query) || predefinedTestConfig.query;
+  const searchParams = useSearchParams();
+  const assessmentId = searchParams.get("id");
+
+  const { assessment, query } = useSelector((state: RootState) => state.localStorage);
+  const { data: fetchedAssessment, isLoading: isFetching, isError, error } = useGetAssessmentQuery(assessmentId || "", {
+    skip: !assessmentId || !!assessment?.questions?.length, // Skip if assessmentId is missing or questions are already in state
+  });
 
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
@@ -58,77 +56,75 @@ const Assessment: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isTestComplete, setIsTestComplete] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [testConfig] = useState<TestConfig>(predefinedTestConfig);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [testConfig, setTestConfig] = useState<TestConfig>({
+    selectedSubjects: [],
+    difficulty: "Beginner",
+    selectedQuestionTypes: ["Multiple Choice"],
+    questionCount: 0,
+    customTopics: "",
+    query: query || "Build a Machine Learning Course",
+  });
 
+  // Set questions from Redux or API
   useEffect(() => {
-    // Validate configuration
-    if (testConfig.selectedSubjects.length === 0 || testConfig.selectedQuestionTypes.length === 0) {
-      setError("Invalid test configuration: Please select at least one subject and question type.");
+    if (assessment?.questions?.length) {
+      // Use questions from Redux state if available
+      setQuestions(
+        assessment.questions.map((q:any, index) => ({
+          ...q,
+          id: q.id || `${assessment.assessmentId}-${index}`, // Ensure each question has an ID
+        }))
+      );
+      setTestConfig((prev) => ({
+        ...prev,
+        questionCount: assessment.questions.length,
+      }));
       setLoading(false);
-      return;
-    }
-
-    // Simulate fetching questions based on config (replace with API call later)
-    const generateQuestions = (): Question[] => {
-      const baseQuestions: Question[] = [
-        {
-          id: "q1",
-          question: `What is a key concept in ${testConfig.query}?`,
-          options: ["Data Modeling", "Feature Engineering", "Gradient Descent", "All of the above"],
-          correctAnswer: "All of the above",
-          explanation: `These are fundamental concepts in ${testConfig.query}.`,
-        },
-        {
-          id: "q2",
-          question: `What does ${testConfig.difficulty} level entail for ${testConfig.query}?`,
-          options: ["Basic understanding", "Intermediate skills", "Advanced techniques", "None"],
-          correctAnswer: "Advanced techniques",
-          explanation: `The ${testConfig.difficulty} level focuses on advanced techniques in ${testConfig.query}.`,
-        },
-        {
-          id: "q3",
-          question: `Which technique is critical for ${testConfig.selectedSubjects[0]}?`,
-          options: ["Variable Assignment", "Data Cleaning", "Model Evaluation", "Hyperparameter Tuning"],
-          correctAnswer: "Variable Assignment",
-          explanation: `Variable Assignment is a core concept in ${testConfig.selectedSubjects[0]}.`,
-        },
-        {
-          id: "q4",
-          question: `What is the purpose of ${testConfig.selectedSubjects[1]} in ${testConfig.query}?`,
-          options: ["Improve model accuracy", "Prepare data for modeling", "Reduce training time", "Visualize data"],
-          correctAnswer: "Prepare data for modeling",
-          explanation: `${testConfig.selectedSubjects[1]} ensures data is ready for machine learning models.`,
-        },
-        {
-          id: "q5",
-          question: `Which algorithm is commonly used in ${testConfig.selectedSubjects[2]}?`,
-          options: ["K-Means", "Linear Regression", "K-Nearest Neighbors", "DBSCAN"],
-          correctAnswer: "Linear Regression",
-          explanation: `Linear Regression is a key algorithm in ${testConfig.selectedSubjects[2]}.`,
-        },
-      ];
-      return baseQuestions.slice(0, Math.min(testConfig.questionCount, baseQuestions.length));
-    };
-
-    const mockQuestions = generateQuestions();
-    if (mockQuestions.length === 0) {
-      setError("No questions available for the selected configuration.");
+    } else if (assessmentId && fetchedAssessment) {
+      // Use fetched assessment data
+      dispatch(setAssessment(fetchedAssessment));
+      setQuestions(
+        fetchedAssessment.questions.map((q:any, index:number) => ({
+          ...q,
+          id: q.id || `${fetchedAssessment.assessmentId}-${index}`,
+        }))
+      );
+      setTestConfig((prev) => ({
+        ...prev,
+        questionCount: fetchedAssessment.questions.length,
+      }));
       setLoading(false);
-      return;
+    } else if (isError) {
+      setErrorMessage(error ? JSON.stringify(error) : "Failed to fetch assessment data.");
+      setLoading(false);
+    } else if (!assessmentId) {
+      setErrorMessage("No assessment ID provided.");
+      setLoading(false);
     }
+  }, [assessment, fetchedAssessment, isError, error, assessmentId, dispatch]);
 
-    setQuestions(mockQuestions);
-    setLoading(false);
-  }, [testConfig]);
-
-  const handleAnswerSelect = useCallback((answer: string) => {
-    setSelectedAnswer(answer);
-    if (answer === questions[currentQuestion].correctAnswer) {
-      setScore((prev) => prev + 1);
+  // Update testConfig based on assessment metadata (if available)
+  useEffect(() => {
+    if (assessment?.questions?.length) {
+      setTestConfig((prev) => ({
+        ...prev,
+        selectedQuestionTypes: [...new Set(assessment.questions.map((q) => q.type))],
+        query: query || "Build a Machine Learning Course",
+      }));
     }
-    setShowExplanation(true);
-  }, [currentQuestion, questions]);
+  }, [assessment, query]);
+
+  const handleAnswerSelect = useCallback(
+    (answer: string) => {
+      setSelectedAnswer(answer);
+      if (answer === questions[currentQuestion].correctAnswer) {
+        setScore((prev) => prev + 1);
+      }
+      setShowExplanation(true);
+    },
+    [currentQuestion, questions]
+  );
 
   const handleNext = useCallback(() => {
     if (currentQuestion < questions.length - 1) {
@@ -137,15 +133,14 @@ const Assessment: React.FC = () => {
       setShowExplanation(false);
     } else {
       // Save results to Redux
-      console.log({ score, totalQuestions: questions.length, selectedTopic: testConfig.query, completedAt: new Date().toISOString() });
-    //   dispatch(
-    //     setTestResults({
-    //       score,
-    //       totalQuestions: questions.length,
-    //       selectedTopic: testConfig.query,
-    //       completedAt: new Date().toISOString(),
-    //     })
-    //   );
+      dispatch(
+        setTestResults({
+          score,
+          totalQuestions: questions.length,
+          selectedTopic: testConfig.query,
+          completedAt: new Date().toISOString(),
+        })
+      );
       setIsTestComplete(true);
     }
   }, [currentQuestion, questions, score, testConfig.query, dispatch]);
@@ -161,14 +156,14 @@ const Assessment: React.FC = () => {
   const handleProceed = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
-      router.push("/playlists/id");
+      router.push(`/playlists/${assessmentId}`); // Use assessmentId in the URL
     }, 2000);
-  }, [router]);
+  }, [router, assessmentId]);
 
-  if (loading) {
+  if (loading || isFetching) {
     return (
-      <div className="w-full h-[60vh] flex items-center justify-center max-lg:py-20 ">
-        <Loader loadingStates={loadingStates} loading={loading} duration={700} />
+      <div className="w-full h-[60vh] flex items-center justify-center max-lg:py-20">
+        <Loader loadingStates={loadingStates} loading={true} duration={700} />
         <Button
           onClick={() => router.push("/generate")}
           className="mt-4 bg-gray-800 text-blue-400 border border-blue-500/50 hover:bg-gray-700"
@@ -180,13 +175,13 @@ const Assessment: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (errorMessage) {
     return (
-      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-lg:py-20 ">
+      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-lg:py-20">
         <div className="max-w-3xl mx-auto text-center">
           <SectionHeading
             title="Error"
-            subtitle={error}
+            subtitle={errorMessage}
             className="text-center"
             headingClassName="text-2xl md:text-3xl lg:text-4xl text-gray-200"
             subheadingClassName="text-lg text-gray-400"
@@ -205,7 +200,7 @@ const Assessment: React.FC = () => {
 
   if (isTestComplete) {
     return (
-      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-lg:py-20 ">
+      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-lg:py-20">
         <div className="max-w-3xl mx-auto">
           <SectionHeading
             title="Test Completed!"
@@ -253,7 +248,7 @@ const Assessment: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-lg:py-20 ">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-lg:py-20">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -261,7 +256,6 @@ const Assessment: React.FC = () => {
             title="Skill Assessment"
             subtitle={`Let's evaluate your current knowledge to personalize your learning path`}
             className="text-center"
-            
           />
         </div>
 
@@ -300,8 +294,8 @@ const Assessment: React.FC = () => {
                       ? option === questions[currentQuestion].correctAnswer
                         ? "border-green-500 bg-green-900/30"
                         : selectedAnswer === option
-                        ? "border-red-500 bg-red-900/30"
-                        : "border-gray-700"
+                          ? "border-red-500 bg-red-900/30"
+                          : "border-gray-700"
                       : "border-gray-700 hover:border-blue-500"
                   } disabled:cursor-not-allowed`}
                   aria-label={`Select answer: ${option}`}

@@ -9,7 +9,7 @@ export const store = configureStore({
   reducer: {
     [apiSlice.reducerPath]: apiSlice.reducer,
     auth: authSlice,
-    localStorage: localStorageSlice
+    localStorage: localStorageSlice,
   },
   devTools: false,
   middleware: (getDefaultMiddleware: any) =>

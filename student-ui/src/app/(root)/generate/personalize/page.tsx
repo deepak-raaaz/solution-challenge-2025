@@ -1,21 +1,28 @@
 "use client";
 import Personalized from "@/components/pages/generate/personalize/personalize";
-import React from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 
 
 const Page: React.FC = () => {
-  const {query} = useSelector((state:any) => state.localStorage); // Retrieve query from Redux store
+  const { query } = useSelector((state: any) => state.localStorage); // Retrieve query from Redux store
 
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!query) {
+      router.push("/generate"); 
+    }
+  }, [query, router]);
 
   return (
     <div>
-      {/* <h1>Learning Path</h1> */}
-      <Personalized/>
-      {/* {query ? (
+      {query ? (
+        <Personalized />
       ) : (
-        <p>No query provided yet.</p>
-      )} */}
+        <p>Redirecting to /generate.</p>
+      )}
     </div>
   );
 };

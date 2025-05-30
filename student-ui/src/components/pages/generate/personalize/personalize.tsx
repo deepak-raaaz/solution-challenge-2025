@@ -1,9 +1,23 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { useGenerateAssessmentMutation, useGenerateTopicsMutation } from "@/redux/features/api/generate/generateApi";
+import { MultiStepLoader as Loader } from "@/components/ui/multi-step-loader";
+
+const loadingStates = [
+  { text: "Structuring your complete guide" },
+  { text: "Sourcing expert insights" },
+  { text: "Curating the perfect playlist" },
+  { text: "Gathering top-tier resources" },
+  { text: "Verifying content quality" },
+  { text: "Organizing everything neatly" },
+  { text: "Polishing your learning package" },
+  { text: "Finalizing—almost there!" },
+];
+
 
 interface Topic {
   name: string;
@@ -24,18 +38,15 @@ interface Platform {
 
 const Personalize: React.FC = () => {
   const router = useRouter();
-  const selectedTopic = useSelector((state: RootState) => state.localStorage.query) || "Build a Machine Learning Course";
-  
-  const [topics, setTopics] = useState<Topic[]>([
-    { name: "Python Fundamentals", level: "Beginner", checked: true },
-    { name: "Data Preprocessing", level: "Intermediate", checked: true },
-    { name: "Supervised Learning", level: "Intermediate", checked: true },
-    { name: "Deep Learning", level: "Advanced", checked: false },
-    { name: "Neural Networks", level: "Advanced", checked: false },
-    { name: "Model Deployment", level: "Advanced", checked: true },
-  ]);
+  const prompt = useSelector((state: RootState) => state.localStorage.query) || "Build a Machine Learning Course";
+  console.log("Selected Topic:", prompt);
 
-  const [difficulty, setDifficulty] = useState<"Beginner" | "Intermediate" | "Advanced">("Advanced");
+  const [generateTopics, { isLoading, isError, error }] = useGenerateTopicsMutation();
+
+  const [generateAssessment, { isLoading: isLoading_generateAssessment, isError: isError__generateAssessment, error: error__generateAssessment }] = useGenerateAssessmentMutation();
+
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [difficulty, setDifficulty] = useState<"Beginner" | "Intermediate" | "Advanced">("Beginner");
   const [questionTypes, setQuestionTypes] = useState<Record<string, boolean>>({
     "Multiple Choice": true,
     "Coding Challenges": false,
@@ -51,13 +62,31 @@ const Personalize: React.FC = () => {
 
   const [platforms, setPlatforms] = useState<Platform[]>([
     { name: "YouTube", type: "Free", checked: true },
-    { name: "Coursera", type: "Paid", checked: true },
+    { name: "Coursera", type: "Paid", checked: false },
     { name: "edX", type: "Paid", checked: false },
     { name: "Udemy", type: "Paid", checked: false },
   ]);
 
   const [language, setLanguage] = useState("en");
   const [pace, setPace] = useState("moderate");
+
+  // Fetch topics on component mount
+  useEffect(() => {
+    const fetchTopics = async () => {
+      try {
+        const response = await generateTopics({ prompt }).unwrap();
+        const fetchedTopics = response.topics.map((topic: { topic: string; level: string }) => ({
+          name: topic.topic,
+          level: topic.level as "Beginner" | "Intermediate" | "Advanced",
+          checked: topic.level === "Beginner" || topic.level === "Intermediate", // Default checked for Beginner and Intermediate
+        }));
+        setTopics(fetchedTopics);
+      } catch (err) {
+        console.error("Error fetching topics:", err);
+      }
+    };
+    fetchTopics();
+  }, [prompt, generateTopics]);
 
   const handleTopicChange = useCallback((index: number) => {
     setTopics((prev) =>
@@ -84,38 +113,54 @@ const Personalize: React.FC = () => {
   const selectedTopicCount = topics.filter((t) => t.checked).length;
   const estimatedWeeks = selectedTopicCount * 2;
 
-
-  const handleTakeAssessment = useCallback(() => {
-    const courseData = {
-      selectedTopic,
-      topics: topics.filter((t) => t.checked).map((t) => ({ name: t.name, level: t.level })),
-      difficulty,
-      questionTypes: Object.entries(questionTypes)
-        .filter(([_, checked]) => checked)
-        .map(([type]) => type),
-      resources: resources.filter((r) => r.checked).map((r) => r.name),
-      platforms: platforms.filter((p) => p.checked).map((p) => ({ name: p.name, type: p.type })),
-      language,
-      pace,
-      courseSummary: {
-        selectedTopicCount,
-        estimatedDuration: `${estimatedWeeks}-${estimatedWeeks + 2} weeks`,
+  const handleTakeAssessment = useCallback(async () => {
+    try {
+      const playlistData = {
+        prompt,
+        topics: topics.filter((t) => t.checked).map((t) => ({ name: t.name, level: t.level })),
         difficulty,
+        questionsTypes: Object.entries(questionTypes)
+          .filter(([_, checked]) => checked)
+          .map(([type]) => type),
+        resources: resources.filter((r) => r.checked).map((r) => r.name),
+        platforms: platforms.filter((p) => p.checked).map((p) => ({ name: p.name, type: p.type })),
+        language,
+        pace,
         resourcesType: platforms.some((p) => p.checked && p.type === "Free") &&
           platforms.some((p) => p.checked && p.type === "Paid")
           ? "Mixed (Free + Paid)"
           : platforms.some((p) => p.checked && p.type === "Free")
-          ? "Free"
-          : "Paid",
-      },
-    };
-    
-    console.log("Course Data:", courseData);
-    router.push("/generate/assessment");
-  }, [selectedTopic, topics, difficulty, questionTypes, resources, platforms, language, pace, selectedTopicCount, router]);
+            ? "Free"
+            : "Paid",
+        estimatedDuration: `${estimatedWeeks}-${estimatedWeeks + 2} weeks`,
+      };
+
+      console.log("Course Data:", playlistData);
+      const response = await generateAssessment(playlistData).unwrap();
+      // router.push("/generate/assessment");
+      const assessmentId = response?.assessmentId || response?.id; // Adjust based on your API response structure
+
+      if (assessmentId) {
+        // Redirect to /generate/assessment with the assessment ID as a query parameter
+        router.push(`/generate/assessment?id=${assessmentId}`);
+      } else {
+        console.error("No assessment ID found in response");
+      }
+    } catch (error) {
+      console.error("Error generating assessment:", error);
+      return;
+
+    }
+
+  }, [prompt, topics, difficulty, questionTypes, resources, platforms, language, pace, selectedTopicCount, router]);
+
+
+  if (isLoading_generateAssessment) {
+    return <Loader loadingStates={loadingStates} loading={isLoading_generateAssessment} duration={700} />
+  }
 
   return (
-    <section className="min-h-screen px-4 py-12 max-lg:py-20 ">
+    <section className="min-h-screen px-4 py-12 max-lg:py-20">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -126,10 +171,13 @@ const Personalize: React.FC = () => {
             Customize your learning experience based on your goals and preferences
           </p>
           <div className="inline-flex items-center px-4 py-2 rounded-lg bg-gray-800/20 border-gray-700/40 border">
-            <span className="text-sm font-medium text-blue-500">Course Topic:</span>
-            <span className="ml-2 text-sm text-gray-200">{selectedTopic}</span>
+            <span className="text-sm font-medium text-blue-500">Prompt:</span>
+            <span className="ml-2 text-sm text-gray-200">{prompt}</span>
           </div>
         </div>
+
+
+
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column - Topic Selection */}
@@ -137,23 +185,34 @@ const Personalize: React.FC = () => {
             {/* Generated Topics */}
             <div className="p-6 rounded-xl bg-gray-800/20 border-gray-700/40 border">
               <h3 className="text-xl font-semibold text-gray-200 mb-6">Select Topics to Include</h3>
-              <div className="space-y-3">
-                {topics.map((topic, index) => (
-                  <label
-                    key={topic.name}
-                    className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-blue-500/10 transition-all"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={topic.checked}
-                      onChange={() => handleTopicChange(index)}
-                      className="w-5 h-5 rounded accent-blue-500"
-                    />
-                    <span className="ml-3 font-medium text-gray-200">{topic.name}</span>
-                    <span className="ml-auto text-sm text-blue-500">{topic.level}</span>
-                  </label>
-                ))}
-              </div>
+              {isLoading && (
+                <div className="text-center text-gray-400">Loading topics...</div>
+              )}
+              {isError && (
+                <div className="text-center text-red-500">
+                  Error fetching topics: {error ? JSON.stringify(error) : "Unknown error"}
+                </div>
+              )}
+              {!isLoading && topics.length > 0 && (
+
+                <div className="space-y-3">
+                  {topics.map((topic, index) => (
+                    <label
+                      key={topic.name}
+                      className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-blue-500/10 transition-all"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={topic.checked}
+                        onChange={() => handleTopicChange(index)}
+                        className="w-5 h-5 rounded accent-blue-500"
+                      />
+                      <span className="ml-3 font-medium text-gray-200">{topic.name}</span>
+                      <span className="ml-auto text-sm text-blue-500">{topic.level}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Assessment Options */}
@@ -170,11 +229,10 @@ const Personalize: React.FC = () => {
                       <button
                         key={level}
                         onClick={() => setDifficulty(level as "Beginner" | "Intermediate" | "Advanced")}
-                        className={`p-3 rounded-lg border-2 transition-all ${
-                          difficulty === level
-                            ? "bg-blue-500/20 border-blue-500"
-                            : "bg-gray-900 border-blue-500/30"
-                        } text-gray-200`}
+                        className={`p-3 rounded-lg border-2 transition-all ${difficulty === level
+                          ? "bg-blue-500/20 border-blue-500"
+                          : "bg-gray-900 border-blue-500/30"
+                          } text-gray-200`}
                       >
                         <div className="text-sm font-medium">{level}</div>
                         <div className="text-xs opacity-70">
@@ -258,9 +316,8 @@ const Personalize: React.FC = () => {
                           <span className="ml-2 text-sm text-gray-200">{platform.name}</span>
                         </div>
                         <span
-                          className={`text-xs px-2 py-1 rounded ${
-                            platform.type === "Free" ? "bg-blue-500" : "bg-orange-500"
-                          } text-white`}
+                          className={`text-xs px-2 py-1 rounded ${platform.type === "Free" ? "bg-blue-500" : "bg-orange-500"
+                            } text-white`}
                         >
                           {platform.type}
                         </span>
@@ -331,17 +388,18 @@ const Personalize: React.FC = () => {
                   <span>Resources:</span>
                   <span className="text-blue-500">
                     {platforms.some((p) => p.checked && p.type === "Free") &&
-                    platforms.some((p) => p.checked && p.type === "Paid")
+                      platforms.some((p) => p.checked && p.type === "Paid")
                       ? "Mixed (Free + Paid)"
                       : platforms.some((p) => p.checked && p.type === "Free")
-                      ? "Free"
-                      : "Paid"}
+                        ? "Free"
+                        : "Paid"}
                   </span>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
@@ -352,14 +410,16 @@ const Personalize: React.FC = () => {
             Back to Start
           </button>
           <button
-           onClick={handleTakeAssessment}
+            onClick={handleTakeAssessment}
             className="px-8 py-3 rounded-xl bg-blue-500 text-white font-semibold hover:scale-105 transition-all"
+            disabled={isLoading || topics.length === 0}
           >
             Take Assessment
           </button>
           <button
             onClick={() => router.push("/roadmap")}
             className="px-8 py-3 rounded-xl border-2 border-blue-500/50 text-gray-200 hover:scale-105 transition-all"
+            disabled={isLoading || topics.length === 0}
           >
             Skip Assessment
           </button>

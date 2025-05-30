@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React, { useEffect } from 'react';
 
 
@@ -135,12 +136,14 @@ export const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose 
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                            <Link href={`/playlists/${playlist.id}`} >
                             <button
-                                onClick={startPlaylist}
+                                // onClick={startPlaylist}
                                 className="px-6 py-3 rounded-lg font-medium text-white transition-colors duration-200 hover:opacity-90 bg-[#1E90FF]"
                             >
                                 Start Learning
                             </button>
+                            </Link>
                             <button
                                 onClick={joinDiscussion}
                                 className="px-6 py-3 rounded-lg font-medium border border-gray-700/40 transition-colors duration-200 hover:bg-neutral-700/50 text-[#E6E6E6]"
