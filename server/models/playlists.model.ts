@@ -52,6 +52,7 @@ export interface IPlaylist extends Document {
     playlistPersonalizationId: Types.ObjectId;
     title: string;
     description: string;
+    thumbnailUrl?: string; // Optional thumbnail URL for the playlist
     tags: string[];
     moduleIds: Types.ObjectId[]; // References to Modules
     status: 'draft' | 'published' | 'archived';
@@ -134,6 +135,7 @@ const PlaylistSchema = new Schema<IPlaylist>(
         playlistPersonalizationId: { type: Schema.Types.ObjectId, ref: 'PlaylistPersonalization', required: true, index: true },
         title: { type: String, required: true, trim: true },
         description: { type: String, required: true, trim: true },
+        thumbnailUrl: { type: String, trim: true }, // Optional thumbnail URL for the playlist
         tags: [{ type: String, trim: true }],
         moduleIds: [{ type: Schema.Types.ObjectId, ref: 'Module', index: true }],
         status: {

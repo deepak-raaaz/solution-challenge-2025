@@ -213,3 +213,83 @@ export const getPlaylistPersonalization = async (req: Request, res: Response, ne
         next(error);
     }
 }
+
+// Submit assessment answers and calculate score
+export const submitAssessment = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { assessmentId } = req.params;
+      const { userAnswers } = req.body;
+  
+      // Debug log to inspect incoming data
+      console.log('Received request:', { assessmentId, userAnswers });
+  
+      if (!assessmentId) {
+        return res.status(400).json({ error: 'Assessment ID is required' });
+      }
+  
+      if (!userAnswers || !Array.isArray(userAnswers)) {
+        return res.status(400).json({ error: 'User answers must be a non-empty array' });
+      }
+  
+      const assessment = await Assessment.findById(assessmentId).exec();
+  
+      if (!assessment) {
+        return res.status(404).json({ error: 'Assessment not found' });
+      }
+  
+      // Validate user answers length
+      if (userAnswers.length !== assessment.questions.length) {
+        return res.status(400).json({ error: 'User answers do not match the number of questions' });
+      }
+  
+      // Transform userAnswers to match IUserAnswer schema
+      const transformedUserAnswers = userAnswers.map((answer: string, index: number) => {
+        // Validate that the answer is a string and exists in the question's options
+        if (typeof answer !== 'string' || !assessment.questions[index].options.includes(answer)) {
+          throw new Error(`Invalid answer for question ${index}: ${answer}`);
+        }
+        return {
+          questionIndex: index,
+          selectedAnswer: answer,
+        };
+      });
+  
+      // Debug log to confirm transformation
+      console.log('Transformed userAnswers:', transformedUserAnswers);
+  
+      // Calculate score
+      let score = 0;
+      assessment.questions.forEach((question, index) => {
+        if (question.correctAnswer === transformedUserAnswers[index].selectedAnswer) {
+          score++;
+        }
+      });
+  
+      // Update assessment with transformed user answers and score
+      assessment.userAnswers = transformedUserAnswers;
+      assessment.isSubmitted = true;
+      assessment.score = score;
+      assessment.maxScore = assessment.questions.length; // Ensure maxScore is set
+  
+      await assessment.save();
+  
+      // Debug log to confirm saved data
+      console.log('Saved assessment:', {
+        assessmentId: assessment._id,
+        userAnswers: assessment.userAnswers,
+        score,
+        maxScore: assessment.maxScore,
+      });
+  
+      return res.status(200).json({
+        message: 'Assessment submitted successfully',
+        score,
+        maxScore: assessment.maxScore,
+        assessmentId: assessment._id,
+        playlistPersonalizationId: assessment.playlistPersonalizationId,
+      });
+    } catch (error) {
+      console.error('Error in submitAssessment:', error);
+      next(error);
+    }
+  };
