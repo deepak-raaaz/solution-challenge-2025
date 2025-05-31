@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { setAssessment, setTestResults } from "@/redux/features/local-storage/localStorageSlice";
-import { useGetAssessmentQuery } from "@/redux/features/api/generate/generateApi";
+import { useGetAssessmentQuery, useSubmitAssessmentMutation, useGeneratePlaylistMutation } from "@/redux/features/api/generate/generateApi";
 import { MultiStepLoader as Loader } from "@/components/ui/multi-step-loader";
 import SectionHeading from "@/components/shared/section-heading";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ interface Question {
   options: string[];
   correctAnswer: string;
   explanation: string;
+  id?: string;
 }
 
 interface TestConfig {
@@ -25,6 +26,11 @@ interface TestConfig {
   questionCount: number;
   customTopics: string;
   query: string;
+}
+
+interface UserAnswer {
+  questionId: string;
+  selectedAnswer: string;
 }
 
 const loadingStates = [
@@ -46,17 +52,27 @@ const Assessment: React.FC = () => {
 
   const { assessment, query } = useSelector((state: RootState) => state.localStorage);
   const { data: fetchedAssessment, isLoading: isFetching, isError, error } = useGetAssessmentQuery(assessmentId || "", {
-    skip: !assessmentId || !!assessment?.questions?.length, // Skip if assessmentId is missing or questions are already in state
+    skip: !assessmentId || !!assessment?.questions?.length,
   });
+
+  const [submitAssessment, { isLoading: isSubmitting, isError: isSubmitError, error: submitError }] = useSubmitAssessmentMutation();
+
 
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [showExplanation, setShowExplanation] = useState<boolean>(false);
   const [score, setScore] = useState<number>(0);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isTestComplete, setIsTestComplete] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [assessmentResult, setAssessmentResult] = useState<{
+    score: number;
+    maxScore: number;
+    assessmentId: string;
+    playlistPersonalizationId: string;
+  } | null>(null);
   const [testConfig, setTestConfig] = useState<TestConfig>({
     selectedSubjects: [],
     difficulty: "Beginner",
@@ -69,47 +85,43 @@ const Assessment: React.FC = () => {
   // Set questions from Redux or API
   useEffect(() => {
     if (assessment?.questions?.length) {
-      // Use questions from Redux state if available
-      setQuestions(
-        assessment.questions.map((q:any, index) => ({
-          ...q,
-          id: q.id || `${assessment.assessmentId}-${index}`, // Ensure each question has an ID
-        }))
-      );
+      const questionsWithIds = assessment.questions.map((q: any, index: number) => ({
+        ...q,
+        id: q.id || `${assessment.assessmentId}-${index}`,
+      }));
+      setQuestions(questionsWithIds);
       setTestConfig((prev) => ({
         ...prev,
-        questionCount: assessment.questions.length,
+        questionCount: questionsWithIds.length,
       }));
       setLoading(false);
     } else if (assessmentId && fetchedAssessment) {
-      // Use fetched assessment data
       dispatch(setAssessment(fetchedAssessment));
-      setQuestions(
-        fetchedAssessment.questions.map((q:any, index:number) => ({
-          ...q,
-          id: q.id || `${fetchedAssessment.assessmentId}-${index}`,
-        }))
-      );
+      const questionsWithIds = fetchedAssessment.questions.map((q: any, index: number) => ({
+        ...q,
+        id: q.id || `${fetchedAssessment.assessmentId}-${index}`,
+      }));
+      setQuestions(questionsWithIds);
       setTestConfig((prev) => ({
         ...prev,
-        questionCount: fetchedAssessment.questions.length,
+        questionCount: questionsWithIds.length,
       }));
       setLoading(false);
     } else if (isError) {
       setErrorMessage(error ? JSON.stringify(error) : "Failed to fetch assessment data.");
       setLoading(false);
     } else if (!assessmentId) {
-      setErrorMessage("No assessment ID provided.");
+      setErrorMessage("No assessment ID provided in the URL.");
       setLoading(false);
     }
   }, [assessment, fetchedAssessment, isError, error, assessmentId, dispatch]);
 
-  // Update testConfig based on assessment metadata (if available)
+  // Update testConfig based on assessment metadata
   useEffect(() => {
     if (assessment?.questions?.length) {
       setTestConfig((prev) => ({
         ...prev,
-        selectedQuestionTypes: [...new Set(assessment.questions.map((q) => q.type))],
+        selectedQuestionTypes: [...new Set(assessment.questions.map((q: any) => q.type))],
         query: query || "Build a Machine Learning Course",
       }));
     }
@@ -117,10 +129,27 @@ const Assessment: React.FC = () => {
 
   const handleAnswerSelect = useCallback(
     (answer: string) => {
+      const currentQuestionId = questions[currentQuestion]?.id;
+      if (!currentQuestionId) {
+        setErrorMessage("Question ID is missing for the current question.");
+        return;
+      }
       setSelectedAnswer(answer);
       if (answer === questions[currentQuestion].correctAnswer) {
         setScore((prev) => prev + 1);
       }
+      setUserAnswers((prev) => {
+        const existingAnswerIndex = prev.findIndex((ans) => ans.questionId === currentQuestionId);
+        if (existingAnswerIndex >= 0) {
+          const updatedAnswers = [...prev];
+          updatedAnswers[existingAnswerIndex] = { questionId: currentQuestionId, selectedAnswer: answer };
+          console.log("Updated userAnswers:", updatedAnswers); // Debug log
+          return updatedAnswers;
+        }
+        const newAnswers = [...prev, { questionId: currentQuestionId, selectedAnswer: answer }];
+        console.log("New userAnswers:", newAnswers); // Debug log
+        return newAnswers;
+      });
       setShowExplanation(true);
     },
     [currentQuestion, questions]
@@ -132,7 +161,10 @@ const Assessment: React.FC = () => {
       setSelectedAnswer("");
       setShowExplanation(false);
     } else {
-      // Save results to Redux
+      if (userAnswers.length < questions.length) {
+        setErrorMessage("Please answer all questions before finishing the test.");
+        return;
+      }
       dispatch(
         setTestResults({
           score,
@@ -143,24 +175,81 @@ const Assessment: React.FC = () => {
       );
       setIsTestComplete(true);
     }
-  }, [currentQuestion, questions, score, testConfig.query, dispatch]);
+  }, [currentQuestion, questions, score, testConfig.query, dispatch, userAnswers]);
 
   const handleRetry = useCallback(() => {
     setCurrentQuestion(0);
     setSelectedAnswer("");
     setShowExplanation(false);
     setScore(0);
+    setUserAnswers([]);
     setIsTestComplete(false);
+    setAssessmentResult(null);
+    setErrorMessage(null);
   }, []);
 
-  const handleProceed = useCallback(() => {
-    setLoading(true);
-    setTimeout(() => {
-      router.push(`/playlists/${assessmentId}`); // Use assessmentId in the URL
-    }, 2000);
-  }, [router, assessmentId]);
+  const handleProceed = useCallback(async () => {
+    if (!assessmentId) {
+      setErrorMessage("Assessment ID is missing from the URL.");
+      setLoading(false);
+      return;
+    }
 
-  if (loading || isFetching) {
+    if (!userAnswers.length || userAnswers.length < questions.length) {
+      setErrorMessage("Please answer all questions before generating the playlist.");
+      setLoading(false);
+      return;
+    }
+
+    // Transform userAnswers to match backend expectation: [string, string, ...]
+    const orderedAnswers = questions.map((q) => {
+      const answer = userAnswers.find((ua) => ua.questionId === q.id);
+      return answer ? answer.selectedAnswer : "";
+    }).filter((answer) => answer !== "");
+
+    if (orderedAnswers.length !== questions.length) {
+      setErrorMessage("Some questions are missing answers. Please complete all questions.");
+      setLoading(false);
+      return;
+    }
+
+    const payload = { userAnswers: orderedAnswers };
+    console.log("Submitting assessment with:", { assessmentId, payload }); // Debug log
+
+    setLoading(true);
+
+    try {
+      // Submit assessment
+      const submitResult = await submitAssessment({
+        assessmentId,
+        userAnswers: orderedAnswers, // Ensure the payload is structured correctly
+      }).unwrap();
+
+      setAssessmentResult({
+        score: submitResult.score,
+        maxScore: submitResult.maxScore,
+        assessmentId: submitResult.assessmentId,
+        playlistPersonalizationId: submitResult.playlistPersonalizationId,
+      });
+
+      console.log("Assessment submitted successfully:", submitResult); // Debug log
+
+      setTimeout(() => {
+        router.push(`/generate/playlist?assessment=${assessmentId}&personalization=${submitResult.playlistPersonalizationId}`);
+      }, 2000);
+
+      // Generate playlist
+
+    } catch (err: any) {
+      console.error("Error during submission or playlist generation:", err); // Debug log
+      setErrorMessage(
+        err?.data?.error || "Failed to submit assessment or generate playlist. Please try again."
+      );
+      setLoading(false);
+    }
+  }, [assessmentId, userAnswers, submitAssessment, router, questions]);
+
+  if (loading || isFetching || isSubmitting) {
     return (
       <div className="w-full h-[60vh] flex items-center justify-center max-lg:py-20">
         <Loader loadingStates={loadingStates} loading={true} duration={700} />
@@ -204,7 +293,8 @@ const Assessment: React.FC = () => {
         <div className="max-w-3xl mx-auto">
           <SectionHeading
             title="Test Completed!"
-            subtitle={`You scored ${score} out of ${questions.length} on your ${testConfig.query} test.`}
+            subtitle={`You scored ${assessmentResult?.score || score} out of ${assessmentResult?.maxScore || questions.length
+              } on your ${testConfig.query} test.`}
             className="text-center"
             headingClassName="text-2xl md:text-3xl lg:text-4xl text-gray-200"
             subheadingClassName="text-lg text-gray-400"
@@ -214,15 +304,22 @@ const Assessment: React.FC = () => {
             <div className="space-y-3 text-sm text-gray-200">
               <div className="flex justify-between">
                 <span>Correct Answers:</span>
-                <span className="text-blue-500">{score}</span>
+                <span className="text-blue-500">{assessmentResult?.score || score}</span>
               </div>
               <div className="flex justify-between">
                 <span>Incorrect Answers:</span>
-                <span className="text-blue-500">{questions.length - score}</span>
+                <span className="text-blue-500">
+                  {(assessmentResult?.maxScore || questions.length) - (assessmentResult?.score || score)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Percentage:</span>
-                <span className="text-blue-500">{((score / questions.length) * 100).toFixed(2)}%</span>
+                <span className="text-blue-500">
+                  {(
+                    ((assessmentResult?.score || score) / (assessmentResult?.maxScore || questions.length)) * 100
+                  ).toFixed(2)}
+                  %
+                </span>
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-4">
@@ -236,9 +333,10 @@ const Assessment: React.FC = () => {
               <Button
                 onClick={handleProceed}
                 className="px-6 py-2.5 bg-blue-500 text-white font-semibold hover:bg-blue-600"
-                aria-label="Proceed to Roadmap"
+                aria-label="Generate Playlist"
+                disabled={isSubmitting}
               >
-                Proceed to Course
+                Generate Playlist
               </Button>
             </div>
           </div>
@@ -250,7 +348,6 @@ const Assessment: React.FC = () => {
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-lg:py-20">
       <div className="max-w-3xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
           <SectionHeading
             title="Skill Assessment"
@@ -259,7 +356,6 @@ const Assessment: React.FC = () => {
           />
         </div>
 
-        {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between mb-2">
             <span className="text-sm text-gray-400">
@@ -277,27 +373,25 @@ const Assessment: React.FC = () => {
           </div>
         </div>
 
-        {/* Question Card */}
         <div className="bg-gray-800/20 border border-gray-700/40 backdrop-blur-sm rounded-xl p-6 shadow-lg mb-6">
           <div className="mb-6">
             <h3 className="text-lg font-medium text-gray-200 mb-4">
-              {questions[currentQuestion].question}
+              {questions[currentQuestion]?.question || "Loading question..."}
             </h3>
             <div className="space-y-3">
-              {questions[currentQuestion].options.map((option, index) => (
+              {questions[currentQuestion]?.options?.map((option, index) => (
                 <button
                   key={index}
                   onClick={() => !showExplanation && handleAnswerSelect(option)}
                   disabled={showExplanation}
-                  className={`w-full p-4 rounded-lg border text-left transition-all ${
-                    showExplanation
+                  className={`w-full p-4 rounded-lg border text-left transition-all ${showExplanation
                       ? option === questions[currentQuestion].correctAnswer
                         ? "border-green-500 bg-green-900/30"
                         : selectedAnswer === option
                           ? "border-red-500 bg-red-900/30"
                           : "border-gray-700"
                       : "border-gray-700 hover:border-blue-500"
-                  } disabled:cursor-not-allowed`}
+                    } disabled:cursor-not-allowed`}
                   aria-label={`Select answer: ${option}`}
                 >
                   <span className="text-gray-200">{option}</span>
@@ -306,7 +400,6 @@ const Assessment: React.FC = () => {
             </div>
           </div>
 
-          {/* Explanation */}
           {showExplanation && (
             <div className="mt-6 p-4 bg-blue-900/30 rounded-lg border border-blue-800">
               <h4 className="text-sm font-medium text-blue-200 mb-2">Explanation</h4>
@@ -314,7 +407,6 @@ const Assessment: React.FC = () => {
             </div>
           )}
 
-          {/* Next/Finish Button */}
           {showExplanation && (
             <div className="mt-6 flex justify-end">
               <Button
@@ -328,7 +420,6 @@ const Assessment: React.FC = () => {
           )}
         </div>
 
-        {/* Test Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div className="bg-gray-800/20 border border-gray-700/40 backdrop-blur-sm rounded-lg p-4 shadow-md">
             <h4 className="font-medium text-gray-200 mb-2">Test Configuration</h4>

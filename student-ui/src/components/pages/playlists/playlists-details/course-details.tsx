@@ -7,13 +7,15 @@ import CourseOverview from './course-overview';
 import ModuleList from './module-list';
 import Sidebar from './sidebar';
 import SaveCourseModal from './save-course-model';
-import { useGetPlaylistByIdQuery } from '@/redux/features/api/generate/generateApi';
+import { useGetPlaylistByIdQuery, usePublishPlaylistMutation } from '@/redux/features/api/generate/generateApi';
+import { toast } from 'react-toastify';
 
 interface Playlist {
   _id: string;
   title: string;
   description: string;
   tags: string[];
+  thumbnailUrl: string;
   moduleIds: {
     _id: string;
     title: string;
@@ -53,12 +55,26 @@ interface CourseDetailsProps {
 
 const CourseDetails: React.FC<CourseDetailsProps> = ({ playlistId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modulePublished, setModulePublished] = useState(true); 
   const router = useRouter();
-  const { data, isLoading, error } = useGetPlaylistByIdQuery(playlistId);
+  const { data, isLoading, error, refetch } = useGetPlaylistByIdQuery(playlistId); // Added refetch from the hook
+
+  const [publishPlaylist, { isLoading: isPublishingPlaylist }] = usePublishPlaylistMutation();
 
   const handleSaveCourse = () => {
     setIsModalOpen(true);
     document.body.style.overflow = 'hidden';
+  };
+
+  const handlePublishCourse = async () => {
+    try {
+      await publishPlaylist({ playlistId, modulePublished }).unwrap();
+      toast.success('Course published successfully!');
+      refetch(); // Refetch the playlist data after successful publish
+    } catch (error) {
+      toast.error('Failed to publish course.');
+      console.error('Error publishing course:', error);
+    }
   };
 
   const handleCloseModal = () => {
@@ -85,9 +101,9 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ playlistId }) => {
       <div className="px-6 py-12 lg:px-8 max-md:px-4">
         <div className="mx-auto max-w-7xl">
           {/* <Header onSaveCourse={handleSaveCourse} onViewDashboard={() => handleSectionNavigation('dashboard')} /> */}
-          <CourseOverview data={playlist} />
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <div className="lg:col-span-3">
+              <CourseOverview data={playlist} handlePublishCourse={handlePublishCourse} isPublishingPlaylist={isPublishingPlaylist}/>
               <ModuleList modules={playlist.moduleIds} onSectionNavigation={handleSectionNavigation} />
             </div>
             <Sidebar data={playlist} onSectionNavigation={handleSectionNavigation} />
