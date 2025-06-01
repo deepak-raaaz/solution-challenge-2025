@@ -13,6 +13,8 @@ import path from 'path';
 import fs from 'node:fs';
 import { redis } from "../utlis/redis";
 import { thumbnailGenerateRequest } from '../utlis/playlist.helper';
+import { YoutubeTranscript } from 'youtube-transcript';
+
 
 // Initialize APIs
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
@@ -40,6 +42,7 @@ interface CreatePlaylistRequest extends Request {
 interface GeneratedPlaylist {
     title: string;
     description: string;
+    overview: string;
     tags: string[];
     modules: {
         title: string;
@@ -48,8 +51,13 @@ interface GeneratedPlaylist {
             title: string;
             description: string;
             topics: string[];
+            searchPhrases: {
+                video: string[];
+                article: string[];
+            };
         }[];
     }[];
+
 }
 
 // Fetch assessment data
@@ -117,6 +125,7 @@ async function generatePlaylistStructure(
       - Create a playlist with:
         - \`title\`: A concise, relevant title based on the \`prompt\` and \`topics\`.
         - \`description\`: A detailed description summarizing the course’s goals and focus.
+        - \`overview\`: Set to an empty string ("") for now.
         - \`tags\`: An array of 3-5 relevant tags derived from \`topics\` and \`prompt\`.
         - \`modules\`: An array of modules, with the number determined by \`estimatedDuration\` and the scope of \`topics\`. Each module should have:
           - \`title\`: A clear, topic-focused title.
@@ -125,6 +134,9 @@ async function generatePlaylistStructure(
             - \`title\`: A specific, actionable title.
             - \`description\`: A concise description of the lesson’s objectives.
             - \`topics\`: An array of 1-3 specific topics covered, aligned with \`topics\` and weak areas from the assessment.
+            - \`searchPhrases\`: An object with two arrays:
+              - \`video\`: 2-3 realistic search phrases that match what users commonly type into YouTube to find relevant video content (e.g., for Machine Learning: ["machine learning tutorial", "learn ML basics", "ML for beginners"]).
+              - \`article\`: 2-3 realistic search phrases for web searches to find relevant articles or blogs (e.g., for Machine Learning: ["machine learning explained", "introduction to ML article", "ML concepts blog"]).
       - Ensure the playlist is tailored to the user’s knowledge level, prioritizing weak areas identified in \`userAnswers\`.
       - Dynamically adjust the number of modules and lessons based on the scope of \`topics\` and \`estimatedDuration\`, rather than a fixed 2-3 modules or lessons.
       - Return the result in valid JSON format, with proper nesting and no trailing commas.
@@ -133,6 +145,7 @@ async function generatePlaylistStructure(
       {
         "title": "Machine Learning Fundamentals",
         "description": "A comprehensive course covering ML concepts, tailored for beginners based on your assessment performance.",
+        "overview": "",
         "tags": ["machine learning", "data science", "python"],
         "modules": [
           {
@@ -142,12 +155,20 @@ async function generatePlaylistStructure(
               {
                 "title": "What is Machine Learning?",
                 "description": "Understand the definition and types of ML.",
-                "topics": ["ML basics", "supervised learning"]
+                "topics": ["ML basics", "supervised learning"],
+                "searchPhrases": {
+                  "video": ["machine learning tutorial", "ML basics video", "what is ML"],
+                  "article": ["machine learning explained", "introduction to ML article", "ML concepts blog"]
+                }
               },
               {
                 "title": "Setting Up Your ML Environment",
                 "description": "Install Python and necessary libraries.",
-                "topics": ["python setup", "numpy"]
+                "topics": ["python setup", "numpy"],
+                "searchPhrases": {
+                  "video": ["python ML setup tutorial", "install numpy for ML", "ML environment setup"],
+                  "article": ["python ML environment guide", "numpy setup article", "ML tools blog"]
+                }
               }
             ]
           },
@@ -158,12 +179,20 @@ async function generatePlaylistStructure(
               {
                 "title": "Linear Regression",
                 "description": "Learn how linear regression works and implement it.",
-                "topics": ["linear regression", "model evaluation"]
+                "topics": ["linear regression", "model evaluation"],
+                "searchPhrases": {
+                  "video": ["linear regression tutorial", "learn linear regression", "ML regression video"],
+                  "article": ["linear regression explained", "linear regression article", "ML regression guide"]
+                }
               },
               {
                 "title": "Classification Basics",
                 "description": "Understand classification techniques like logistic regression.",
-                "topics": ["classification", "logistic regression"]
+                "topics": ["classification", "logistic regression"],
+                "searchPhrases": {
+                  "video": ["logistic regression tutorial", "classification ML video", "learn classification"],
+                  "article": ["logistic regression guide", "classification ML article", "ML classification blog"]
+                }
               }
             ]
           }
@@ -195,15 +224,15 @@ async function analyzeSentiment(text: string): Promise<ISentiment> {
 }
 
 // Fetch YouTube videos for a lesson
-async function fetchYouTubeVideos(lessonTitle: string): Promise<IResource[]> {
+async function fetchYouTubeVideos(searchPhrases: string[]): Promise<IResource[]> {
     const cache: { [key: string]: IResource[] } = {};
-    const cacheKey = `youtube:${lessonTitle.toLowerCase()}`;
+    const cacheKey = `youtube:${searchPhrases.map(p => p.toLowerCase()).join('|')}`;
     if (cache[cacheKey]) {
-        console.log(`Returning cached videos for lesson: ${lessonTitle}`);
+        console.log(`Returning cached videos for search phrases: ${searchPhrases.join(', ')}`);
         return cache[cacheKey];
     }
 
-    const videos: IResource[] = [];
+    const videos: any[] = [];
 
     function isLikelyEnglish(text: string): boolean {
         const asciiRatio = text.replace(/[^a-zA-Z\s]/g, '').length / (text.length || 1);
@@ -214,94 +243,115 @@ async function fetchYouTubeVideos(lessonTitle: string): Promise<IResource[]> {
         return text.replace(/[^\x20-\x7E]/g, ' ').replace(/\s+/g, ' ').trim();
     }
 
-    try {
-        const response = await youtube.search.list({
-            part: ['snippet'],
-            q: `"${lessonTitle}" tutorial`,
-            type: ['video'],
-            maxResults: 10,
-            order: 'viewCount',
-            regionCode: 'IN', // Still targeting Indian region
-            videoCategoryId: '27',
-            videoDuration: 'medium',       // medium length videos
-            videoDefinition: 'high',       // HD videos only
-            videoEmbeddable: 'true',       // embeddable videos
-            videoSyndicated: 'true',       // playable outside YouTube
-            publishedAfter: '2023-01-01T00:00:00Z', // recent videos from 2023
-        });
+    // Sentiment analysis using comments only
+    async function analyzeSentiment(text: string): Promise<ISentiment> {
+        try {
+            const response = await axios.post(
+                'https://language.googleapis.com/v1/documents:analyzeSentiment',
+                { document: { type: 'PLAIN_TEXT', content: text } },
+                { params: { key: process.env.GOOGLE_CLOUD_API_KEY } }
+            );
+            return {
+                score: response.data.documentSentiment.score.toString(),
+                message: response.data.documentSentiment.score > 0 ? 'positive' : response.data.documentSentiment.score < 0 ? 'negative' : 'neutral',
+            };
+        } catch (error) {
+            console.error('Sentiment analysis failed:', error);
+            return { score: '0', message: 'Sentiment analysis failed' };
+        }
+    }
 
+    try {
         const videoCandidates: { item: youtube_v3.Schema$SearchResult, stats: youtube_v3.Schema$Video }[] = [];
 
-        for (const item of response.data.items || []) {
-            if (!item.id?.videoId) continue;
-
-            const videoDetails = await youtube.videos.list({
-                part: ['contentDetails', 'statistics', 'snippet'],
-                id: [item.id.videoId],
+        // Fetch videos for each search phrase
+        for (const phrase of searchPhrases.slice(0, 3)) { // Limit to 3 phrases
+            const response = await youtube.search.list({
+                part: ['snippet'],
+                q: `"${phrase}"`, // Exact phrase search
+                type: ['video'],
+                maxResults: 10, // Fetch 10 per phrase
+                order: 'relevance',
+                regionCode: 'IN',
+                videoCategoryId: '27', // Education
+                videoDuration: 'medium', // 4-20 minutes
+                videoDefinition: 'high',
+                videoEmbeddable: 'true',
+                videoSyndicated: 'true',
+                publishedAfter: '2023-01-01T00:00:00Z',
             });
 
-            const video = videoDetails.data.items?.[0];
-            if (!video) continue;
+            const videoIds = (response.data.items || [])
+                .filter(item => item.id?.videoId)
+                .map(item => item.id!.videoId!);
 
-            const durationIso = video.contentDetails?.duration || 'PT0S';
-            const durationMatch = durationIso.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-            const hours = durationMatch && durationMatch[1] ? parseInt(durationMatch[1]) * 3600 : 0;
-            const minutes = durationMatch && durationMatch[2] ? parseInt(durationMatch[2]) * 60 : 0;
-            const seconds = durationMatch && durationMatch[3] ? parseInt(durationMatch[3]) : 0;
-            const durationSeconds = hours + minutes + seconds;
-
-            if (durationSeconds < 300) continue;
-
-            const title = (video.snippet?.title || '').toLowerCase();
-            const description = (video.snippet?.description || '').toLowerCase();
-            const tags = (video.snippet?.tags || []).map(tag => tag.toLowerCase());
-            const lessonLower = lessonTitle.toLowerCase();
-            const titleWords = lessonLower.split(/\s+/);
-
-            const hasRelevance = titleWords.some(word =>
-                title.includes(word) || description.includes(word) || tags.includes(word)
-            );
-
-            if (!hasRelevance) {
-                console.log(`Skipping video ${item.id.videoId} due to low relevance`);
+            if (videoIds.length === 0) {
+                console.log(`No videos found for phrase: ${phrase}`);
                 continue;
             }
 
-            if (!isLikelyEnglish(title) || !isLikelyEnglish(description)) {
-                console.log(`Skipping video ${item.id.videoId} due to non-English content`);
-                continue;
+            // Batch fetch video details
+            const videoDetails = await youtube.videos.list({
+                part: ['contentDetails', 'statistics', 'snippet'],
+                id: videoIds,
+            });
+
+            for (const video of videoDetails.data.items || []) {
+                const item = response.data.items?.find(i => i.id?.videoId === video.id);
+                if (!item || !video.id) continue;
+
+                const durationIso = video.contentDetails?.duration || 'PT0S';
+                const durationMatch = durationIso.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+                const hours = durationMatch && durationMatch[1] ? parseInt(durationMatch[1]) * 3600 : 0;
+                const minutes = durationMatch && durationMatch[2] ? parseInt(durationMatch[2]) * 60 : 0;
+                const seconds = durationMatch && durationMatch[3] ? parseInt(durationMatch[3]) : 0;
+                const durationSeconds = hours + minutes + seconds;
+
+                if (durationSeconds < 300) continue;
+
+                const title = (video.snippet?.title || '').toLowerCase();
+                if (!isLikelyEnglish(title)) {
+                    console.log(`Skipping video ${video.id} due to non-English content`);
+                    continue;
+                }
+
+                videoCandidates.push({ item, stats: video });
             }
-
-            // Removed non-Indian channel filter
-
-            videoCandidates.push({ item, stats: video });
         }
 
+        // Rank videos
         videoCandidates.sort((a, b) => {
             const aViews = parseInt(a.stats.statistics?.viewCount || '0');
             const aLikes = parseInt(a.stats.statistics?.likeCount || '0');
+            const aComments = parseInt(a.stats.statistics?.commentCount || '0');
             const aDate = new Date(a.stats.snippet?.publishedAt || 0).getTime();
+            const aLikeToViewRatio = aViews > 0 ? aLikes / aViews : 0;
 
             const bViews = parseInt(b.stats.statistics?.viewCount || '0');
             const bLikes = parseInt(b.stats.statistics?.likeCount || '0');
+            const bComments = parseInt(b.stats.statistics?.commentCount || '0');
             const bDate = new Date(b.stats.snippet?.publishedAt || 0).getTime();
+            const bLikeToViewRatio = bViews > 0 ? bLikes / bViews : 0;
 
-            const aScore = aViews + aLikes * 2 + (aDate / (1000 * 60 * 60 * 24)) * 100;
-            const bScore = bViews + bLikes * 2 + (bDate / (1000 * 60 * 60 * 24)) * 100;
+            // Weighted score: 40% views, 30% like-to-view ratio, 20% comments, 10% recency
+            const aScore = (aViews * 0.4) + (aLikeToViewRatio * 1000 * 0.3) + (aComments * 0.2) + (aDate / (1000 * 60 * 60 * 24) * 0.1);
+            const bScore = (bViews * 0.4) + (bLikeToViewRatio * 1000 * 0.3) + (bComments * 0.2) + (bDate / (1000 * 60 * 60 * 24) * 0.1);
 
             return bScore - aScore;
         });
 
+        // Process up to 2 videos
         for (const candidate of videoCandidates.slice(0, 2)) {
             const item = candidate.item;
             const stats = candidate.stats;
             if (!item.id?.videoId) continue;
 
             const resourceId = `youtube_${item.id.videoId}`;
-            const existingResource = await Resource.findOne({ resourceId });
-            if (existingResource) {
-                console.log(`Resource with ID ${resourceId} already exists, using existing resource`);
-                videos.push(existingResource);
+            let resource = await Resource.findOne({ resourceId });
+
+            if (resource) {
+                console.log(`Reusing existing resource with ID ${resourceId}`);
+                videos.push(resource);
                 continue;
             }
 
@@ -324,50 +374,54 @@ async function fetchYouTubeVideos(lessonTitle: string): Promise<IResource[]> {
                     const commentsResponse = await youtube.commentThreads.list({
                         part: ['snippet'],
                         videoId: item.id.videoId,
-                        maxResults: 10,
+                        maxResults: 20,
+                        textFormat: 'plainText',
                     });
 
                     const comments = commentsResponse.data.items?.map(
                         (item) => item.snippet?.topLevelComment?.snippet?.textDisplay || ''
                     ) || [];
 
-                    if (comments.length) {
-                        const cleanedComments = cleanTextForSentiment(comments.join(' '));
-                        if (cleanedComments) {
-                            sentiment = await analyzeSentiment(cleanedComments);
-                        } else {
-                            sentiment = { score: '0', message: 'No valid text for sentiment analysis' };
-                        }
+                    const textForAnalysis = cleanTextForSentiment(comments.join(' '));
+                    if (textForAnalysis) {
+                        sentiment = await analyzeSentiment(textForAnalysis);
+                    } else {
+                        sentiment = { score: '0', message: 'No valid comments for sentiment analysis' };
                     }
                     await redis.setex(sentimentKey, 30 * 24 * 60 * 60, JSON.stringify(sentiment));
                 } catch (error: any) {
                     if (error?.response?.data?.error?.message?.includes('disabled comments')) {
                         sentiment = { score: '0', message: 'Comments disabled' };
                     } else {
+                        console.error('Sentiment analysis error:', error);
                         sentiment = { score: '0', message: 'Sentiment analysis failed' };
                     }
                     await redis.setex(sentimentKey, 30 * 24 * 60 * 60, JSON.stringify(sentiment));
                 }
             }
 
-            videos.push({
+            resource = {
                 resourceId,
                 type: 'youtube',
                 title: item.snippet?.title || 'Untitled Video',
                 url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
-                thumbnailUrl: item.snippet?.thumbnails?.default?.url || '',
+                thumbnailUrl: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.default?.url || '',
                 sentiment,
-                lessonId: null,
-                createdAt: new Date(),
-                updatedAt: new Date(),
+                lessonId: null as any, // Caller will set lessonId
+                commentsEnabled: true,
                 metadata: {
                     channel: item.snippet?.channelTitle || '',
                     duration: durationSeconds,
                     views: parseInt(stats.statistics?.viewCount || '0'),
                     likes: parseInt(stats.statistics?.likeCount || '0'),
+                    commentCount: parseInt(stats.statistics?.commentCount || '0'),
                     publishedAt: stats.snippet?.publishedAt || new Date().toISOString(),
                 },
-            } as any);
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            } as any;
+
+            videos.push(resource);
         }
     } catch (error: any) {
         if (error.code === 403 && error.message.includes('quota')) {
@@ -384,12 +438,12 @@ async function fetchYouTubeVideos(lessonTitle: string): Promise<IResource[]> {
 
 
 // Fetch articles using Google Custom Search API
-async function fetchArticles(lessonTitle: string): Promise<IResource[]> {
+async function fetchArticles(searchPhrases: string): Promise<IResource[]> {
     // In-memory cache (replace with Redis if needed)
     const cache: { [key: string]: IResource[] } = {};
-    const cacheKey = `articles:${lessonTitle.toLowerCase()}`;
+    const cacheKey = `articles:${searchPhrases.toLowerCase()}`;
     if (cache[cacheKey]) {
-        console.log(`Returning cached articles for lesson: ${lessonTitle}`);
+        console.log(`Returning cached articles for lesson: ${searchPhrases}`);
         return cache[cacheKey];
     }
 
@@ -410,7 +464,7 @@ async function fetchArticles(lessonTitle: string): Promise<IResource[]> {
             params: {
                 key: process.env.GOOGLE_SEARCH_API_KEY,
                 cx: process.env.GOOGLE_CSE_ID,
-                q: lessonTitle,
+                q: searchPhrases,
                 num: 2, // Limit to 2 articles
             },
         });
@@ -434,17 +488,10 @@ async function fetchArticles(lessonTitle: string): Promise<IResource[]> {
 
             // Check relevance
             const title = (item.title || '').toLowerCase();
-            const snippet = (item.snippet || '').toLowerCase();
-            const lessonLower = lessonTitle.toLowerCase();
-            const titleWords = lessonLower.split(' ');
-            const hasRelevance = titleWords.some(word => title.includes(word) || snippet.includes(word));
-            if (!hasRelevance) {
-                console.log(`Skipping article ${item.link} due to low relevance`);
-                continue;
-            }
+
 
             // Filter non-English articles
-            if (!isLikelyEnglish(title) || !isLikelyEnglish(snippet)) {
+            if (!isLikelyEnglish(title)) {
                 console.log(`Skipping article ${item.link} due to non-English content`);
                 continue;
             }
@@ -476,7 +523,10 @@ async function fetchArticles(lessonTitle: string): Promise<IResource[]> {
 
 // Create resources for a lesson
 async function createLessonResources(
-    lessonTitle: string,
+    searchPhrases: {
+        video: string[];
+        article: string[];
+    },
     lessonId: Types.ObjectId
 ): Promise<{ resourceIds: Types.ObjectId[]; lessonDuration: number }> {
     const resourceIds: Types.ObjectId[] = [];
@@ -484,7 +534,7 @@ async function createLessonResources(
     let maxSentimentScore = -Infinity;
 
     // Fetch YouTube videos
-    const videos = await fetchYouTubeVideos(lessonTitle);
+    const videos = await fetchYouTubeVideos(searchPhrases.video);
     for (const video of videos) {
         // Check if resource already exists
         const existingResource = await Resource.findOne({ resourceId: video.resourceId });
@@ -518,7 +568,7 @@ async function createLessonResources(
     }
 
     // Fetch articles
-    const articles = await fetchArticles(lessonTitle);
+    const articles = await fetchArticles(searchPhrases.article[0]);
     for (const article of articles) {
         // Check if resource already exists (unlikely for articles due to UUID)
         const existingResource = await Resource.findOne({ resourceId: article.resourceId });
@@ -563,6 +613,8 @@ async function createLessons(
             lessonId: `lesson_${uuidv4()}`,
             title: lessonData.title,
             description: lessonData.description,
+            topics: lessonData.topics,
+            searchPhrases: lessonData.searchPhrases,
             moduleId,
             resourceIds: [],
             status: 'draft',
@@ -573,7 +625,7 @@ async function createLessons(
 
         const savedLesson = await Lesson.create(lesson) as any;
         console.log(lessonData.topics)
-        const { resourceIds, lessonDuration } = await createLessonResources(lessonData.title, savedLesson._id);
+        const { resourceIds, lessonDuration } = await createLessonResources(lessonData.searchPhrases, savedLesson._id);
         await Lesson.updateOne(
             { _id: savedLesson._id },
             { resourceIds, duration: lessonDuration }
@@ -672,6 +724,7 @@ export const createPlaylist = async (req: CreatePlaylistRequest, res: Response) 
             title: playlistData.title,
             description: playlistData.description,
             tags: playlistData.tags,
+            overview: playlistData.overview || '', // Set to empty string if not provided
             moduleIds: [],
             status: 'draft',
             createdAt: new Date(),
