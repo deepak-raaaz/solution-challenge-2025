@@ -730,7 +730,10 @@ export const getPlaylistById = async (req: Request, res: Response, next: NextFun
                     path: 'lessonIds',
                     populate: { path: 'resourceIds' },
                 },
-            });
+            }).populate({
+                path: 'userId',
+                select: '_id name email ',
+            })
 
         if (!playlist) {
             return res.status(404).json({ error: 'Playlist not found' });
@@ -922,6 +925,221 @@ export const generatePlaylistThumbnail = async (req: Request, res: Response, nex
         });
     } catch (error: any) {
         // console.error('Error generating playlist thumbnail:', error);
+        return res.status(500).json({ error: error.message || 'Internal server error' });
+    }
+};
+
+
+// Interface for query parameters
+interface PlaylistQueryParams {
+    page?: string;
+    limit?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    search?: string;
+    level?: 'Beginner' | 'Intermediate' | 'Advanced';
+    resourceType?: 'Free' | 'Paid' | 'Mixed';
+    estimatedDuration?: string;
+    platforms?: string;
+    tags?: string;
+    language?: string;
+}
+
+// Interface for the response
+interface PlaylistResponse {
+    message: string;
+    playlists: IPlaylist[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}
+
+/**
+ * Get all playlists publicly with filtering, sorting, pagination, and search
+ * @route GET /api/playlists
+ * @query {page, limit, sortBy, sortOrder, search, level, resourceType, estimatedDuration, platforms, tags, language}
+ * @access Public
+ */
+export const getAllPlaylists = async (req: Request<{}, {}, {}, PlaylistQueryParams>, res: Response): Promise<Response> => {
+    try {
+        // Extract query parameters
+        const {
+            page = '1',
+            limit = '10',
+            sortBy = 'createdAt',
+            sortOrder = 'desc',
+            search,
+            level,
+            resourceType,
+            estimatedDuration,
+            platforms,
+            tags,
+            language,
+        } = req.query;
+
+        // Parse pagination parameters
+        const pageNum = parseInt(page, 10) || 1;
+        const limitNum = parseInt(limit, 10) || 10;
+        const skip = (pageNum - 1) * limitNum;
+
+        // Validate pagination parameters
+        if (pageNum < 1 || limitNum < 1) {
+            return res.status(400).json({ error: 'Page and limit must be positive integers' });
+        }
+
+        // Build match stage for aggregation
+        const match: any = { status: 'published' };
+
+        // Search on title and description using regex
+        if (search) {
+            match.$or = [
+                { title: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } },
+            ];
+        }
+
+        // Filter by tags
+        if (tags) {
+            const tagArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+            if (tagArray.length) {
+                match.tags = { $all: tagArray };
+            }
+        }
+
+        // Filter by language (metadata.language)
+        if (language) {
+            match['metadata.language'] = language;
+        }
+
+        // Build aggregation pipeline
+        const pipeline: any[] = [
+            { $match: match },
+            {
+                $lookup: {
+                    from: 'playlistpersonalizations', // Collection name (lowercase, plural)
+                    localField: 'playlistPersonalizationId',
+                    foreignField: '_id',
+                    as: 'personalization',
+                },
+            },
+            { $unwind: '$personalization' }, // Convert personalization array to object
+            {
+                $match: {
+                    // Apply filters on personalization fields
+                    ...(level && ['Beginner', 'Intermediate', 'Advanced'].includes(level)
+                        ? { 'personalization.difficulty': level }
+                        : {}),
+                    ...(resourceType && ['Free', 'Paid', 'Mixed'].includes(resourceType)
+                        ? { 'personalization.resourcesType': resourceType }
+                        : {}),
+                    ...(estimatedDuration
+                        ? {
+                            'personalization.estimatedDuration': {
+                                $regex: /^(\d+-\d+\s+weeks|\d+\s+weeks)$/i,
+                                $eq: estimatedDuration,
+                            },
+                        }
+                        : {}),
+                    ...(platforms
+                        ? {
+                            'personalization.platforms': {
+                                $all: platforms.split(',').map(p => p.trim()).filter(p => p),
+                            },
+                        }
+                        : {}),
+                },
+            },
+        ];
+
+        // Build sort stage
+        const sort: { [key: string]: 1 | -1 } = {};
+        const validSortFields = ['createdAt', 'updatedAt', 'title', 'metadata.popularity'];
+        if (validSortFields.includes(sortBy)) {
+            sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+        } else {
+            sort.createdAt = -1; // Default sort
+        }
+
+        // Add sort, skip, and limit to pipeline
+        pipeline.push({ $sort: sort }, { $skip: skip }, { $limit: limitNum });
+
+        // Execute aggregation
+        const playlists = await Playlist.aggregate(pipeline).exec();
+
+        // Populate related fields
+        await Playlist.populate(playlists, [
+            { path: 'userId', select: 'name' },
+            { path: 'moduleIds', select: 'title description' },
+            {
+                path: 'playlistPersonalizationId',
+                select: 'estimatedDuration resourcesType difficulty platforms resources',
+            },
+        ]);
+
+        // Count total documents
+        const countPipeline = [
+            { $match: match },
+            {
+                $lookup: {
+                    from: 'playlistpersonalizations',
+                    localField: 'playlistPersonalizationId',
+                    foreignField: '_id',
+                    as: 'personalization',
+                },
+            },
+            { $unwind: '$personalization' },
+            {
+                $match: {
+                    ...(level ? { 'personalization.difficulty': level } : {}),
+                    ...(resourceType ? { 'personalization.resourcesType': resourceType } : {}),
+                    ...(estimatedDuration
+                        ? {
+                            'personalization.estimatedDuration': {
+                                $regex: /^(\d+-\d+\s+weeks|\d+\s+weeks)$/i,
+                                $eq: estimatedDuration,
+                            },
+                        }
+                        : {}),
+                    ...(platforms
+                        ? {
+                            'personalization.platforms': {
+                                $all: platforms.split(',').map(p => p.trim()).filter(p => p),
+                            },
+                        }
+                        : {}),
+                },
+            },
+            { $count: 'total' },
+        ];
+        const countResult = await Playlist.aggregate(countPipeline).exec();
+        const total = countResult[0]?.total || 0;
+
+        // Check if playlists exist
+        if (!playlists || playlists.length === 0) {
+            return res.status(404).json({ message: 'No playlists found' });
+        }
+
+        // Calculate pagination metadata
+        const totalPages = Math.ceil(total / limitNum);
+
+        // Format response
+        const response: PlaylistResponse = {
+            message: 'Playlists fetched successfully',
+            playlists,
+            pagination: {
+                total,
+                page: pageNum,
+                limit: limitNum,
+                totalPages,
+            },
+        };
+
+        return res.status(200).json(response);
+    } catch (error: any) {
+        console.error('Error fetching playlists:', error);
         return res.status(500).json({ error: error.message || 'Internal server error' });
     }
 };
