@@ -46,8 +46,15 @@ const ModuleList: React.FC<ModuleListProps> = ({ modules, onSectionNavigation })
     );
   };
 
+  // Function to truncate description to approximately 100 characters
+  const truncateDescription = (description: string, maxLength: number = 100) => {
+    if (description.length <= maxLength) return description;
+    return description.substring(0, maxLength).trim() + '...';
+  };
+
   return (
-    <div className="space-y-6 max-md:space-y-3">
+    <div className="space-y-6 max-md:space-y-3 bg-gray-800/10 border border-gray-700/40 p-4 rounded-lg ">
+      <h1 className='text-lg font-semibold'>Modules</h1>
       {modules.map((module, index) => (
         <div
           key={module._id}
@@ -61,7 +68,7 @@ const ModuleList: React.FC<ModuleListProps> = ({ modules, onSectionNavigation })
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center mr-4`}
+                  className={`w-12 h-12 max-sm:w-6 max-sm:h-8 rounded-full flex items-center justify-center mr-4`}
                 >
                   {module.status !== 'draft' ? (
                     <span className="text-white font-bold">{index + 1}</span>
@@ -75,14 +82,16 @@ const ModuleList: React.FC<ModuleListProps> = ({ modules, onSectionNavigation })
                     </svg>
                   )}
                 </div>
-                <div>
+                <div className='w-full'>
                   <h3
-                    className={`text-xl font-bold ${module.status !== 'draft' ? 'text-white' : 'text-gray-400'}`}
+                    className={`text-lg font-semibold ${module.status !== 'draft' ? 'text-white' : 'text-gray-400'}`}
                   >
                     {module.title}
                   </h3>
                   <p className={`text-sm ${module.status !== 'draft' ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {module.description}
+                    {expandedModules.includes(module._id)
+                      ? module.description
+                      : truncateDescription(module.description)}
                   </p>
                 </div>
               </div>

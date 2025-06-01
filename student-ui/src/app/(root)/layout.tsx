@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import Sidebar from "@/components/shared/sidebar/sidebar";
 import BottomNavbar from "@/components/shared/bottom-navbar/bottom-navbar";
 import MobileNav from "@/components/shared/mobile-nav/mobile-nav";
+import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 const Layout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     AOS.init({
@@ -20,6 +21,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       new LocomotiveScroll();
     })();
   }, []);
+  const { isLoading } = useLoadUserQuery({});
 
   return (
     <div className="flex">

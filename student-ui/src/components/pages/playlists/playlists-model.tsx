@@ -88,31 +88,31 @@ export const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div>
                                 <img
-                                    src={playlist.image}
-                                    alt={playlist.title}
+                                    src={playlist?.thumbnailUrl}
+                                    alt={playlist?.title}
                                     className="w-full h-64 object-cover rounded-lg mb-4"
                                 />
-                                <p className="text-neutral-400 mb-4">{playlist.description}</p>
+                                <p className="text-neutral-400 mb-4 line-clamp-2">{playlist?.description}</p>
                                 <div className="space-y-3">
                                     <div className="flex items-center">
                                         <span className="text-sm font-medium w-20 text-[#E6E6E6]">Mentor:</span>
-                                        <span className="text-sm text-neutral-400">{playlist.mentor}</span>
+                                        <span className="text-sm text-neutral-400">{playlist?.userId?.name}</span>
                                     </div>
                                     <div className="flex items-center">
                                         <span className="text-sm font-medium w-20 text-[#E6E6E6]">Duration:</span>
-                                        <span className="text-sm text-neutral-400">{playlist.duration}</span>
+                                        <span className="text-sm text-neutral-400">{playlist?.playlistPersonalizationId?.estimatedDuration}</span>
                                     </div>
                                     <div className="flex items-center">
                                         <span className="text-sm font-medium w-20 text-[#E6E6E6]">Level:</span>
-                                        <span className="text-sm text-neutral-400">{playlist.level}</span>
+                                        <span className="text-sm text-neutral-400">{playlist?.playlistPersonalizationId.difficulty}</span>
                                     </div>
                                     <div className="flex items-center">
                                         <span className="text-sm font-medium w-20 text-[#E6E6E6]">Price:</span>
                                         <span
                                             className="text-sm px-2 py-1 rounded-full text-white"
-                                            style={{ backgroundColor: playlist.price === 'Free' ? '#10B981' : '#F59E0B' }}
+                                            style={{ backgroundColor: playlist?.price === 'Free' ? '#10B981' : '#F59E0B' }}
                                         >
-                                            {playlist.price}
+                                            {playlist?.playlistPersonalizationId.resourcesType}
                                         </span>
                                     </div>
                                 </div>
@@ -120,7 +120,7 @@ export const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose 
                             <div>
                                 <h3 className="text-lg font-bold mb-4 text-[#E6E6E6]">Course Modules</h3>
                                 <div className="space-y-3">
-                                    {playlist.modules.map((module: any, index: any) => (
+                                    {playlist?.moduleIds.map((module: any, index: any) => (
                                         <div
                                             key={index}
                                             className="flex items-center p-3 rounded-lg border border-gray-700/40 bg-[#0E1217]"
@@ -128,7 +128,7 @@ export const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose 
                                             <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 bg-[#1E90FF]">
                                                 <span className="text-sm font-medium text-white">{index + 1}</span>
                                             </div>
-                                            <span className="text-sm text-[#E6E6E6]">{module}</span>
+                                            <span className="text-sm text-[#E6E6E6]">{module.title}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -136,7 +136,7 @@ export const PlaylistModal: React.FC<PlaylistModalProps> = ({ playlist, onClose 
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-4 mt-6">
-                            <Link href={`/playlists/${playlist.id}`} >
+                            <Link href={`/playlists/${playlist._id}`} >
                             <button
                                 // onClick={startPlaylist}
                                 className="px-6 py-3 rounded-lg font-medium text-white transition-colors duration-200 hover:opacity-90 bg-[#1E90FF]"

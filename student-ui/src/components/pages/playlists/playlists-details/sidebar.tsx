@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChatBubbleLeftRightIcon, ChatBubbleOvalLeftIcon, UserIcon, Cog6ToothIcon } from '@heroicons/react/20/solid';
+import { ChartNoAxesCombined } from 'lucide-react';
 
 interface SidebarProps {
   data: {
@@ -66,6 +67,34 @@ const Sidebar: React.FC<SidebarProps> = ({ data, onSectionNavigation }) => {
 
   return (
     <div className="space-y-6">
+
+      <div className="bg-gray-800/20 border border-gray-700/40 rounded-lg p-6">
+        <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+          <ChartNoAxesCombined className="w-5 h-5 mr-2 text-blue-400" />
+          Playlist Achievement
+        </h3>
+        <div className="mb-4">
+          <span>
+            <span className="text-yellow-500">★</span>{" "}4.8 (245 reviews)
+          </span>
+
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="bg-gray-800/30 border border-gray-700/60 p-3 rounded-lg flex flex-col items-center">
+            <span className="text-2xl font-bold text-purple-400 mb-1">10k</span>
+            <p className="text-gray-300 text-sm">Views</p>
+          </div>
+          <div className="bg-gray-800/30 border border-gray-700/60 p-3 rounded-lg flex flex-col items-center">
+            <span className="text-2xl font-bold text-blue-400 mb-1">889</span>
+            <p className="text-gray-300 text-sm">Likes</p>
+          </div>
+          <div className="bg-gray-800/30 border border-gray-700/60 p-3 rounded-lg flex flex-col items-center">
+            <span className="text-2xl font-bold text-green-400 mb-1">20k</span>
+            <p className="text-gray-300 text-sm">Enrolled</p>
+          </div>
+        </div>
+      </div>
+
       <div className="bg-gray-800/20 border border-gray-700/40 rounded-lg p-6">
         <h3 className="text-lg font-bold text-white mb-4 flex items-center">
           <Cog6ToothIcon className="w-5 h-5 mr-2 text-blue-400" />
@@ -120,7 +149,7 @@ const Sidebar: React.FC<SidebarProps> = ({ data, onSectionNavigation }) => {
         </div>
       </div>
 
-      <div className="bg-gray-800/20 border border-gray-700/40 rounded-lg p-6">
+      {/* <div className="bg-gray-800/20 border border-gray-700/40 rounded-lg p-6">
         <h3 className="text-lg font-bold text-white mb-4">Course Resources</h3>
         <div className="space-y-3">
           {resources.map((resource,index) => (
@@ -134,7 +163,7 @@ const Sidebar: React.FC<SidebarProps> = ({ data, onSectionNavigation }) => {
             </a>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

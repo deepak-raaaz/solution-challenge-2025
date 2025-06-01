@@ -58,7 +58,7 @@ const LessonCard: React.FC<LessonCardProps> = ({ lesson, onSectionNavigation, in
             <div className="flex  justify-between flex-col gap-3">
                 <div className="flex items-center justify-between gap-4" onClick={() => lesson.status !== 'draft' && toggleLesson(lesson.id)}>
                     {/* <h4 className="text-lg font-semibold text-white">{index + 1}</h4> */}
-                    <h4 className="text-lg font-semibold text-white">{lesson.title}</h4>
+                    <h4 className="text-base font-medium text-white">{lesson.title}</h4>
                     <ChevronDownIcon
                         className={`w-6 h-6 ${lesson.status !== 'draft' ? 'text-gray-400' : 'text-gray-500'} transform transition-transform duration-200 ${expandedLesson.includes(lesson.id) ? 'rotate-180' : ''}`}
                     />

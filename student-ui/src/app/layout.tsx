@@ -32,6 +32,9 @@ export default function RootLayout({
       new LocomotiveScroll();
     })();
   }, []);
+
+
+
   return (
     <html lang="en" className="dark">
       <body

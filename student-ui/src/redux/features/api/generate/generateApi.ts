@@ -154,6 +154,32 @@ export const generateApi = apiSlice.injectEndpoints({
                     // Handle error if needed
                 }
             },
+        }),
+        getAllPlaylists: builder.query({
+            query: (params) => ({
+                url: "playlists",
+                method: "GET",
+                params: {
+                    page: params.page,
+                    limit: params.limit,
+                    search: params.search,
+                    level: params.level,
+                    resourceType: params.resourceType,
+                    platforms: params.platforms,
+                    tags: params.tags,
+                    sortBy: params.sortBy,
+                    sortOrder: params.sortOrder,
+                  },
+            }),
+            async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+                try {
+                    const result = await queryFulfilled;
+                    // Handle successful response if needed
+                } catch (error: any) {
+                    console.log(error);
+                    // Handle error if needed
+                }
+            },
         })
     }),
 });
@@ -167,5 +193,6 @@ export const {
     useSubmitAssessmentMutation,
     useGeneratePlaylistMutation,
     useGenerateThumbnailMutation,
-    usePublishPlaylistMutation
+    usePublishPlaylistMutation,
+    useGetAllPlaylistsQuery
 } = generateApi;

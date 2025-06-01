@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
+import { useSelector } from 'react-redux';
 
 const navItems = [
   {
@@ -81,6 +82,7 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { user } = useSelector((state: any) => state.auth);
 
   return (
     <nav className="hidden lg:flex  lg:flex-col lg:w-64 h-screen bg-white border-r border-gray-200 dark:bg-gray-800/20 dark:border-gray-700/40 overflow-y-auto shadow-sm fixed">
@@ -118,8 +120,8 @@ export default function Sidebar() {
             alt="User profile"
           />
           <div className="ml-3">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Deepak Kumar</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">deepakjamui26@gmail.com</p>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{user?.name}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
           </div>
         </div>
       </div>
