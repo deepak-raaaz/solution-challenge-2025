@@ -9,6 +9,12 @@ import Sidebar from './sidebar';
 import SaveCourseModal from './save-course-model';
 import { useGetPlaylistByIdQuery, usePublishPlaylistMutation } from '@/redux/features/api/generate/generateApi';
 import { toast } from 'react-toastify';
+import Reviews from './tabs/reviews';
+import FAQs from './tabs/faq';
+import Overview from './tabs/overview';
+import Assessment from './tabs/assessment';
+import Comments from './tabs/comments';
+import { useSelector } from 'react-redux';
 
 interface Playlist {
   _id: string;
@@ -55,6 +61,7 @@ interface CourseDetailsProps {
 }
 
 const CourseDetails: React.FC<CourseDetailsProps> = ({ playlistId }) => {
+  const { user } = useSelector((state: any) => state.auth);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modulePublished, setModulePublished] = useState(true);
   const [activeTab, setActiveTab] = useState('Overview');
@@ -103,15 +110,17 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ playlistId }) => {
 
   const tabs = [
     'Overview',
-    'Content',
+    'Modules',
     'Assessment',
-    'Announcement',
+    'FAQs',
     'Reviews',
     'Comment',
   ];
 
+
+
   return (
-    <section id="course-roadmap" className="min-h-screen text-gray-100 max-lg:py-10">
+    <section id="course-roadmap" className="min-h-screen text-gray-100 py-10">
       <div className="px-6 py-12 max-md:px-4">
         <div className="mx-auto max-w-7xl">
           {/* <Header onSaveCourse={handleSaveCourse} onViewDashboard={() => handleSectionNavigation('dashboard')} /> */}
@@ -123,14 +132,14 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ playlistId }) => {
                 isPublishingPlaylist={isPublishingPlaylist}
               />
               <div className="">
-                <nav className="flex space-x-4 border-b border-gray-700/60 mb-6">
+                <nav className="flex space-x-4  mb-6">
                   {tabs.map((tab) => (
                     <button
                       key={tab}
                       onClick={() => handleTabChange(tab)}
-                      className={`px-3 py-2 text-sm font-medium ${
+                      className={`h-10 px-6 bg-gray-800/40 border border-gray-700/40 flex items-center justify-center  text-gray-200 rounded-full  transition-colors text-sm font-medium ${
                         activeTab === tab
-                          ? 'border-b-2 border-gray-100 text-gray-100'
+                          ? 'text-gray-100 dark:bg-blue-600 border border-gray-700/40'
                           : 'text-gray-400 hover:text-gray-200'
                       }`}
                     >
@@ -138,17 +147,17 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ playlistId }) => {
                     </button>
                   ))}
                 </nav>
-                {activeTab === 'Overview' && <div className="text-gray-100">Overview content</div>}
-                {activeTab === 'Content' && (
+                {activeTab === 'Overview' && <Overview user={user} data={playlist}/>}
+                {activeTab === 'Modules' && (
                   <ModuleList
                     modules={playlist.moduleIds}
                     onSectionNavigation={handleSectionNavigation}
                   />
                 )}
-                {activeTab === 'Assessment' && <div className="text-gray-100">Assessment content</div>}
-                {activeTab === 'Announcement' && <div className="text-gray-100">Announcement content</div>}
-                {activeTab === 'Reviews' && <div className="text-gray-100">Reviews content</div>}
-                {activeTab === 'Comment' && <div className="text-gray-100">Comment content</div>}
+                {activeTab === 'Assessment' && <Assessment user={user} data={playlist}/>}
+                {activeTab === 'FAQs' && <FAQs/>}
+                {activeTab === 'Reviews' && <Reviews/>}
+                {activeTab === 'Comment' && <Comments/>}
               </div>
               {/* <ModuleList modules={playlist.moduleIds} onSectionNavigation={handleSectionNavigation} /> */}
             </div>

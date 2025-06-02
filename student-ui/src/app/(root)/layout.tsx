@@ -7,6 +7,7 @@ import Sidebar from "@/components/shared/sidebar/sidebar";
 import BottomNavbar from "@/components/shared/bottom-navbar/bottom-navbar";
 import MobileNav from "@/components/shared/mobile-nav/mobile-nav";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
+import DesktopNavbar from "@/components/shared/nav-bar/desktop-navbar";
 const Layout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     AOS.init({
@@ -27,6 +28,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <div className="flex">
       <Sidebar />
       <div className="flex-1 lg:ml-64 max-sm:py-0">
+        <DesktopNavbar/>
         {children}
       </div>
       <BottomNavbar />

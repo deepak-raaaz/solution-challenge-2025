@@ -54,7 +54,7 @@ const ModuleList: React.FC<ModuleListProps> = ({ modules, onSectionNavigation })
 
   return (
     <div className="space-y-6 max-md:space-y-3 bg-gray-800/10 border border-gray-700/40 p-4 rounded-lg ">
-      <h1 className='text-lg font-semibold'>Modules</h1>
+      <h1 className='text-xl font-semibold mx-2'>Modules</h1>
       {modules.map((module, index) => (
         <div
           key={module._id}

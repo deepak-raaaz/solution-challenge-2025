@@ -75,7 +75,7 @@ const CourseOverview: React.FC<CourseOverviewProps> = ({ data, handlePublishCour
                   }`}
               >
                 <WandSparkles className="w-4 h-4" />
-                <span className="ml-2 font-semibold">
+                <span className="ml-2 text-sm font-semibold">
                   {isGeneratingThumbnail ? 'Generating...' : 'Generate Thumbnail'}
                 </span>
               </button>
@@ -97,7 +97,7 @@ const CourseOverview: React.FC<CourseOverviewProps> = ({ data, handlePublishCour
                   }`}
               >
                 <WandSparkles className="w-4 h-4" />
-                <span className="ml-2 font-semibold">
+                <span className="ml-2 text-sm font-semibold">
                   {isGeneratingThumbnail ? 'Generating...' : 'Regenerate Thumbnail'}
                 </span>
               </button>
