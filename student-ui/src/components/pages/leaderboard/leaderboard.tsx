@@ -33,7 +33,7 @@ export default function Leaderboard() {
   };
 
   return (
-    <section id="leaderboard" className="min-h-screen  p-6 max-lg:py-20 max-lg:px-4">
+    <section id="leaderboard" className="min-h-screen  p-6 py-20 max-lg:px-4">
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4 max-sm:flex-col max-sm:items-start max-sm:gap-4">
           <div>

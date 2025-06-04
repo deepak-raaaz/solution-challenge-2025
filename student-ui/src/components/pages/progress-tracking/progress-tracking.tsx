@@ -34,7 +34,7 @@ const stats = [
     };
   
     return (
-      <section id="progress-tracking" className="min-h-screen p-6 max-md:px-4 max-lg:py-20">
+      <section id="progress-tracking" className="min-h-screen p-6 max-md:px-4 py-20">
         <div className="mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div>

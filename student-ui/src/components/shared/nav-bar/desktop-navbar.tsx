@@ -24,7 +24,7 @@ const DesktopNavbar = () => {
                     <Search size={18}/>
                 </button>
                 <button className="h-10 px-6 bg-gray-800/40   flex items-center justify-center  text-gray-200 rounded-full  transition-colors">
-                    Become a Mentor
+                    Become a Educator
                 </button>
                 <button className="h-10 px-6 bg-gray-800/40 border border-gray-700/40 flex items-center justify-center  text-gray-200 rounded-full  transition-colors">
                     My Playlists

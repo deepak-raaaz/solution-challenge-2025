@@ -25,14 +25,14 @@ export default function PlaylistCard({ playlist, onClick }: PlaylistCardProps) {
         )}
         <span
           className={`absolute top-3 right-3 px-2 py-1 text-xs font-medium rounded-full text-white ${
-            playlist?.price === 'Free' ? 'bg-green-500' : 'bg-yellow-500'
+            playlist?.playlistPersonalizationId.resourcesType === 'Free' ? 'bg-green-500' : 'bg-yellow-500'
           }`}
         >
-          {playlist?.price}
+          {playlist?.playlistPersonalizationId.resourcesType}
         </span>
-        <span className="absolute bottom-3 right-3 px-2 py-1 rounded text-xs font-medium text-white bg-black/70">
+        {/* <span className="absolute bottom-3 right-3 px-2 py-1 rounded text-xs font-medium text-white bg-black/70">
           {playlist?.duration}
-        </span>
+        </span> */}
       </div>
       <div className="p-4">
         <h3 className="font-bold text-lg mb-2 text-gray-100">{playlist?.title}</h3>
@@ -75,7 +75,7 @@ export default function PlaylistCard({ playlist, onClick }: PlaylistCardProps) {
                   d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                 />
               </svg>
-              {playlist?.stats?.likes}
+              {playlist?.stats?.likes.length || 0}
             </span>
             <span className="flex items-center">
               <svg
@@ -91,7 +91,7 @@ export default function PlaylistCard({ playlist, onClick }: PlaylistCardProps) {
                   d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
                 />
               </svg>
-              {playlist?.stats?.shares}
+              {playlist?.stats?.shares || 0}
             </span>
             <span className="flex items-center">
               <svg
@@ -107,7 +107,7 @@ export default function PlaylistCard({ playlist, onClick }: PlaylistCardProps) {
                   d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h8z"
                 />
               </svg>
-              {playlist?.stats?.comments}
+              {playlist?.stats?.comments || 0}
             </span>
           </div>
           <div className="flex items-center">
@@ -120,7 +120,7 @@ export default function PlaylistCard({ playlist, onClick }: PlaylistCardProps) {
                 />
               ))} */}
             </div>
-            <span className="ml-2 text-xs">+{playlist?.stats?.enrolled} enrolled</span>
+            <span className="ml-2 text-xs">+{playlist?.stats?.enrolled || 0} enrolled</span>
           </div>
         </div>
       </div>

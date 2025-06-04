@@ -6,6 +6,7 @@ import WelcomeBanner from './welcome-banner';
 import PlaylistSection from './playlist-section';
 import GamificationSection from './gamification-section';
 import QuickActions from './quick-actions';
+import PendingAssessment from './pending-assessment';
 
 const levels = ['All Levels', 'Beginner', 'Intermediate', 'Advanced'];
 const types = ['All Types', 'Free', 'Paid'];
@@ -23,32 +24,10 @@ export default function Dashboard() {
   };
 
   return (
-    <section id="home" className="min-h-screen  text-[#E6E6E6] p-6 max-lg:py-20 max-md:px-4">
+    <section id="home" className="min-h-screen  text-[#E6E6E6] p-6 py-20 max-md:px-4">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col lg:flex-row justify-between items-center mb-8 space-y-4 lg:space-y-0 max-md:hidden ">
-          <div className="flex-1 max-w-2xl">
-            <SearchBar value={searchQuery} onChange={setSearchQuery} />
-          </div>
-          <div className="flex flex-wrap gap-4 items-center justify-center">
-            <FilterSelect
-              options={levels}
-              value={levelFilter}
-              onChange={setLevelFilter}
-            />
-            <FilterSelect
-              options={types}
-              value={typeFilter}
-              onChange={setTypeFilter}
-            />
-            <FilterSelect
-              options={languages}
-              value={language}
-              onChange={setLanguage}
-            />
-          </div>
-        </div>
-
         <WelcomeBanner onStartLearning={() => handleSectionChange('create-start')} />
+         <PendingAssessment/>
         <PlaylistSection onViewAll={() => handleSectionChange('playlists')} />
         <GamificationSection
           onLeaderboardClick={() => handleSectionChange('leaderboard')}

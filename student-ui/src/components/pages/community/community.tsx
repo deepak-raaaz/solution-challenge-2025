@@ -88,7 +88,7 @@ export default function CommunitySection() {
   };
 
   return (
-    <section id="community" className="min-h-screen px-4 py-12 max-lg:py-20">
+    <section id="community" className="min-h-screen px-4 py-20">
       <div className="max-w-7xl mx-auto">
         <CommunityHeader />
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">

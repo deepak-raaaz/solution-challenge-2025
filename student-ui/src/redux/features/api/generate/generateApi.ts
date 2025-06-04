@@ -180,6 +180,22 @@ export const generateApi = apiSlice.injectEndpoints({
                     // Handle error if needed
                 }
             },
+        }),
+        learningRoadmap: builder.query({
+            query: (roadmapId) => ({
+                url: `learning-roadmap/${roadmapId}`,
+                method: "GET",
+                credentials: "include" as const,
+            }),
+            async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+                try {
+                    const result = await queryFulfilled;
+                    // Handle successful response if needed
+                } catch (error: any) {
+                    console.log(error);
+                    // Handle error if needed
+                }
+            }, 
         })
     }),
 });
@@ -194,5 +210,6 @@ export const {
     useGeneratePlaylistMutation,
     useGenerateThumbnailMutation,
     usePublishPlaylistMutation,
-    useGetAllPlaylistsQuery
+    useGetAllPlaylistsQuery,
+    useLearningRoadmapQuery
 } = generateApi;
