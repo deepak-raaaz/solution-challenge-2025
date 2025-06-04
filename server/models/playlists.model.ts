@@ -110,6 +110,7 @@ export interface IPlaylist extends Document {
     commentsEnabled: boolean;
     faqIds: Types.ObjectId[];
     enrolledUsers: Types.ObjectId[];
+    featured?: boolean; // Optional field to mark featured playlists
     createdAt: Date;
     updatedAt: Date;
 }
@@ -255,6 +256,7 @@ const PlaylistSchema = new Schema<IPlaylist>(
         commentsEnabled: { type: Boolean, default: true },
         faqIds: [{ type: Schema.Types.ObjectId, ref: 'FAQ', index: true }],
         enrolledUsers: [{ type: Schema.Types.ObjectId, ref: 'User', index: true }],
+        featured: { type: Boolean, default: false }, // Optional field to mark featured playlists
         createdAt: { type: Date, default: Date.now },
         updatedAt: { type: Date, default: Date.now },
     },

@@ -11,6 +11,7 @@ import './config/google.strategy'
 import { accessTokenOptions, refreshTokenOptions } from "./utlis/jwt";
 import promptRouter from "./routes/prompt.router";
 import playlistsRouter from "./routes/playlists.router";
+import LearningRoadmapRouter from "./routes/learning-roadmap.router";
 
 app.use(express.json({ limit: "50mb" }));
 
@@ -36,6 +37,7 @@ const limiter = rateLimit({
 app.use("/api/v1", userRouter);
 app.use("/api/v1", promptRouter)
 app.use("/api/v1", playlistsRouter);
+app.use("/api/v1", LearningRoadmapRouter);
 
 
 //google auth route

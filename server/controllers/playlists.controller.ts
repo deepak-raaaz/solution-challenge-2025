@@ -13,7 +13,6 @@ import path from 'path';
 import fs from 'node:fs';
 import { redis } from "../utlis/redis";
 import { thumbnailGenerateRequest } from '../utlis/playlist.helper';
-import { YoutubeTranscript } from 'youtube-transcript';
 
 
 // Initialize APIs

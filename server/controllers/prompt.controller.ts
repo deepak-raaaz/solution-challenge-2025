@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { cleanJsonResponse } from "../utlis/cleanJson.helper";
 
 const genAI = new GoogleGenerativeAI(
     process.env.GEMINI_API_KEY || "YOUR_API_KEY"
@@ -7,17 +8,6 @@ const genAI = new GoogleGenerativeAI(
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 
-const cleanJsonResponse = (text: string): string => {
-    // Remove markdown code fences and any leading/trailing whitespace
-    return (
-        text
-            .replace(/```json/g, "")
-            .replace(/```/g, "")
-            .replace(/^\s+|\s+$/g, "")
-            // Remove any other unexpected characters (optional, customize as needed)
-            .replace(/[\r\n]+/g, "")
-    );
-};
 
 // enhance the prompt
 export const enhancePrompt = async (req: Request, res: Response, next: NextFunction) => {
