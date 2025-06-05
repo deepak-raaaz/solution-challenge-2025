@@ -116,7 +116,7 @@ const ArticleContent: React.FC<ArticleContentProps> = ({ resource }) => {
         </div>
       </div>
       <div className="p-6">
-        <h2 className="text-3xl font-bold text-gray-100 mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold text-gray-100 mb-4  ">
           {resource.title}
         </h2>
         <div className="flex items-center space-x-4 text-sm text-gray-400 mb-4">

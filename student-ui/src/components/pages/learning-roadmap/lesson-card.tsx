@@ -41,7 +41,7 @@ interface LessonCardProps {
                 <ResourceCard key={index} resource={resource} roadmapId={roadmapId} />
               ))}
                {lesson.quizId?.[0]?.attempts?.length === 0 && (
-              <QuizCard quiz={{ id: lesson.quizId[0]._id, title: `${lesson.title} Quiz` }} />
+              <QuizCard quiz={{ id: lesson.quizId[0]._id, title: `${lesson.title} Quiz`, attempts: lesson.quizId[0].attempts }} roadmapId={roadmapId} />
             )}
             </div>
           </>
