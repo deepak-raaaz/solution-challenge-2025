@@ -1,14 +1,16 @@
 import { Lesson } from "./learning-roadmap";
 import { ProgressBar } from "./progressbar";
+import QuizCard from "./quiz-card";
 import { ResourceCard } from "./resource-card";
 
 
 // LessonCard Component
 interface LessonCardProps {
     lesson: Lesson;
+    roadmapId:string;
   }
   
-  const LessonCard: React.FC<LessonCardProps> = ({ lesson }) => {
+  const LessonCard: React.FC<LessonCardProps> = ({ lesson, roadmapId}) => {
     const statusStyles = {
       completed: 'bg-green-600',
       'in-progress': 'bg-blue-600',
@@ -20,6 +22,7 @@ interface LessonCardProps {
       'in-progress': 'bg-blue-600 text-white',
       locked: 'bg-gray-600 text-gray-300',
     };
+    console.log(lesson)
   
     return (
       <div className={`bg-gray-700/20 border rounded-lg p-4 ${lesson.status === 'locked' ? 'opacity-60' : ''}`}>
@@ -35,8 +38,11 @@ interface LessonCardProps {
             <ProgressBar percentage={lesson.progress} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {lesson.resources.map((resource, index) => (
-                <ResourceCard key={index} resource={resource} />
+                <ResourceCard key={index} resource={resource} roadmapId={roadmapId} />
               ))}
+               {lesson.quizId?.[0]?.attempts?.length === 0 && (
+              <QuizCard quiz={{ id: lesson.quizId[0]._id, title: `${lesson.title} Quiz` }} />
+            )}
             </div>
           </>
         )}

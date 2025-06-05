@@ -1,70 +1,75 @@
 import React, { useState } from 'react';
 
 interface VideoContentProps {
-  videoId: string;
-  title: string;
-  instructor: string;
-  avatarUrl: string;
-  duration: string;
-  level: string;
-  description: string;
-  initialLikes?: number;
-  initialComments?: number;
+  resource: any
+}
+function formatTimeFromSeconds(seconds: number) {
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  const parts = [];
+  if (hrs > 0) parts.push(`${hrs} hr`);
+  if (mins > 0) parts.push(`${mins} min`);
+  if (secs > 0 && hrs === 0) parts.push(`${secs} sec`); // Only show seconds if under an hour
+
+  return parts.join(" ");
 }
 
-const VideoContent: React.FC<VideoContentProps> = ({
-  videoId,
-  title,
-  instructor,
-  avatarUrl,
-  duration,
-  level,
-  description,
-  initialLikes = 1200,
-  initialComments = 89,
-}) => {
-  const [likes, setLikes] = useState(initialLikes);
-  const [comments, setComments] = useState(initialComments);
-  const [isWatched, setIsWatched] = useState(false);
+function formatNumber(num: number) {
+  if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + 'B';
+  if (num >= 1_000_000) return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (num >= 1_000) return (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+  return num.toString();
+}
 
-  const handleLike = () => setLikes(likes + 1);
-  const handleComment = () => setComments(comments + 1);
+
+const VideoContent: React.FC<VideoContentProps> = ({
+  resource
+}) => {
+
+  const [isWatched, setIsWatched] = useState(resource.status === 'completed');
+console.log(resource.status)
+
   const handleMarkWatched = () => setIsWatched(!isWatched);
 
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-lg max-w-3xl mx-auto">
+    <div className="bg-gray-800/20 border border-gray-700/40 rounded-lg w-full mx-auto">
       <div className="aspect-video bg-black rounded-t-lg">
         <iframe
           className="w-full h-full rounded-t-lg"
-          src={`https://www.youtube.com/embed/${videoId}`}
+          src={`https://www.youtube.com/embed/${resource.resourceId.replace("youtube_", "")}`}
           frameBorder="0"
           allowFullScreen
-          title={title}
+          title={resource.title}
         />
       </div>
       <div className="p-6">
-        <h2 className="text-2xl font-bold text-gray-100 mb-4">{title}</h2>
+        <h2 className="text-2xl font-bold text-gray-100 mb-4">{resource.title}</h2>
         <div className="flex items-center space-x-4 text-sm text-gray-400 mb-4">
           <div className="flex items-center space-x-2">
+
             <img
-              src={avatarUrl}
-              alt={instructor}
-              className="w-6 h-6 rounded-full"
-              loading="lazy"
+              src={`https://avatar.iran.liara.run/public/${Math.floor(Math.random() * 100)}`}
+              alt={resource.metadata.channelr}
+              className="w-6 h-6 rounded-full mr-3"
             />
-            <span>{instructor}</span>
+            <span>{resource.metadata.channel}</span>
           </div>
           <span>•</span>
-          <span>{duration}</span>
+          <span>{formatNumber(resource.metadata.views)} views</span>
           <span>•</span>
-          <span>{level}</span>
+          <span>{formatTimeFromSeconds(resource.metadata.duration)}</span>
+          <span>•</span>
+          <span>Score: {resource.sentiment.score}</span>
         </div>
-        <p className="text-gray-300 mb-6">{description}</p>
+        <p className="text-gray-300 mb-6">{"description"}</p>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
+         
             <button
               className="flex items-center space-x-2 text-gray-400 hover:text-blue-400 transition-colors duration-200"
-              onClick={handleLike}
+
               aria-label="Like video"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,11 +80,11 @@ const VideoContent: React.FC<VideoContentProps> = ({
                   d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                 />
               </svg>
-              <span>{likes.toLocaleString()}</span>
+              <span>{formatNumber(resource.metadata.likes)}</span>
             </button>
             <button
               className="flex items-center space-x-2 text-gray-400 hover:text-blue-400 transition-colors duration-200"
-              onClick={handleComment}
+
               aria-label="Comment on video"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,15 +95,14 @@ const VideoContent: React.FC<VideoContentProps> = ({
                   d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
                 />
               </svg>
-              <span>{comments.toLocaleString()}</span>
+              <span>{formatNumber(resource.metadata.commentCount)}</span>
             </button>
           </div>
           <button
-            className={`px-6 py-2 rounded-lg transition-colors duration-200 ${
-              isWatched
+            className={`px-6 py-2 rounded-lg transition-colors duration-200 ${isWatched
                 ? 'bg-green-600 hover:bg-green-700 text-white'
                 : 'bg-blue-600 hover:bg-blue-700 text-white'
-            }`}
+              }`}
             onClick={handleMarkWatched}
           >
             {isWatched ? 'Watched' : 'Mark as Watched'}

@@ -63,8 +63,24 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
               <>
                 <ProgressBar percentage={module.progress} />
                 <div className="space-y-4">
+              
+                {module.nextTask && (
+                  <div className="bg-blue-900 border border-blue-700 rounded-lg p-4 mt-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-blue-600 p-2 rounded">
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-100">{module.nextTask.title}</h4>
+                        <p className="text-blue-400 text-sm">{module.nextTask.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
                   {module.lessons.map((lesson) => (
-                    <LessonCard key={lesson.id} lesson={lesson} />
+                    <LessonCard key={lesson.id} lesson={lesson} roadmapId={module.roadmapId} />
                   ))}
                 </div>
                 {module.quiz && (
@@ -90,21 +106,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
                     </div>
                   </div>
                 )}
-                {module.nextTask && (
-                  <div className="bg-blue-900 border border-blue-700 rounded-lg p-4 mt-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="bg-blue-600 p-2 rounded">
-                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-gray-100">{module.nextTask.title}</h4>
-                        <p className="text-blue-400 text-sm">{module.nextTask.description}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                
               </>
             )}
             {module.status === 'locked' && (

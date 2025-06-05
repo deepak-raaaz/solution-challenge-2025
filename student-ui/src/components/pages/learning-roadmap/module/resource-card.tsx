@@ -29,10 +29,7 @@ interface ResourceCardProps {
 }
 
 export const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
-  const router = useRouter();
-  const handleButton = () => {
-    router.push(`/learning-roadmap/module?id=${resource.moduleId}&lesson=${resource.lessonId}/${resource._id}`);
-  }
+
   const buttonStyles = {
     completed: 'bg-gray-600/40 text-gray-300 cursor-pointer',
     'in-progress': 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer',
@@ -69,13 +66,12 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
       </div>
       {
         resource.status !== 'locked' ?
-        <Link target='_blank' href={`/learning-roadmap/${resource.roadmapId}/resource?id=${resource._id}`}
+        <Link target='_blank' href={`/learning-roadmap/${resource.roadmapId}/resource?id=${resource._id}&lesson=${resource.lessonId}`}
           className={`w-full py-2 rounded flex items-center justify-center text-sm transition-colors duration-200 ${buttonStyles[resource.status]}`}
         >
           {buttonText[resource.status]}
         </Link> : 
        <button
-      onClick={() => handleButton}
        className={`w-full py-2 rounded text-sm transition-colors duration-200 ${buttonStyles[resource.status]}`}>
         {buttonText[resource.status]}
       </button>
