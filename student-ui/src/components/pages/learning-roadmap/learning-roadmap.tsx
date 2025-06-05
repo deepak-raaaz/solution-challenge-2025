@@ -37,10 +37,21 @@ export interface Lesson {
 }
 
 export interface Resource {
+  _id:string;
+  lessonId:string;
+  url:string;
+  thumbnailUrl:string;
+  sentiment: {
+    score:string;
+    message:string;
+  };
+  metadata: {
+    duration:string;
+  }
   type: 'video' | 'article' | 'quiz' | 'project';
   title: string;
   duration: string;
-  status: 'completed' | 'in-progress' | 'locked';
+  status: 'completed' | 'in-progress' | 'locked' | 'unlocked';
   icon: React.ReactNode;
 }
 
@@ -52,9 +63,7 @@ const getResourceIcon = (type: string) => {
   switch (type) {
     case 'youtube':
       return (
-        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1M9 6h6"></path>
-        </svg>
+        <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>
       );
     case 'article':
       return (
@@ -73,6 +82,10 @@ const getResourceIcon = (type: string) => {
         <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
         </svg>
+      );
+      case 'youtube':
+      return (
+        <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>
       );
     default:
       return (
@@ -96,6 +109,7 @@ const LearningRoadmap: React.FC<LearningRoadmapProps> = ({ roadmapId }) => {
   const transformedModules: Module[] = roadmapData.modules.map((module: any, index: number) => {
     const lessons = module.lessonIds.map((lesson: any) => {
       const resources = lesson.resourceIds.map((resource: any) => ({
+        _id:resource._id,
         type: resource.type === 'youtube' ? 'video' : resource.type,
         title: resource.title,
         duration: resource.metadata?.duration
@@ -105,6 +119,7 @@ const LearningRoadmap: React.FC<LearningRoadmapProps> = ({ roadmapId }) => {
             : 'Assignment',
         status: resource.status,
         icon: getResourceIcon(resource.type),
+        ...resource
       }));
 
       const totalResources = resources.length;
