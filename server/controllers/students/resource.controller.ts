@@ -163,6 +163,7 @@ async function generateQuiz(lesson: any, module: any): Promise<any> {
   }
 }
 
+
 export const setResourceCompleted = async (
   req: Request,
   res: Response,
@@ -307,3 +308,4 @@ export const setResourceCompleted = async (
     return res.status(500).json({ error: 'Internal server error', message: error.message });
   }
 };
+

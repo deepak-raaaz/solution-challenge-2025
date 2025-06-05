@@ -6,6 +6,7 @@ export interface IUserProgress extends Document {
     completedResources: Types.ObjectId[];
     completedLessons: Types.ObjectId[];
     completedModules: Types.ObjectId[];
+    completedQuizzes: Types.ObjectId[];
     failedQuizLessons: Types.ObjectId[];
     totalXp: number;
     progressPercentage: number;

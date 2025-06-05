@@ -814,3 +814,5 @@ export const getResourceById = async (req: Request, res: Response, next: NextFun
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+
