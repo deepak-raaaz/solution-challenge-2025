@@ -2,6 +2,7 @@ import React from 'react';
 import { ProgressBar } from './progressbar';
 import { Module } from './learning-roadmap';
 import LessonCard from './lesson-card';
+import Link from 'next/link';
 
 // ModuleCard Component
 interface ModuleCardProps {
@@ -9,9 +10,10 @@ interface ModuleCardProps {
 }
 
 const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
+  console.log(module)
   const statusStyles = {
     completed: 'bg-green-600',
-    'in-progress': 'bg-blue-600 animate-pulse',
+    'in-progress': 'bg-blue-600',
     locked: 'bg-gray-600 opacity-60',
   };
 
@@ -32,7 +34,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
             </svg>
           ) : module.status === 'in-progress' ? (
-            <span className="text-white font-bold text-lg">{module.id}</span>
+            <Link href={`${module.roadmapId}/module?id=${module._id}`} className="text-white font-bold text-lg">{module.id}</Link>
           ) : (
             <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
@@ -45,7 +47,13 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
               }`}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-gray-100">{module.title}</h3>
+              {
+                module.status !== 'locked' &&
+                <Link href={`${module.roadmapId}/module?id=${module._id}`} >
+                  <h3 className="text-xl font-semibold text-gray-100">{module.title}</h3>
+                </Link>
+              }
+              {/* <h3 className="text-xl font-semibold text-gray-100">{module.title}</h3> */}
               <span className={`text-xs px-2 py-1 rounded ${statusBadgeStyles[module.status]}`}>
                 {module.status.charAt(0).toUpperCase() + module.status.slice(1)}
               </span>

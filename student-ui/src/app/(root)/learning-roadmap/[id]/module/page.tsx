@@ -10,7 +10,7 @@ const Page = () => {
 
     const params = useParams();
     const roadmapId = params.id as string;
-console.log(moduleId);
+    console.log(moduleId);
 
     return (
         <Module roadmapId={roadmapId} moduleId={moduleId || ''} />

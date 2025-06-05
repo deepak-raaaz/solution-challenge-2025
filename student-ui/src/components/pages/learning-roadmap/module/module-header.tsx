@@ -18,18 +18,12 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({ module, roadmapTitle }) => 
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div>
+            <p className="text-gray-400 uppercase tracking-widest">Module</p>
             <h1 className="text-3xl font-bold text-gray-100 mb-2">{module.title}</h1>
             <p className="text-gray-400">{module.description}</p>
             <p className="text-gray-500 text-sm mt-1">Part of: {roadmapTitle}</p>
           </div>
-          <div className="flex items-center space-x-4">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
-              Save Progress
-            </button>
-            <button className="bg-gray-700 hover:bg-gray-600 text-gray-100 px-4 py-2 rounded-lg transition-colors duration-200">
-              Share Module
-            </button>
-          </div>
+
         </div>
         <div className="bg-gray-800/20 border border-gray-700/40 rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">

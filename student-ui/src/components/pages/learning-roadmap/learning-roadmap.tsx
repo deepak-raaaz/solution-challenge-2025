@@ -10,6 +10,8 @@ import { useLearningRoadmapQuery } from '@/redux/features/api/generate/generateA
 
 // Interfaces
 export interface Module {
+  roadmapId:string;
+  _id:string;
   id: number;
   title: string;
   description: string;
@@ -59,7 +61,7 @@ interface LearningRoadmapProps {
   roadmapId: string;
 }
 
-const getResourceIcon = (type: string) => {
+export const getResourceIcon = (type: string) => {
   switch (type) {
     case 'youtube':
       return (
@@ -146,6 +148,8 @@ const LearningRoadmap: React.FC<LearningRoadmapProps> = ({ roadmapId }) => {
       .find((r: Resource) => r.status === 'in-progress' || r.status === 'locked');
 
     return {
+      roadmapId: roadmapId,
+      _id:module._id,
       id: index + 1,
       title: module.title,
       description: module.description,
