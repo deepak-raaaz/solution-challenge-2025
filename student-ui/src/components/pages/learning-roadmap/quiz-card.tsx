@@ -22,23 +22,16 @@ const QuizCard: React.FC<QuizCardProps> = ({ quiz, roadmapId }) => {
                 </div>
                 <div>
                     <h4 className="font-medium text-gray-100">{quiz.title}</h4>
-                    <p className="text-gray-400 text-sm">Test your knowledge</p>
+                    <p className="text-gray-400 text-sm">
+                        You scored {quiz.attempts[0]?.score} out of {quiz.attempts[0]?.total} ({((quiz.attempts[0]?.score / quiz.attempts[0]?.total) * 100).toFixed(1)}%)
+                    </p>
                 </div>
             </div>
-            {
-                quiz.attempts ?
-                    <Link target='_blank' href={`/learning-roadmap/${roadmapId}/quiz?id=${quiz.id}`}
-                        className={`w-full py-2 rounded flex items-center justify-center text-sm transition-colors duration-200 bg-blue-600 hover:bg-blue-700 text-white `}
-                    >
-                        Start Quiz
-                    </Link>
-                    :
-                    <button
-                        className={`w-full py-2 rounded text-sm transition-colors duration-200 bg-gray-600 hover:bg-gray-700 text-white `}>
-                        Done
-                    </button>
-            }
-
+            <Link target='_blank' href={`/learning-roadmap/${roadmapId}/quiz?id=${quiz.id}`}
+                className={`w-full py-2 rounded flex items-center justify-center text-sm transition-colors duration-200 bg-blue-600 hover:bg-blue-700 text-white `}
+            >{quiz.attempts[0] ? 'View Result' :
+                'Start Quiz'}
+            </Link>
 
         </div>
     );

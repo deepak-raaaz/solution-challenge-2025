@@ -212,7 +212,40 @@ export const generateApi = apiSlice.injectEndpoints({
                     // Handle error if needed
                 }
             }, 
-        })
+        }),
+        getQuiz: builder.query({
+            query: (quizId) => ({
+                url: `learning-roadmap/quiz/${quizId}`,
+                method: "GET",
+                credentials: "include" as const,
+            }),
+            async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+                try {
+                    const result = await queryFulfilled;
+                    // Handle successful response if needed
+                } catch (error: any) {
+                    console.log(error);
+                    // Handle error if needed
+                }
+            }, 
+        }),
+        submitQuiz: builder.mutation({
+            query: ({ quizId, answers }) => ({
+                url: `learning-roadmap/submit-quiz/${quizId}`,
+                method: "PUT",
+                body: { answers },
+                credentials: "include" as const,
+            }),
+            async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+                try {
+                    const result = await queryFulfilled;
+                    // Handle successful response if needed
+                } catch (error: any) {
+                    console.log(error);
+                    // Handle error if needed
+                }
+            },
+        }),
     }),
 });
 
@@ -228,5 +261,8 @@ export const {
     usePublishPlaylistMutation,
     useGetAllPlaylistsQuery,
     useLearningRoadmapQuery,
-    useLearningResourceQuery
+    useLearningResourceQuery,
+    useGetQuizQuery,
+    useSubmitQuizMutation
+
 } = generateApi;
