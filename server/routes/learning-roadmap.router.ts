@@ -1,4 +1,5 @@
-import { createLearningRoadmap, getLearningRoadmapById } from '../controllers/students/learning-roadmap.controller';
+import { setResourceCompleted } from '../controllers/students/resource.controller';
+import { createLearningRoadmap, getLearningRoadmapById, getResourceById } from '../controllers/students/learning-roadmap.controller';
 import { isAuthenticate } from '../middleware/auth';
 import express from 'express';
 
@@ -10,6 +11,11 @@ LearningRoadmapRouter.post('/create-learning-roadmap', isAuthenticate, createLea
 
 LearningRoadmapRouter.get('/learning-roadmap/:learningRoadmapId', isAuthenticate, getLearningRoadmapById);
 
+
+LearningRoadmapRouter.get('/learning-roadmap/resource/:resourceId', isAuthenticate, getResourceById);
+
+
+LearningRoadmapRouter.put('/learning-roadmap/resource/completed/:resourceId', isAuthenticate, setResourceCompleted);
 
 
 export default LearningRoadmapRouter

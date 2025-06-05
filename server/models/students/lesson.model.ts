@@ -7,7 +7,7 @@ export interface ILesson extends Document {
     description: string;
     status: 'completed' | 'in-progress' | 'locked';
     resourceIds: Types.ObjectId[];
-    quizId: Types.ObjectId | null;
+    quizId: Types.ObjectId[] | null;
     topics: string[];
     isSupplemental: boolean; // Added
     metadata: Record<string, any>; // Added
@@ -23,7 +23,7 @@ const LessonSchema = new Schema<ILesson>(
         description: { type: String, required: true, trim: true },
         status: { type: String, enum: ['completed', 'in-progress', 'locked'], default: 'locked' },
         resourceIds: [{ type: Schema.Types.ObjectId, ref: 'Resource', index: true }],
-        quizId: { type: Schema.Types.ObjectId, ref: 'Quiz', default: null },
+        quizId: [{ type: Schema.Types.ObjectId, ref: 'Quiz', default: null }],
         topics: [{
             type: String, trim: true,
             isSupplemental: { type: Boolean, default: false }, // Added

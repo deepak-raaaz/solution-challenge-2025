@@ -10,7 +10,7 @@ export interface IResource extends Document {
     lessonId: Types.ObjectId;
     title: string;
     type: 'youtube' | 'article' | 'blog' | 'podcast';
-    status: 'completed' | 'in-progress' | 'locked';
+    status: 'completed' | 'in-progress' | 'locked' | 'unlocked';
     url: string;
     thumbnailUrl?: string;
     sentiment: ISentiment;
@@ -31,7 +31,7 @@ const ResourceSchema = new Schema<IResource>(
         lessonId: { type: Schema.Types.ObjectId, ref: 'Lesson', required: true, index: true },
         title: { type: String, required: true, trim: true },
         type: { type: String, enum: ['youtube', 'article', 'blog', 'podcast'], required: true },
-        status: { type: String, enum: ['completed', 'in-progress', 'locked'], default: 'locked' },
+        status: { type: String, enum: ['completed', 'in-progress', 'locked','unlocked'], default: 'unlocked' },
         url: { type: String, required: true, trim: true },
         thumbnailUrl: { type: String, trim: true },
         sentiment: { type: SentimentSchema, required: true },

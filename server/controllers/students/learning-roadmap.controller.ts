@@ -229,7 +229,7 @@ async function fetchYouTubeVideos(searchPhrases: string[]): Promise<IResource[]>
         lessonId: null as any,
         title: item.snippet?.title || 'Untitled Video',
         type: 'youtube',
-        status: 'locked',
+        status: 'unlocked',
         url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
         thumbnailUrl: item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.default?.url || '',
         sentiment,
@@ -315,7 +315,7 @@ async function fetchArticles(searchPhrases: string): Promise<IResource[]> {
         lessonId: null as any,
         title: item.title || 'Untitled Article',
         type: 'article',
-        status: 'locked',
+        status: 'unlocked',
         url: item.link || '',
         thumbnailUrl: item.pagemap?.metatags?.[0]?.['og:image'] || '',
         sentiment: { score: '0', message: 'No sentiment analysis for articles' },
@@ -650,61 +650,167 @@ export const createLearningRoadmap = async (req: CreatePlaylistRequest, res: Res
   }
 };
 
-//// Get playlist by ID with populated modules and lessons
+// Get playlist by ID with populated modules and lessons
 export const getLearningRoadmapById = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { learningRoadmapId } = req.params;
-  
-      // Validate ObjectId
-      if (!mongoose.Types.ObjectId.isValid(learningRoadmapId)) {
-        return res.status(400).json({ error: 'Invalid playlist ID' });
-      }
-  
-      // Fetch the roadmap without population first to inspect modules array
-      const roadmap = await LearningRoadmap.findById(learningRoadmapId);
-      if (!roadmap) {
-        return res.status(404).json({ error: 'Learning Roadmap not found' });
-      }
-  
-      // Check if modules array is empty before population
-      if (!roadmap.modules || roadmap.modules.length === 0) {
-        console.warn(`No modules found in roadmap ${learningRoadmapId}`);
-        return res.status(200).json({
-          message: 'Learning Roadmap fetched successfully, but no modules exist',
-          data: roadmap,
-        });
-      }
-  
-      // Populate modules, lessons, and resources
-      const data = await LearningRoadmap.findById(learningRoadmapId)
-        .populate({
-          path: 'modules',
-          model: 'LearningRoadmapModule', // Explicitly specify model to avoid schema mismatch
-          populate: {
-            path: 'lessonIds',
-            model: 'LearningRoadmapLesson', // Explicitly specify model
-            populate: {
-              path: 'resourceIds',
-              model: 'LearningRoadmapResource', // Explicitly specify model
-            },
-          },
-        })
-        .populate({
-          path: 'userId',
-          select: '_id name email',
-          model: 'User', // Explicitly specify model
-        });
-  
-      if (!data) {
-        return res.status(404).json({ error: 'Learning Roadmap not found after population' });
-      }
-  
-      return res.status(200).json({
-        message: 'Learning Roadmap fetched successfully',
-        data,
-      });
-    } catch (error: any) {
-      console.error('Error fetching Learning Roadmap:', error);
-      return res.status(500).json({ error: error.message || 'Internal server error' });
+  try {
+    const { learningRoadmapId } = req.params;
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(learningRoadmapId)) {
+      return res.status(400).json({ error: 'Invalid playlist ID' });
     }
-  };
+
+    // Fetch the roadmap without population first to inspect modules array
+    const roadmap = await LearningRoadmap.findById(learningRoadmapId);
+    if (!roadmap) {
+      return res.status(404).json({ error: 'Learning Roadmap not found' });
+    }
+
+    // Check if modules array is empty before population
+    if (!roadmap.modules || roadmap.modules.length === 0) {
+      console.warn(`No modules found in roadmap ${learningRoadmapId}`);
+      return res.status(200).json({
+        message: 'Learning Roadmap fetched successfully, but no modules exist',
+        data: roadmap,
+      });
+    }
+
+    // Populate modules, lessons, and resources
+    const data = await LearningRoadmap.findById(learningRoadmapId)
+      .populate({
+        path: 'modules',
+        model: 'LearningRoadmapModule', // Explicitly specify model to avoid schema mismatch
+        populate: {
+          path: 'lessonIds',
+          model: 'LearningRoadmapLesson', // Explicitly specify model
+          populate: [{
+            path: 'resourceIds',
+            model: 'LearningRoadmapResource', // Explicitly specify model
+          }, {
+            path: 'quizId',
+            model: 'LearningRoadmapQuiz', // Explicitly specify model
+            select: '-questions'
+          }],
+        },
+      })
+      .populate({
+        path: 'userId',
+        select: '_id name email',
+        model: 'User', // Explicitly specify model
+      });
+
+    if (!data) {
+      return res.status(404).json({ error: 'Learning Roadmap not found after population' });
+    }
+
+    return res.status(200).json({
+      message: 'Learning Roadmap fetched successfully',
+      data,
+    });
+  } catch (error: any) {
+    console.error('Error fetching Learning Roadmap:', error);
+    return res.status(500).json({ error: error.message || 'Internal server error' });
+  }
+};
+
+
+
+
+
+// Helper to verify resource ownership
+async function verifyResourceOwnership(
+  resourceId: string,
+  userId: string
+): Promise<{ resource: any; lesson: any } | null> {
+  // Check cache
+  const cacheKey = `resource:${resourceId}:user:${userId}`;
+  const cached = await redis.get(cacheKey);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  // Use aggregation to verify ownership in one query
+  const result = await Resource.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(resourceId) } },
+    {
+      $lookup: {
+        from: 'learningroadmaplessons',
+        localField: '_id',
+        foreignField: 'resourceIds',
+        as: 'lesson',
+      },
+    },
+    { $unwind: { path: '$lesson', preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: 'learningroadmapmodules',
+        localField: 'lesson.moduleId',
+        foreignField: '_id',
+        as: 'module',
+      },
+    },
+    { $unwind: { path: '$module', preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: 'learningroadmaps',
+        localField: 'module.roadmapId',
+        foreignField: '_id',
+        as: 'roadmap',
+      },
+    },
+    { $unwind: { path: '$roadmap', preserveNullAndEmptyArrays: true } },
+    {
+      $match: {
+        'roadmap.userId': new mongoose.Types.ObjectId(userId),
+        'lesson.status': 'in-progress',
+        'resource.status': { $ne: 'locked' },
+      },
+    },
+    {
+      $project: {
+        resource: '$$ROOT',
+        lesson: 1,
+      },
+    },
+  ]);
+
+  if (result.length === 0) return null;
+
+  // Cache result for 5 minutes
+  await redis.setex(cacheKey, 300, JSON.stringify(result[0]));
+  return result[0];
+}
+
+export const getResourceById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { resourceId } = req.params;
+    const userId = req.user?._id as any;
+
+    // Validate inputs
+    if (!userId) {
+
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    if (!mongoose.Types.ObjectId.isValid(resourceId) || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: 'Invalid resourceId or userId' });
+    }
+
+    // Verify ownership and get resource
+    const result = await verifyResourceOwnership(resourceId, userId);
+    if (!result) {
+
+      return res.status(403).json({ error: 'Forbidden: Resource not found or unauthorized' });
+    }
+
+    const { resource } = result;
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Resource retrieved successfully',
+      resource,
+    });
+  } catch (error: any) {
+
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
