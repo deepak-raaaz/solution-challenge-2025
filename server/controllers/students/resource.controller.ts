@@ -13,12 +13,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { logger } from '../../utlis/logger';
 
 
-
-// Interface for request params
-interface SetResourceCompletedParams {
-  resourceId: string;
-}
-
 // Helper to verify resource ownership
 async function verifyResourceOwnership(
   resourceId: string,
@@ -28,10 +22,25 @@ async function verifyResourceOwnership(
   const cached = await redis.get(cacheKey);
   if (cached) {
     logger.debug(`Cache hit for resource:${resourceId}:user:${userId}`);
-    return JSON.parse(cached);
+    const parsed = JSON.parse(cached);
+    const resource = await Resource.findById(parsed.resource?._id);
+    if (!resource || !parsed.lesson?._id || !parsed.module?._id || !parsed.roadmap?._id) {
+      logger.warn(`Invalid cached data for resource:${resourceId}, user:${userId}, resource:${!!resource}, lesson:${!!parsed.lesson?._id}, module:${!!parsed.module?._id}, roadmap:${!!parsed.roadmap?._id}`);
+      await redis.del(cacheKey); // Clear invalid cache
+      return null;
+    }
+    parsed.resource = resource;
+    return parsed;
   }
 
   logger.debug(`Verifying ownership for resource:${resourceId}, user:${userId}`);
+
+  const resource = await Resource.findById(resourceId);
+  if (!resource) {
+    logger.warn(`Resource not found: ${resourceId}`);
+    return null;
+  }
+
   const result = await Resource.aggregate([
     { $match: { _id: new mongoose.Types.ObjectId(resourceId) } },
     {
@@ -42,7 +51,7 @@ async function verifyResourceOwnership(
         as: 'lesson',
       },
     },
-    { $unwind: { path: '$lesson', preserveNullAndEmptyArrays: true } },
+    { $unwind: { path: '$lesson', preserveNullAndEmptyArrays: false } },
     {
       $lookup: {
         from: 'learningroadmapmodules',
@@ -51,7 +60,7 @@ async function verifyResourceOwnership(
         as: 'module',
       },
     },
-    { $unwind: { path: '$module', preserveNullAndEmptyArrays: true } },
+    { $unwind: { path: '$module', preserveNullAndEmptyArrays: false } },
     {
       $lookup: {
         from: 'learningroadmaps',
@@ -60,16 +69,15 @@ async function verifyResourceOwnership(
         as: 'roadmap',
       },
     },
-    { $unwind: { path: '$roadmap', preserveNullAndEmptyArrays: true } },
+    { $unwind: { path: '$roadmap', preserveNullAndEmptyArrays: false } },
     {
       $match: {
         'roadmap.userId': new mongoose.Types.ObjectId(userId),
-        'lesson.status': 'in-progress',
+        // 'lesson.status': 'in-progress', // Temporarily relaxed for debugging
       },
     },
     {
       $project: {
-        resource: '$$ROOT',
         lesson: 1,
         module: 1,
         roadmap: 1,
@@ -77,23 +85,33 @@ async function verifyResourceOwnership(
     },
   ]);
 
-  if (
-    result.length === 0 ||
-    !result[0]?.lesson?._id ||
-    !result[0]?.module?._id ||
-    !result[0]?.roadmap?._id
-  ) {
-    logger.warn(`Ownership verification failed for resource:${resourceId}, user:${userId}`);
+  if (result.length === 0) {
+    logger.warn(`Ownership verification failed for resource:${resourceId}, user:${userId}, aggregation result: ${JSON.stringify(result)}`);
+    const lessonCheck = await Lesson.findOne({ resourceIds: new mongoose.Types.ObjectId(resourceId) });
+    logger.debug(`Direct lesson check for resource:${resourceId}: ${JSON.stringify(lessonCheck)}`);
     return null;
   }
 
   logger.debug(`Ownership verified for resource:${resourceId}, user:${userId}`);
-  await redis.setex(cacheKey, 300, JSON.stringify(result[0]));
-  return result[0];
+  const ownershipData = {
+    resource,
+    lesson: result[0].lesson,
+    module: result[0].module,
+    roadmap: result[0].roadmap,
+  };
+  await redis.setex(cacheKey, 300, JSON.stringify({
+    ...ownershipData,
+    resource: resource.toObject(),
+  }));
+  return ownershipData;
 }
 
 // Helper to generate quiz using Gemini API
-async function generateQuiz(lesson: any, module: any): Promise<any> {
+async function generateQuiz(
+  lesson: any,
+  module: any,
+  existingQuestions: string[] = []
+): Promise<any> {
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
   const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
@@ -104,9 +122,11 @@ async function generateQuiz(lesson: any, module: any): Promise<any> {
     - Lesson Topics: ${JSON.stringify(lesson.topics || [])}
     - Module Title: ${module?.title || 'No module title'}
     - Module Description: ${module?.description || 'No module description'}
+    - Existing Questions to Avoid: ${JSON.stringify(existingQuestions)}
 
     ### Requirements:
     - Create a quiz with 10-15 multiple-choice questions.
+    - Each question must be unique and not similar to the provided existing questions.
     - Each question should have:
       - A clear question text.
       - 4 multiple-choice options.
@@ -141,7 +161,6 @@ async function generateQuiz(lesson: any, module: any): Promise<any> {
       throw new Error('Invalid quiz structure or insufficient questions');
     }
 
-    // Validate each question
     quizData.questions = quizData.questions.map((q: any) => ({
       type: 'Multiple Choice',
       question: q?.question || 'Untitled Question',
@@ -163,7 +182,6 @@ async function generateQuiz(lesson: any, module: any): Promise<any> {
   }
 }
 
-
 export const setResourceCompleted = async (
   req: Request,
   res: Response,
@@ -183,10 +201,10 @@ export const setResourceCompleted = async (
       session.endSession();
       return res.status(401).json({ error: 'Unauthorized: No user authenticated' });
     }
-    const userId = user._id;
+    const userId = user._id as any;
 
     // Validate inputs
-    if (!mongoose.Types.ObjectId.isValid(resourceId) || !mongoose.Types.ObjectId.isValid(userId as any)) {
+    if (!mongoose.Types.ObjectId.isValid(resourceId) || !mongoose.Types.ObjectId.isValid(userId)) {
       logger.warn(`Invalid input: resourceId:${resourceId}, userId:${userId}`);
       await session.abortTransaction();
       session.endSession();
@@ -194,7 +212,7 @@ export const setResourceCompleted = async (
     }
 
     // Verify ownership
-    const ownership = await verifyResourceOwnership(resourceId, userId as any);
+    const ownership = await verifyResourceOwnership(resourceId, userId);
     if (!ownership) {
       logger.warn(`Unauthorized access by user:${userId} to resource:${resourceId}`);
       await session.abortTransaction();
@@ -203,6 +221,14 @@ export const setResourceCompleted = async (
     }
 
     const { resource, lesson, module, roadmap } = ownership;
+
+    // Add null checks
+    if (!lesson?._id || !module?._id || !roadmap?._id) {
+      logger.error(`Missing required ownership data for resource:${resourceId}`);
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(500).json({ error: 'Internal server error', message: 'Invalid ownership data' });
+    }
 
     // Log resource and lesson details for debugging
     logger.debug(`Processing resource:${resourceId}, lesson:${lesson._id}, module:${module._id}, roadmap:${roadmap._id}`);
@@ -256,6 +282,10 @@ export const setResourceCompleted = async (
       { session }
     );
     const lockedResources = lessonResources.filter(r => r.status === 'locked');
+    const allResourcesCompleted = lessonResources.every(r => r.status === 'completed');
+
+    let quizGenerated = false;
+
     if (lockedResources.length > 0) {
       // Unlock the next locked resource
       const nextResource = lockedResources[0];
@@ -265,7 +295,45 @@ export const setResourceCompleted = async (
         { session }
       );
       logger.debug(`Unlocked next resource:${nextResource._id} for lesson:${lesson._id}`);
-    } else if (!lesson.quizId) {
+    } else if (lesson.quizId && lesson.quizId.length > 0) {
+      // All resources completed, quiz exists, check score
+      if (allResourcesCompleted) {
+        // Check the latest quiz in the quizId array
+        const latestQuizId = lesson.quizId[lesson.quizId.length - 1];
+        const existingQuiz = await Quiz.findById(latestQuizId, null, { session });
+        if (existingQuiz && existingQuiz.attempts.length > 0) {
+          const latestAttempt = existingQuiz.attempts[existingQuiz.attempts.length - 1];
+          const scorePercentage = (latestAttempt.score / latestAttempt.total) * 100;
+          
+          if (scorePercentage < 80) {
+            // Generate new quiz with unique questions
+            logger.debug(`Latest quiz score ${scorePercentage}% < 80%, generating new quiz for lesson:${lesson._id}`);
+            const existingQuestions = existingQuiz.questions.map(q => q.question);
+            const quizData = await generateQuiz(lesson, module, existingQuestions);
+            const newQuiz = new Quiz({
+              quizId: `quiz_${uuidv4()}`,
+              parentId: lesson._id,
+              parentType: 'Lesson',
+              questions: quizData.questions,
+              attempts: [],
+              isActive: true,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+            await newQuiz.save({ session });
+
+            // Push new quizId to lesson.quizId array
+            await Lesson.updateOne(
+              { _id: lesson._id },
+              { $push: { quizId: newQuiz._id }, updatedAt: new Date() },
+              { session }
+            );
+            logger.debug(`New quiz added to lesson:${lesson._id}, quizId:${newQuiz._id}`);
+            quizGenerated = true;
+          }
+        }
+      }
+    } else {
       // All resources completed, no quiz exists, generate quiz
       logger.debug(`Generating quiz for lesson:${lesson._id}`);
       const quizData = await generateQuiz(lesson, module);
@@ -281,13 +349,14 @@ export const setResourceCompleted = async (
       });
       await quiz.save({ session });
 
-      // Update lesson with quizId
+      // Push new quizId to lesson.quizId array
       await Lesson.updateOne(
         { _id: lesson._id },
-        { quizId: quiz._id, updatedAt: new Date() },
+        { $push: { quizId: quiz._id }, updatedAt: new Date() },
         { session }
       );
       logger.debug(`Quiz created for lesson:${lesson._id}, quizId:${quiz._id}`);
+      quizGenerated = true;
     }
 
     await session.commitTransaction();
@@ -297,7 +366,7 @@ export const setResourceCompleted = async (
     return res.status(200).json({
       status: 'success',
       message: 'Resource marked as completed',
-      quizGenerated: !lesson.quizId, // True if a quiz was generated (pre-update state)
+      quizGenerated, // True if a quiz was generated or added
     });
   } catch (error: any) {
     await session.abortTransaction();
@@ -308,4 +377,3 @@ export const setResourceCompleted = async (
     return res.status(500).json({ error: 'Internal server error', message: error.message });
   }
 };
-

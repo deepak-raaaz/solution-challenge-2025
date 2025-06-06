@@ -21,18 +21,6 @@ const customSearch = google.customsearch({
   auth: process.env.GOOGLE_API_KEY,
 });
 
-
-
-// Interface for request params
-interface NewResourceParams {
-  lessonId: string;
-}
-
-// Interface for request body
-interface NewResourceBody {
-  resourceType: 'video' | 'article';
-}
-
 // Helper to verify lesson ownership
 async function verifyLessonOwnership(
   lessonId: string,
@@ -95,13 +83,19 @@ async function verifyLessonOwnership(
   return result[0];
 }
 
-// Fetch YouTube videos (from createLearningRoadmap)
-async function fetchYouTubeVideos(searchPhrases: string[]): Promise<any[]> {
-  const cacheKey = `youtube:${searchPhrases.map(p => p.toLowerCase()).join('|')}`;
-  const cachedVideos = await redis.get(cacheKey);
-  if (cachedVideos) {
-    logger.debug(`Returning cached videos for search phrases: ${searchPhrases.join(', ')}`);
-    return JSON.parse(cachedVideos);
+// Fetch YouTube videos
+async function fetchYouTubeVideos(
+  searchPhrases: string[],
+  lessonId: string,
+  bypassCache: boolean = false
+): Promise<any[]> {
+  const cacheKey = `youtube:${searchPhrases.map(p => p.toLowerCase()).join('|')}:${lessonId}`;
+  if (!bypassCache) {
+    const cachedVideos = await redis.get(cacheKey);
+    if (cachedVideos) {
+      logger.debug(`Returning cached videos for search phrases: ${searchPhrases.join(', ')}`);
+      return JSON.parse(cachedVideos);
+    }
   }
 
   const videos: any[] = [];
@@ -133,6 +127,15 @@ async function fetchYouTubeVideos(searchPhrases: string[]): Promise<any[]> {
   }
 
   try {
+    // Get existing video resourceIds for this lesson
+    const existingResources = await Resource.find(
+      { lessonId: new mongoose.Types.ObjectId(lessonId), type: 'youtube' },
+      { resourceId: 1 }
+    );
+    const existingVideoIds = existingResources
+      .map(r => r.resourceId.replace('youtube_', ''))
+      .filter(id => id);
+
     const videoCandidates: { item: youtube_v3.Schema$SearchResult; stats: youtube_v3.Schema$Video }[] = [];
 
     for (const phrase of searchPhrases.slice(0, 3)) {
@@ -152,11 +155,11 @@ async function fetchYouTubeVideos(searchPhrases: string[]): Promise<any[]> {
       });
 
       const videoIds = (response.data.items || [])
-        .filter(item => item.id?.videoId)
+        .filter(item => item.id?.videoId && !existingVideoIds.includes(item.id.videoId))
         .map(item => item.id!.videoId!);
 
       if (videoIds.length === 0) {
-        logger.debug(`No videos found for phrase: ${phrase}`);
+        logger.debug(`No new videos found for phrase: ${phrase}`);
         continue;
       }
 
@@ -213,11 +216,14 @@ async function fetchYouTubeVideos(searchPhrases: string[]): Promise<any[]> {
       if (!item.id?.videoId) continue;
 
       const resourceId = `youtube_${item.id.videoId}`;
-      let resource = await Resource.findOne({ resourceId });
+      // Double-check resource doesn't exist for this lesson
+      const existingResource = await Resource.findOne({
+        resourceId,
+        lessonId: new mongoose.Types.ObjectId(lessonId),
+      });
 
-      if (resource) {
-        logger.debug(`Reusing existing resource with ID ${resourceId}`);
-        videos.push(resource);
+      if (existingResource) {
+        logger.debug(`Skipping existing resource with ID ${resourceId} for lesson ${lessonId}`);
         continue;
       }
 
@@ -239,7 +245,7 @@ async function fetchYouTubeVideos(searchPhrases: string[]): Promise<any[]> {
           const commentsResponse = await youtube.commentThreads.list({
             part: ['snippet'],
             videoId: item.id.videoId,
-            maxResults: 20,
+            maxResults: 200,
             textFormat: 'plainText',
           });
 
@@ -265,9 +271,9 @@ async function fetchYouTubeVideos(searchPhrases: string[]): Promise<any[]> {
         }
       }
 
-      resource = {
+      const resource = {
         resourceId,
-        lessonId: null,
+        lessonId: new mongoose.Types.ObjectId(lessonId),
         title: item.snippet?.title || 'Untitled Video',
         type: 'youtube',
         status: 'in-progress',
@@ -285,7 +291,7 @@ async function fetchYouTubeVideos(searchPhrases: string[]): Promise<any[]> {
         },
         createdAt: new Date(),
         updatedAt: new Date(),
-      } as any;
+      };
 
       videos.push(resource);
     }
@@ -301,7 +307,7 @@ async function fetchYouTubeVideos(searchPhrases: string[]): Promise<any[]> {
   return videos;
 }
 
-// Fetch articles using Google Custom Search API (from createLearningRoadmap)
+// Fetch articles using Google Custom Search API
 async function fetchArticles(searchPhrases: string): Promise<any[]> {
   const cacheKey = `articles:${searchPhrases.toLowerCase()}`;
   const cachedArticles = await redis.get(cacheKey);
@@ -357,7 +363,7 @@ async function fetchArticles(searchPhrases: string): Promise<any[]> {
         title: item.title || 'Untitled Article',
         type: 'article',
         status: 'in-progress',
-        url: item.link || '',
+        url: 'http://' + item.link || '',
         thumbnailUrl: item.pagemap?.metatags?.[0]?.['og:image'] || '',
         sentiment: { score: '0', message: 'No sentiment analysis for articles' },
         xpEarned: 10,
@@ -386,52 +392,19 @@ async function createTargetedResources(
   const resourceIds: Types.ObjectId[] = [];
 
   if (resourceType === 'video') {
-    const videos = await fetchYouTubeVideos(searchPhrases);
+    const videos = await fetchYouTubeVideos(searchPhrases, lessonId.toString(), true); // Bypass cache
     for (const video of videos) {
-      const existingResource = await Resource.findOne({ resourceId: video.resourceId });
-      let resourceId: any;
-
-      if (existingResource) {
-        logger.debug(`Reusing existing resource with ID ${video.resourceId} for lesson ${lessonId}`);
-        resourceId = existingResource._id;
-
-        if (!existingResource.lessonId || !existingResource.lessonId.equals(lessonId)) {
-          await Resource.updateOne(
-            { _id: existingResource._id },
-            { $set: { lessonId, updatedAt: new Date() } }
-          );
-        }
-      } else {
-        video.lessonId = lessonId;
-        const savedResource = await Resource.create(video);
-        resourceId = savedResource._id;
-      }
-
-      resourceIds.push(resourceId);
+      const savedResource = await Resource.create(video);
+      resourceIds.push(savedResource._id as any);
+      logger.debug(`Created new video resource with ID ${savedResource.resourceId} for lesson ${lessonId}`);
     }
   } else if (resourceType === 'article') {
     const articles = await fetchArticles(searchPhrases[0] || '');
     for (const article of articles) {
-      const existingResource = await Resource.findOne({ resourceId: article.resourceId });
-      let resourceId: any;
-
-      if (existingResource) {
-        logger.debug(`Reusing existing resource with ID ${article.resourceId} for lesson ${lessonId}`);
-        resourceId = existingResource._id;
-
-        if (!existingResource.lessonId || !existingResource.lessonId.equals(lessonId)) {
-          await Resource.updateOne(
-            { _id: existingResource._id },
-            { $set: { lessonId, updatedAt: new Date() } }
-          );
-        }
-      } else {
-        article.lessonId = lessonId;
-        const savedResource = await Resource.create(article);
-        resourceId = savedResource._id;
-      }
-
-      resourceIds.push(resourceId);
+      article.lessonId = lessonId;
+      const savedResource = await Resource.create(article);
+      resourceIds.push(savedResource._id as any);
+      logger.debug(`Created new article resource with ID ${savedResource.resourceId} for lesson ${lessonId}`);
     }
   }
 
@@ -445,17 +418,13 @@ async function analyzeQuizWeakPoints(quiz: any, lesson: any): Promise<string[]> 
     return lesson.topics || [lesson.title || ''];
   }
 
-  // Get latest attempt
   const latestAttempt = quiz.attempts[quiz.attempts.length - 1];
   const weakPoints: string[] = [];
 
-  // Analyze incorrect answers
   for (const answer of latestAttempt.userAnswers) {
     const question = quiz.questions[answer.questionIndex];
     if (!question || answer.selectedAnswer === question.correctAnswer) continue;
 
-    // Assume question relates to lesson topics (no question-specific topics in schema)
-    // Fallback to lesson title if topics are unavailable
     const topicIndex = answer.questionIndex % (lesson.topics?.length || 1);
     const weakTopic = lesson.topics?.[topicIndex] || lesson.title || '';
     if (weakTopic && !weakPoints.includes(weakTopic)) {
@@ -463,7 +432,6 @@ async function analyzeQuizWeakPoints(quiz: any, lesson: any): Promise<string[]> 
     }
   }
 
-  // If no weak points identified, use all lesson topics or title
   if (weakPoints.length === 0) {
     logger.debug(`No weak points identified for quiz:${quiz._id}, using lesson topics`);
     return lesson.topics || [lesson.title || ''];
