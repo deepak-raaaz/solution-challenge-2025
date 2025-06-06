@@ -181,6 +181,24 @@ export const generateApi = apiSlice.injectEndpoints({
                 }
             },
         }),
+
+        generateRoadmap: builder.mutation({
+            query: (data) => ({
+                url: "create-learning-roadmap",
+                method: "POST",
+                body: data,
+                credentials: "include" as const,
+            }),
+            async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+                try {
+                    const result = await queryFulfilled;
+                    // Handle successful response if needed
+                } catch (error: any) {
+                    console.log(error);
+                    // Handle error if needed
+                }
+            },
+        }),
         learningRoadmap: builder.query({
             query: (roadmapId) => ({
                 url: `learning-roadmap/${roadmapId}`,
@@ -316,5 +334,6 @@ export const {
     useSubmitQuizMutation,
     useCompleteMarkMutation,
     useCreateReAttemptQuizMutation,
-    useCreateNewResourceMutation
+    useCreateNewResourceMutation,
+    useGenerateRoadmapMutation
 } = generateApi;

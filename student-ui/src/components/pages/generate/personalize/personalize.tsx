@@ -160,7 +160,7 @@ const Personalize: React.FC = () => {
   }
 
   return (
-    <section className="min-h-screen px-4 py-12 max-lg:py-20">
+    <section className="min-h-screen px-4 py-20">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">

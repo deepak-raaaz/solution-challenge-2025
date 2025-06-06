@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { setAssessment, setTestResults } from "@/redux/features/local-storage/localStorageSlice";
-import { useGetAssessmentQuery, useSubmitAssessmentMutation, useGeneratePlaylistMutation } from "@/redux/features/api/generate/generateApi";
+import { useGetAssessmentQuery, useSubmitAssessmentMutation, } from "@/redux/features/api/generate/generateApi";
 import { MultiStepLoader as Loader } from "@/components/ui/multi-step-loader";
 import SectionHeading from "@/components/shared/section-heading";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ interface UserAnswer {
 const loadingStates = [
   { text: "Structuring your complete guide" },
   { text: "Sourcing expert insights" },
-  { text: "Curating the perfect playlist" },
+  { text: "Curating the perfect Roadmap" },
   { text: "Gathering top-tier resources" },
   { text: "Verifying content quality" },
   { text: "Organizing everything neatly" },
@@ -196,7 +196,7 @@ const Assessment: React.FC = () => {
     }
 
     if (!userAnswers.length || userAnswers.length < questions.length) {
-      setErrorMessage("Please answer all questions before generating the playlist.");
+      setErrorMessage("Please answer all questions before generating the Learning Roadmap.");
       setLoading(false);
       return;
     }
@@ -235,7 +235,7 @@ const Assessment: React.FC = () => {
       console.log("Assessment submitted successfully:", submitResult); // Debug log
 
       setTimeout(() => {
-        router.push(`/generate/playlist?assessment=${assessmentId}&personalization=${submitResult.playlistPersonalizationId}`);
+        router.push(`/generate/learning-roadmap?assessment=${assessmentId}&personalization=${submitResult.playlistPersonalizationId}`);
       }, 2000);
 
       // Generate playlist
@@ -251,7 +251,7 @@ const Assessment: React.FC = () => {
 
   if (loading || isFetching || isSubmitting) {
     return (
-      <div className="w-full h-[60vh] flex items-center justify-center max-lg:py-20">
+      <div className="w-full h-[60vh] flex items-center justify-center py-20">
         <Loader loadingStates={loadingStates} loading={true} duration={700} />
         <Button
           onClick={() => router.push("/generate")}
@@ -266,7 +266,7 @@ const Assessment: React.FC = () => {
 
   if (errorMessage) {
     return (
-      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-lg:py-20">
+      <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-20">
         <div className="max-w-3xl mx-auto text-center">
           <SectionHeading
             title="Error"
@@ -289,7 +289,7 @@ const Assessment: React.FC = () => {
 
   if (isTestComplete) {
     return (
-      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-lg:py-20">
+      <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-20">
         <div className="max-w-3xl mx-auto">
           <SectionHeading
             title="Test Completed!"
@@ -333,10 +333,10 @@ const Assessment: React.FC = () => {
               <Button
                 onClick={handleProceed}
                 className="px-6 py-2.5 bg-blue-500 text-white font-semibold hover:bg-blue-600"
-                aria-label="Generate Playlist"
+                aria-label="Generate Learning Roadmap"
                 disabled={isSubmitting}
               >
-                Generate Playlist
+                Generate Learning Roadmap
               </Button>
             </div>
           </div>
@@ -346,7 +346,7 @@ const Assessment: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-lg:py-20">
+    <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-20">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
           <SectionHeading
