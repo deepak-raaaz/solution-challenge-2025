@@ -169,7 +169,7 @@ export const generateApi = apiSlice.injectEndpoints({
                     tags: params.tags,
                     sortBy: params.sortBy,
                     sortOrder: params.sortOrder,
-                  },
+                },
             }),
             async onQueryStarted(arg, { queryFulfilled, dispatch }) {
                 try {
@@ -195,7 +195,7 @@ export const generateApi = apiSlice.injectEndpoints({
                     console.log(error);
                     // Handle error if needed
                 }
-            }, 
+            },
         }),
         learningResource: builder.query({
             query: (resourceId) => ({
@@ -211,7 +211,7 @@ export const generateApi = apiSlice.injectEndpoints({
                     console.log(error);
                     // Handle error if needed
                 }
-            }, 
+            },
         }),
         getQuiz: builder.query({
             query: (quizId) => ({
@@ -227,13 +227,63 @@ export const generateApi = apiSlice.injectEndpoints({
                     console.log(error);
                     // Handle error if needed
                 }
-            }, 
+            },
         }),
         submitQuiz: builder.mutation({
             query: ({ quizId, answers }) => ({
                 url: `learning-roadmap/submit-quiz/${quizId}`,
                 method: "PUT",
                 body: { answers },
+                credentials: "include" as const,
+            }),
+            async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+                try {
+                    const result = await queryFulfilled;
+                    // Handle successful response if needed
+                } catch (error: any) {
+                    console.log(error);
+                    // Handle error if needed
+                }
+            },
+        }),
+        completeMark: builder.mutation({
+            query: ({ resourceId }) => ({
+                url: `learning-roadmap/resource/completed/${resourceId}`,
+                method: "PUT",
+                credentials: "include" as const,
+            }),
+            async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+                try {
+                    const result = await queryFulfilled;
+                    // Handle successful response if needed
+                } catch (error: any) {
+                    console.log(error);
+                    // Handle error if needed
+                }
+            },
+        }),
+        createNewResource: builder.mutation({
+            query: ({ lessonId, resourceType }) => ({
+                url: `learning-roadmap/new-resource/${lessonId}`,
+                method: "PUT",
+                body: { resourceType },
+                credentials: "include" as const,
+            }),
+            async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+                try {
+                    const result = await queryFulfilled;
+                    // Handle successful response if needed
+                } catch (error: any) {
+                    console.log(error);
+                    // Handle error if needed
+                }
+            },
+        }),
+        createReAttemptQuiz: builder.mutation({
+            query: ({ data }) => ({
+                url: `learning-roadmap/create-reattempt-new-quiz`,
+                method: "PUT",
+                body: data,
                 credentials: "include" as const,
             }),
             async onQueryStarted(arg, { queryFulfilled, dispatch }) {
@@ -263,6 +313,8 @@ export const {
     useLearningRoadmapQuery,
     useLearningResourceQuery,
     useGetQuizQuery,
-    useSubmitQuizMutation
-
+    useSubmitQuizMutation,
+    useCompleteMarkMutation,
+    useCreateReAttemptQuizMutation,
+    useCreateNewResourceMutation
 } = generateApi;

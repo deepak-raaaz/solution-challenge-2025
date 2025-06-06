@@ -41,7 +41,7 @@ const LessonCard: React.FC<LessonCardProps> = ({ lesson, roadmapId }) => {
               <ResourceCard key={index} resource={resource} roadmapId={roadmapId} />
             ))}
             {
-              lesson.quizId.map((quiz: any, index: number) => (
+              lesson?.quizId && lesson.quizId.map((quiz: any, index: number) => (
                 <QuizCard key={quiz._id} quiz={{ id: quiz._id, title: `${lesson.title} Quiz ${index + 1}`, attempts: quiz.attempts }} roadmapId={roadmapId} />
 
               ))

@@ -1,8 +1,10 @@
+import { useCompleteMarkMutation } from '@/redux/features/api/generate/generateApi';
 import React, { useState } from 'react';
 
 interface VideoContentProps {
-  resource: any
+  resource: any;
 }
+
 function formatTimeFromSeconds(seconds: number) {
   const hrs = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
@@ -23,15 +25,21 @@ function formatNumber(num: number) {
   return num.toString();
 }
 
-
-const VideoContent: React.FC<VideoContentProps> = ({
-  resource
-}) => {
-
+const VideoContent: React.FC<VideoContentProps> = ({ resource }) => {
+  const [completeMark, { isLoading: isMarking, data: markData, error: markError }] = useCompleteMarkMutation();
   const [isWatched, setIsWatched] = useState(resource.status === 'completed');
-console.log(resource.status)
 
-  const handleMarkWatched = () => setIsWatched(!isWatched);
+  const handleMarkWatched = async () => {
+    if (isWatched || isMarking) return; // Prevent action if already watched or marking
+
+    try {
+      await completeMark({ resourceId: resource._id }).unwrap();
+      setIsWatched(true);
+    } catch (err) {
+      console.error('Failed to mark as watched:', markError || err);
+      // Optionally show error to user (e.g., toast notification)
+    }
+  };
 
   return (
     <div className="bg-gray-800/20 border border-gray-700/40 rounded-lg w-full mx-auto">
@@ -48,10 +56,9 @@ console.log(resource.status)
         <h2 className="text-2xl font-bold text-gray-100 mb-4">{resource.title}</h2>
         <div className="flex items-center space-x-4 text-sm text-gray-400 mb-4">
           <div className="flex items-center space-x-2">
-
             <img
               src={`https://avatar.iran.liara.run/public/${Math.floor(Math.random() * 100)}`}
-              alt={resource.metadata.channelr}
+              alt={resource.metadata.channel}
               className="w-6 h-6 rounded-full mr-3"
             />
             <span>{resource.metadata.channel}</span>
@@ -66,10 +73,8 @@ console.log(resource.status)
         <p className="text-gray-300 mb-6">{"description"}</p>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-         
             <button
               className="flex items-center space-x-2 text-gray-400 hover:text-blue-400 transition-colors duration-200"
-
               aria-label="Like video"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,7 +89,6 @@ console.log(resource.status)
             </button>
             <button
               className="flex items-center space-x-2 text-gray-400 hover:text-blue-400 transition-colors duration-200"
-
               aria-label="Comment on video"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,8 +108,10 @@ console.log(resource.status)
                 : 'bg-blue-600 hover:bg-blue-700 text-white'
               }`}
             onClick={handleMarkWatched}
+            disabled={isMarking || isWatched}
+            aria-label={isWatched ? 'Video marked as watched' : 'Mark video as watched'}
           >
-            {isWatched ? 'Watched' : 'Mark as Watched'}
+            {isMarking ? 'Marking...' : isWatched ? 'Watched' : 'Mark as Watched'}
           </button>
         </div>
       </div>
