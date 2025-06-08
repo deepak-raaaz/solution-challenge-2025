@@ -18,8 +18,8 @@ export interface ILearningRoadmap extends Document {
 const LearningRoadmapSchema = new Schema<ILearningRoadmap>(
     {
         userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-        assessment: { type: Schema.Types.ObjectId, ref: 'Assessment', required: true, index: true },
-        playlistPersonalization: { type: Schema.Types.ObjectId, ref: 'PlaylistPersonalization', required: true, index: true },
+        assessment: { type: Schema.Types.ObjectId, ref: 'Assessment', required: true, index: true, unique: true },
+        playlistPersonalization: { type: Schema.Types.ObjectId, ref: 'PlaylistPersonalization', required: true, index: true, unique: true },
         title: { type: String, required: true, trim: true },
         description: { type: String, required: true, trim: true },
         overview: { type: String, default: '', trim: true },

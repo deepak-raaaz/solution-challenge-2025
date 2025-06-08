@@ -1,5 +1,5 @@
 import { setResourceCompleted } from '../controllers/students/resource.controller';
-import { createLearningRoadmap, getLearningRoadmapById, getResourceById } from '../controllers/students/learning-roadmap.controller';
+import { createLearningRoadmap, getLearningRoadmapById, getResourceById, myLearningRoadmap } from '../controllers/students/learning-roadmap.controller';
 import { isAuthenticate } from '../middleware/auth';
 import express from 'express';
 import { getQuizById } from '../controllers/students/quiz/quiz.controller';
@@ -30,6 +30,8 @@ LearningRoadmapRouter.put('/learning-roadmap/new-resource/:lessonId', isAuthenti
 
 
 LearningRoadmapRouter.put('/learning-roadmap/create-reattempt-new-quiz', isAuthenticate, createReattemptNewQuiz);
+
+LearningRoadmapRouter.get('/my-learning-roadmap', isAuthenticate, myLearningRoadmap);
 
 
 export default LearningRoadmapRouter

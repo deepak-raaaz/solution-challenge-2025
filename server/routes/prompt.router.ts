@@ -1,7 +1,7 @@
 import { isAuthenticate } from '../middleware/auth';
 import { enhancePrompt, generateTopics } from '../controllers/prompt.controller';
 import express from 'express';
-import { generateAssessment, getAssessment, getPlaylistPersonalization, submitAssessment } from '../controllers/assessment.controller';
+import { generateAssessment, getAssessment, getPlaylistPersonalization, myPendingAssessment, submitAssessment } from '../controllers/assessment.controller';
 
 const promptRouter = express.Router();
 
@@ -16,5 +16,7 @@ promptRouter.get('/assessment/:assessmentId', isAuthenticate, getAssessment);
 promptRouter.put('/assessment-submit/:assessmentId', isAuthenticate, submitAssessment);
 
 promptRouter.get('/playlist-personalization/:personalizationId', isAuthenticate, getPlaylistPersonalization);
+
+promptRouter.get('/my-pending-assessment', isAuthenticate, myPendingAssessment)
 
 export default promptRouter;

@@ -23,7 +23,7 @@ const LessonSchema = new Schema<ILesson>(
         description: { type: String, required: true, trim: true },
         status: { type: String, enum: ['completed', 'in-progress', 'locked'], default: 'locked' },
         resourceIds: [{ type: Schema.Types.ObjectId, ref: 'Resource', index: true }],
-        quizId: [{ type: Schema.Types.ObjectId, ref: 'Quiz', default: null }],
+        quizId: [{ type: Schema.Types.ObjectId, ref: 'Quiz' }],
         topics: [{
             type: String, trim: true,
             isSupplemental: { type: Boolean, default: false }, // Added

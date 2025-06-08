@@ -12,6 +12,7 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { cleanJsonResponse } from '../../utlis/cleanJson.helper';
 import { redis } from '../../utlis/redis';
+import { logger } from '../../utlis/logger';
 
 // Initialize APIs
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
@@ -506,145 +507,159 @@ async function createModules(roadmapData: GeneratedRoadmap, roadmapId: Types.Obj
 
 // Create learning roadmap endpoint
 export const createLearningRoadmap = async (req: CreatePlaylistRequest, res: Response) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     const userId = req?.user?._id as string;
     const { assessmentId, playlistPersonalizationId } = req.body;
 
     // Validate input
     if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(assessmentId) || !mongoose.Types.ObjectId.isValid(playlistPersonalizationId)) {
-      await session.abortTransaction();
-      session.endSession();
       return res.status(400).json({ error: 'Invalid userId, assessmentId, or playlistPersonalizationId' });
     }
 
-    // Check if user exists
-    const user = await mongoose.model('User').findById(userId).session(session);
-    if (!user) {
-      await session.abortTransaction();
-      session.endSession();
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    // Check if assessment exists
-    const assessment = await fetchAssessment(assessmentId);
-    if (!assessment) {
-      await session.abortTransaction();
-      session.endSession();
-      return res.status(404).json({ error: 'Assessment not found' });
-    }
-
-    // Check if playlist personalization exists
-    const personalization = await fetchPersonalization(playlistPersonalizationId);
-    if (!personalization) {
-      await session.abortTransaction();
-      session.endSession();
-      return res.status(404).json({ error: 'Playlist personalization not found' });
-    }
-
-    // Check if the assessment and personalization belong to the user
-    if (assessment.userId.toString() !== userId || personalization.userId.toString() !== userId) {
-      await session.abortTransaction();
-      session.endSession();
-      return res.status(403).json({ error: 'You are not authorized to create a roadmap for this assessment and personalization' });
-    }
-
-    // Check if learning roadmap already exists
+    // Early check for existing roadmap
     const existingLearningRoadmap = await LearningRoadmap.findOne({
       userId: new Types.ObjectId(userId),
       assessment: new Types.ObjectId(assessmentId),
       playlistPersonalization: new Types.ObjectId(playlistPersonalizationId),
-    }).session(session);
+    });
 
     if (existingLearningRoadmap) {
-      await session.abortTransaction();
-      session.endSession();
       return res.status(201).json({
         error: 'Learning roadmap already exists for this assessment and personalization',
         roadmapId: existingLearningRoadmap._id,
       });
     }
 
-    // Generate learning roadmap structure using Gemini
-    const roadmapData = await generateLearningRoadmapStructure(assessment, personalization);
+    const session = await mongoose.startSession();
+    session.startTransaction({ readConcern: { level: 'snapshot' } });
 
-    // Create roadmap
-    const roadmap: any = {
-      userId: new Types.ObjectId(userId),
-      assessment: new Types.ObjectId(assessmentId),
-      playlistPersonalization: new Types.ObjectId(playlistPersonalizationId),
-      title: roadmapData.title,
-      description: roadmapData.description,
-      overview: roadmapData.overview || '',
-      tags: roadmapData.tags,
-      modules: [],
-      status: 'active',
-      metadata: { totalXp: 0, source: 'gemini' },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    try {
+      // Check if user exists
+      const user = await mongoose.model('User').findById(userId).session(session);
+      if (!user) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(404).json({ error: 'User not found' });
+      }
 
-    const savedRoadmap = await LearningRoadmap.create([roadmap], { session });
-    const roadmapId = savedRoadmap[0]._id;
+      // Check if assessment exists
+      const assessment = await fetchAssessment(assessmentId);
+      if (!assessment) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(404).json({ error: 'Assessment not found' });
+      }
 
-    // Create modules (with lessons only for the first module)
-    roadmap.modules = await createModules(roadmapData, roadmapId as any);
+      // Check if playlist personalization exists
+      const personalization = await fetchPersonalization(playlistPersonalizationId);
+      if (!personalization) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(404).json({ error: 'Playlist personalization not found' });
+      }
 
-    // Update roadmap with module IDs
-    await LearningRoadmap.updateOne({ _id: roadmapId }, { modules: roadmap.modules, updatedAt: new Date() }, { session });
+      // Check if the assessment and personalization belong to the user
+      if (assessment.userId.toString() !== userId || personalization.userId.toString() !== userId) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(403).json({ error: 'You are not authorized to create a roadmap for this assessment and personalization' });
+      }
 
-    // Initialize user progress
-    await UserProgress.create([{
-      userId: new Types.ObjectId(userId),
-      roadmapId,
-      completedResources: [],
-      completedLessons: [],
-      completedModules: [],
-      failedQuizLessons: [],
-      totalXp: 0,
-      progressPercentage: 0,
-      lastUpdated: new Date(),
-    }], { session });
+      // Generate learning roadmap structure using Gemini
+      const roadmapData = await generateLearningRoadmapStructure(assessment, personalization);
 
-    await session.commitTransaction();
-    session.endSession();
+      // Create roadmap
+      const roadmap: any = {
+        userId: new Types.ObjectId(userId),
+        assessment: new Types.ObjectId(assessmentId),
+        playlistPersonalization: new Types.ObjectId(playlistPersonalizationId),
+        title: roadmapData.title,
+        description: roadmapData.description,
+        overview: roadmapData.overview || '',
+        tags: roadmapData.tags,
+        modules: [],
+        status: 'active',
+        metadata: { totalXp: 0, source: 'gemini' },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
 
-    // Fetch populated roadmap
-    const populatedRoadmap = await LearningRoadmap.findById(roadmapId)
-      .populate({
-        path: 'modules',
-        model: 'LearningRoadmapModule',
-        populate: {
-          path: 'lessonIds',
-          model: 'LearningRoadmapLesson',
-          populate: { path: 'resourceIds', model: 'LearningRoadmapResource' },
+      const savedRoadmap = await LearningRoadmap.create([roadmap], { session });
+      const roadmapId = savedRoadmap[0]._id;
+
+      // Create modules (with lessons only for the first module)
+      roadmap.modules = await createModules(roadmapData, roadmapId as any);
+
+      // Update roadmap with module IDs
+      await LearningRoadmap.updateOne({ _id: roadmapId }, { modules: roadmap.modules, updatedAt: new Date() }, { session });
+
+      // Initialize user progress
+      await UserProgress.create([{
+        userId: new Types.ObjectId(userId),
+        roadmapId,
+        completedResources: [],
+        completedLessons: [],
+        completedModules: [],
+        failedQuizLessons: [],
+        totalXp: 0,
+        progressPercentage: 0,
+        lastUpdated: new Date(),
+      }], { session });
+
+      await session.commitTransaction();
+      session.endSession();
+
+      // Fetch populated roadmap
+      const populatedRoadmap = await LearningRoadmap.findById(roadmapId)
+        .populate({
+          path: 'modules',
+          model: 'LearningRoadmapModule',
+          populate: {
+            path: 'lessonIds',
+            model: 'LearningRoadmapLesson',
+            populate: { path: 'resourceIds', model: 'LearningRoadmapResource' },
+          },
+        })
+        .populate({
+          path: 'userId',
+          select: '_id name email',
+          model: 'User',
+        });
+
+      // Calculate total lessons safely
+      const totalLessons = populatedRoadmap?.modules
+        ? populatedRoadmap.modules.reduce((sum, module: any) => sum + (Array.isArray(module.lessonIds) ? module.lessonIds.length : 0), 0)
+        : 0;
+
+      return res.status(201).json({
+        message: 'Learning roadmap created successfully',
+        roadmapId: populatedRoadmap?._id,
+        roadmap: {
+          ...populatedRoadmap?.toObject(),
+          moduleCount: populatedRoadmap?.modules?.length || 0,
+          lessonCount: totalLessons,
         },
-      })
-      .populate({
-        path: 'userId',
-        select: '_id name email',
-        model: 'User',
       });
-
-    // Calculate total lessons safely
-    const totalLessons = populatedRoadmap?.modules
-      ? populatedRoadmap.modules.reduce((sum, module: any) => sum + (Array.isArray(module.lessonIds) ? module.lessonIds.length : 0), 0)
-      : 0;
-
-    return res.status(201).json({
-      message: 'Learning roadmap created successfully',
-      roadmapId: populatedRoadmap?._id,
-      roadmap: {
-        ...populatedRoadmap?.toObject(),
-        moduleCount: populatedRoadmap?.modules?.length || 0,
-        lessonCount: totalLessons,
-      },
-    });
+    } catch (error: any) {
+      await session.abortTransaction();
+      session.endSession();
+      if (error.code === 11000) {
+        // Handle duplicate key error
+        const existingRoadmap = await LearningRoadmap.findOne({
+          userId: new Types.ObjectId(userId),
+          assessment: new Types.ObjectId(assessmentId),
+          playlistPersonalization: new Types.ObjectId(playlistPersonalizationId),
+        });
+        if (existingRoadmap) {
+          return res.status(201).json({
+            error: 'Learning roadmap already exists for this assessment and personalization',
+            roadmapId: existingRoadmap._id,
+          });
+        }
+      }
+      throw error;
+    }
   } catch (error: any) {
-    await session.abortTransaction();
-    session.endSession();
     console.error('Error creating learning roadmap:', error);
     return res.status(500).json({ error: error.message || 'Internal server error' });
   }
@@ -712,9 +727,6 @@ export const getLearningRoadmapById = async (req: Request, res: Response, next: 
     return res.status(500).json({ error: error.message || 'Internal server error' });
   }
 };
-
-
-
 
 
 // Helper to verify resource ownership
@@ -816,3 +828,103 @@ export const getResourceById = async (req: Request, res: Response, next: NextFun
 };
 
 
+export const myLearningRoadmap = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = req.user;
+
+    // Validate user authentication
+    if (!user?._id) {
+      logger.warn('Unauthorized access attempt: No user in request');
+      return res.status(401).json({ error: 'Unauthorized: No user authenticated' });
+    }
+    const userId = user._id as any;
+
+    // Validate userId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      logger.warn(`Invalid userId: ${userId}`);
+      return res.status(400).json({ error: 'Invalid userId' });
+    }
+
+    // Check cache
+    const cacheKey = `roadmap:card:user:${userId}`;
+    const cachedRoadmap = await redis.get(cacheKey);
+    if (cachedRoadmap) {
+      logger.debug(`Cache hit for roadmap:card:user:${userId}`);
+      return res.status(200).json({
+        status: 'success',
+        data: JSON.parse(cachedRoadmap),
+      });
+    }
+
+    // Fetch roadmap with minimal data
+    const roadmap = await LearningRoadmap.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+      {
+        $lookup: {
+          from: 'learningroadmapmodules',
+          localField: '_id',
+          foreignField: 'roadmapId',
+          as: 'modules',
+        },
+      },
+      {
+        $lookup: {
+          from: 'learningroadmaplessons',
+          let: { moduleIds: '$modules._id' },
+          pipeline: [
+            { $match: { $expr: { $in: ['$moduleId', '$$moduleIds'] } } },
+          ],
+          as: 'lessons',
+        },
+      },
+      {
+        $lookup: {
+          from: 'userprogresses',
+          localField: '_id',
+          foreignField: 'roadmapId',
+          as: 'progress',
+        },
+      },
+      { $unwind: { path: '$progress', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          roadmapId: '$_id',
+          title: 1,
+          description: 1,
+          moduleCount: { $size: '$modules' },
+          lessonCount: { $size: '$lessons' },
+          progressPercentage: '$progress.progressPercentage',
+          totalXp: '$progress.totalXp',
+          createdAt: 1,
+          _id: 0,
+        },
+      },
+    ]);
+
+    if (!roadmap || roadmap.length === 0) {
+      logger.warn(`No roadmap found for user:${userId}`);
+      return res.status(200).json({ 
+        status: 'success',
+        data: {},
+       });
+    }
+
+    // Cache result
+    await redis.setex(cacheKey, 300, JSON.stringify(roadmap));
+    logger.debug(`Cached roadmap card for user:${userId}`);
+
+    return res.status(200).json({
+      status: 'success',
+      data: roadmap,
+    });
+  } catch (error: any) {
+    logger.error(`Error fetching roadmap card for user:${req.user?._id}: ${error.message}`, {
+      stack: error.stack,
+    });
+    return res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+};
