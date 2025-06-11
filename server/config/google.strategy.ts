@@ -1,7 +1,7 @@
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import passport from 'passport';
 import userModel from '../models/user.model';
-import  ErrorHandler from '../utlis/ErrorHandler';
+import  {AppError} from '../utlis/ErrorHandler';
 import { redis } from '../utlis/redis';
 
 passport.use(new GoogleStrategy({
@@ -33,6 +33,6 @@ async (accessToken: string, refreshToken: string, profile: any, cb: Function) =>
     return cb(null, {user,accessToken,refreshToken})
 
   } catch (error:any) {
-    return cb(new ErrorHandler(error.message, error.code));
+    return cb(new AppError(error.message, error.code));
   }
 }));
