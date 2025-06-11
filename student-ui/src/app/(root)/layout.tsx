@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { Suspense } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { useEffect } from "react";
@@ -25,15 +25,18 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const { isLoading } = useLoadUserQuery({});
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <div className="flex-1 lg:ml-64 max-sm:py-0">
-        <DesktopNavbar/>
-        {children}
+    <Suspense fallback={<div>Loading...</div>}>
+
+      <div className="flex">
+        <Sidebar />
+        <div className="flex-1 lg:ml-64 max-sm:py-0">
+          <DesktopNavbar />
+          {children}
+        </div>
+        <BottomNavbar />
+        <MobileNav />
       </div>
-      <BottomNavbar />
-      <MobileNav />
-    </div>
+    </Suspense>
   );
 };
 

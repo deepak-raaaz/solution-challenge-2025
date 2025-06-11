@@ -1,12 +1,14 @@
-import Playlists from '@/components/pages/playlists/playlists'
-import React from 'react'
+'use client';
+
+import Playlists from '@/components/pages/playlists/playlists';
+import React, { Suspense } from 'react';
 
 const Page = () => {
   return (
-    <>
-    <Playlists/>
-    </>
-  )
-}
+    <Suspense fallback={<div>Loading playlists...</div>}>
+      <Playlists />
+    </Suspense>
+  );
+};
 
-export default Page
+export default Page;

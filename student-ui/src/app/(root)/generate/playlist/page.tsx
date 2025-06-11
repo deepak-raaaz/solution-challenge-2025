@@ -1,6 +1,6 @@
 "use client"
 import { redirect } from 'next/navigation';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useGeneratePlaylistMutation } from '@/redux/features/api/generate/generateApi';
 import { MultiStepLoader as Loader } from '@/components/ui/multi-step-loader';
@@ -54,7 +54,11 @@ const Page = () => {
   }, [assessmentId, personalizationId, generatePlaylist, router]);
 
   // Show loader while generating
-  return <Loader loadingStates={loadingStates} loading={isGenerating} duration={700} />;
+  return <Suspense fallback={<Loader loadingStates={loadingStates} loading={true} duration={700} />}>
+  <Loader loadingStates={loadingStates} loading={isGenerating} duration={700} />;
+</Suspense>
+  
+  
 };
 
 export default Page;
