@@ -1,0 +1,130 @@
+name: Build and Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-student-ui:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./student-ui # Set working directory to student-ui folder
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Create .env for Build
+        run: |
+          cat << EOF > .env
+          NEXT_PUBLIC_SERVER_URI="${{ secrets.NEXT_PUBLIC_SERVER_URI }}"
+          ACCESS_TOKEN="${{ secrets.ACCESS_TOKEN }}"
+          NEXT_PUBLIC_BASE_URL="${{ secrets.NEXT_PUBLIC_BASE_URL }}"
+          NEXT_PUBLIC_ENV="${{ secrets.NEXT_PUBLIC_ENV }}"
+          EOF
+          cat .env || echo "Failed to create .env"
+        working-directory: ./student-ui # Ensure .env is created in student-ui folder
+
+      - name: Build Docker Image
+        run: |
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/student-ui .
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Push Docker Image
+        run: |
+          gcloud auth configure-docker gcr.io
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/student-ui
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy student-ui \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/student-ui \
+            --region asia-southeast1 \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars "NEXT_PUBLIC_SERVER_URI=${{ secrets.NEXT_PUBLIC_SERVER_URI }},ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }},NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }},NEXT_PUBLIC_ENV=${{ secrets.NEXT_PUBLIC_ENV }}"
+
+  deploy-server:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server # Set working directory to server folder
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Create .env and Build Docker Image
+        run: |
+          cat << EOF > .env
+          PORT=${{ secrets.PORT }}
+          ORIGIN="${{ secrets.ORIGIN }}"
+          FRONTEND_HOST="${{ secrets.FRONTEND_HOST }}"
+          NODE_ENV="${{ secrets.NODE_ENV }}"
+          DB_URL="${{ secrets.DB_URL }}"
+          CLOUD_NAME="${{ secrets.CLOUD_NAME }}"
+          CLOUD_API_KEY="${{ secrets.CLOUD_API_KEY }}"
+          CLOUD_SECRET_KEY="${{ secrets.CLOUD_SECRET_KEY }}"
+          REDIS_URL="${{ secrets.REDIS_URL }}"
+          ACTIVATION_SECRET="${{ secrets.ACTIVATION_SECRET }}"
+          ACCESS_TOKEN="${{ secrets.ACCESS_TOKEN }}"
+          REFRESH_TOKEN="${{ secrets.REFRESH_TOKEN }}"
+          ACCESS_TOKEN_EXPIRE="${{ secrets.ACCESS_TOKEN_EXPIRE }}"
+          REFRESH_TOKEN_EXPIRE="${{ secrets.REFRESH_TOKEN_EXPIRE }}"
+          SMTP_HOST="${{ secrets.SMTP_HOST }}"
+          SMTP_PORT="${{ secrets.SMTP_PORT }}"
+          SMTP_SERVICE="${{ secrets.SMTP_SERVICE }}"
+          SMTP_MAIL="${{ secrets.SMTP_MAIL }}"
+          SMTP_PASSWORD="${{ secrets.SMTP_PASSWORD }}"
+          GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}"
+          GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
+          GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
+          YOUTUBE_API_KEY="${{ secrets.YOUTUBE_API_KEY }}"
+          GOOGLE_SEARCH_API_KEY="${{ secrets.GOOGLE_SEARCH_API_KEY }}"
+          GOOGLE_SEARCH_CX="${{ secrets.GOOGLE_SEARCH_CX }}"
+          GOOGLE_CLOUD_API_KEY="${{ secrets.GOOGLE_CLOUD_API_KEY }}"
+          GOOGLE_CLOUD_PROJECT="${{ secrets.GOOGLE_CLOUD_PROJECT }}"
+          GOOGLE_APPLICATION_CREDENTIALS="${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}"
+          GCS_BUCKET_NAME="${{ secrets.GCS_BUCKET_NAME }}"
+          GOOGLE_API_KEY="${{ secrets.GOOGLE_API_KEY }}"
+          GOOGLE_CSE_ID="${{ secrets.GOOGLE_CSE_ID }}"
+          EOF
+          cat .env || echo "Failed to create .env"
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/server .
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Push Docker Image
+        run: |
+          gcloud auth configure-docker gcr.io
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/server
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy server \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/server \
+            --region asia-southeast1 \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars "PORT=${{ secrets.PORT }},ORIGIN=${{ secrets.ORIGIN }},FRONTEND_HOST=${{ secrets.FRONTEND_HOST }},NODE_ENV=${{ secrets.NODE_ENV }},DB_URL=${{ secrets.DB_URL }},CLOUD_NAME=${{ secrets.CLOUD_NAME }},CLOUD_API_KEY=${{ secrets.CLOUD_API_KEY }},CLOUD_SECRET_KEY=${{ secrets.CLOUD_SECRET_KEY }},REDIS_URL=${{ secrets.REDIS_URL }},ACTIVATION_SECRET=${{ secrets.ACTIVATION_SECRET }},ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }},REFRESH_TOKEN=${{ secrets.REFRESH_TOKEN }},ACCESS_TOKEN_EXPIRE=${{ secrets.ACCESS_TOKEN_EXPIRE }},REFRESH_TOKEN_EXPIRE=${{ secrets.REFRESH_TOKEN_EXPIRE }},SMTP_HOST=${{ secrets.SMTP_HOST }},SMTP_PORT=${{ secrets.SMTP_PORT }},SMTP_SERVICE=${{ secrets.SMTP_SERVICE }},SMTP_MAIL=${{ secrets.SMTP_MAIL }},SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }},GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }},GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }},GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }},YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }},GOOGLE_SEARCH_API_KEY=${{ secrets.GOOGLE_SEARCH_API_KEY }},GOOGLE_SEARCH_CX=${{ secrets.GOOGLE_SEARCH_CX }},GOOGLE_CLOUD_API_KEY=${{ secrets.GOOGLE_CLOUD_API_KEY }},GOOGLE_CLOUD_PROJECT=${{ secrets.GOOGLE_CLOUD_PROJECT }},GOOGLE_APPLICATION_CREDENTIALS=${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }},GCS_BUCKET_NAME=${{ secrets.GCS_BUCKET_NAME }},GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }},GOOGLE_CSE_ID=${{ secrets.GOOGLE_CSE_ID }}"
