@@ -20,7 +20,7 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PORT=8082
+ENV PORT=8080
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
@@ -33,6 +33,6 @@ COPY --from=builder --chown=appuser:nodejs /app/package.json ./package.json
 
 USER appuser
 
-EXPOSE 8082
+EXPOSE 8080
 
 CMD ["npm", "start"]

@@ -51,6 +51,7 @@ jobs:
         run: |
           gcloud run deploy student-ui \
             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/student-ui \
+            --timeout=600s \
             --region asia-southeast1 \
             --platform managed \
             --allow-unauthenticated \
