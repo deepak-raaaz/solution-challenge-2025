@@ -20,7 +20,7 @@ app.use(cookieParser());
 // cors = cross origin resource sharing
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000","https://student-ui-554347060569.asia-southeast1.run.app"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
