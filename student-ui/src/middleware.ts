@@ -25,10 +25,9 @@ export async function middleware(request: NextRequest) {
         if (refreshToken) {
           try {
             const response = await fetch(
-              `${
-                process.env.NEXT_PUBLIC_ENV === "production"
-                  ? "https://backend-server-554347060569.asia-southeast1.run.app/api/v1/refresh-token"
-                  : "http://localhost:8080/api/v1/refresh-token"
+              `${process.env.NEXT_PUBLIC_ENV === "production"
+                ? "https://backend-server-554347060569.asia-southeast1.run.app/api/v1/refresh-token"
+                : "http://localhost:8080/api/v1/refresh-token"
               }`,
               {
                 method: "GET",
@@ -53,19 +52,20 @@ export async function middleware(request: NextRequest) {
             nextResponse.cookies.set("access_token", data.accessToken, {
               expires: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000),
               maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
-              httpOnly: false,
-              sameSite: "none",
-              secure: true,
-             
+              httpOnly: true,
+              sameSite: "none", // Use 'none' for cross-site requests
+              secure: true,     // Set to true for HTTPS in production
+              path: "/"
+
             });
 
             nextResponse.cookies.set("refresh_token", data.refreshToken, {
               expires: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000),
-              maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
-              httpOnly: false,
-              sameSite: "none",
-              secure: true,
-             
+              httpOnly: true,
+              sameSite: "none", // Use 'none' for cross-site requests
+              secure: true,     // Set to true for HTTPS in production
+              path: "/"
+
             });
 
             if (authPaths.includes(path)) {
