@@ -25,6 +25,9 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 appuser
 
+# Create logs directory with correct permissions
+RUN mkdir /app/logs && chown -R appuser:nodejs /app/logs
+
 # Copy built files and dependencies
 COPY --from=builder --chown=appuser:nodejs /app/dist ./dist
 COPY --from=builder --chown=appuser:nodejs /app/node_modules ./node_modules
