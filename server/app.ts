@@ -41,22 +41,45 @@ app.use("/api/v1", LearningRoadmapRouter);
 
 
 //google auth route
-app.get('/auth/google',
-  passport.authenticate('google', { session: false, scope: ['profile', 'email'] }));
+app.get(
+  "/auth/google",
+  passport.authenticate("google", {
+    session: false,
+    scope: ["profile", "email"],
+  })
+);
 
-app.get('/auth/google/callback',
-  passport.authenticate('google', { session: false, failureRedirect: `${process.env.FRONTEND_HOST}/signin` }),
+app.get(
+  "/auth/google/callback",
+  passport.authenticate("google", {
+    session: false,
+    failureRedirect: `${process.env.FRONTEND_HOST}/signin`,
+  }),
   function (req, res) {
-    // Successful authentication, redirect home.
     const { user, accessToken, refreshToken } = req.user as any;
 
     res.cookie("access_token", accessToken, accessTokenOptions);
-    res.cookie("refresh_token", refreshToken, refreshTokenOptions);
+    res.cookie("refresh_token", refreshToken, accessTokenOptions);
 
-    res.redirect(`${process.env.FRONTEND_HOST}`);
-  });
+    let redirectUrl = req.cookies.redirectTo || "/";
 
+    // Ensure redirect URL points to frontend (localhost:3000)
+    if (!redirectUrl.startsWith("http")) {
+     
+      redirectUrl = `${process.env.FRONTEND_HOST}${decodeURIComponent(redirectUrl)}`;
+  
+    }
+    // redirectUrl = `${process.env.FRONTEND_HOST}${decodeURIComponent(redirectUrl)}`;
 
+    res.clearCookie("redirectTo");
+    res.send(
+      `<script>
+      window.opener.postMessage({ success: true, redirectUrl: '${redirectUrl}' }, '${process.env.FRONTEND_HOST}');
+      window.close();
+    </script>`
+    );
+  }
+);
 
 
 // testing api

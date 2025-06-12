@@ -11,7 +11,7 @@ const HeroSection = () => {
     e.preventDefault();
     if (query.trim()) {
       
-      router.push(`/login?query=${encodeURIComponent(query)}`);
+      router.push(`/generate`);
     }
   };
 
@@ -45,7 +45,9 @@ const HeroSection = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                   </svg>
                 </button>
-                <button type="submit" className="px-6 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white font-semibold rounded-full hover:from-blue-600 hover:to-blue-700 transition-all cursor-pointer">
+                <button
+
+                 type="submit" className="px-6 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white font-semibold rounded-full hover:from-blue-600 hover:to-blue-700 transition-all cursor-pointer">
                   Generate
                 </button>
               </div>

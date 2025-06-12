@@ -80,9 +80,22 @@ const Page = (props: Props) => {
   const { errors, touched, handleChange, handleSubmit } = formik;
 
   const handleGoogleSignin = () => {
-    window.open("http://localhost:8080/auth/google", "_self");
+    const searchParams = new URLSearchParams(window.location.search);
+    const redirectTo = searchParams.get("redirectTo") || "/";
+  
+    document.cookie = `redirectTo=${redirectTo}; path=/; domain=.run.app; samesite=none; secure`;
+  
+    const authWindow = window.open("https://backend-server-554347060569.asia-southeast1.run.app/auth/google",
+     "_blank", "width=500,height=600");
+  
+    window.addEventListener("message", (event) => {
+      if (event.data?.success) {
+        authWindow?.close();
+        window.location.href = event.data.redirectUrl;
+      }
+    }, { once: true });
   };
-
+  
   return (
     <div className="min-h-screen max-w-screen-xl mx-auto flex justify-center items-center">
       <div className="max-w-[420px] bg-[#131920] rounded-xl p-10 w-full ">

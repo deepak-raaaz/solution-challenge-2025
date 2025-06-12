@@ -27,6 +27,7 @@
     "gsap": "^3.13.0",
     "heroicons": "^2.2.0",
     "input-otp": "^1.4.2",
+    "jose": "^6.0.11",
     "locomotive-scroll": "^4.1.4",
     "lucide-react": "^0.511.0",
     "motion": "^12.15.0",
