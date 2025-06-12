@@ -242,7 +242,7 @@ export default function Navbar() {
             </div>
             <span className="sr-only">Toggle theme</span>
           </button>
-          <Link href="/dashboard" className="!cursor-pointer">
+          <Link href="/login" className="!cursor-pointer">
             <Button className="rounded-full font-semibold cursor-pointer">Get Started</Button>
           </Link>
         </div>
