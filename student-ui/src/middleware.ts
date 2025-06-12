@@ -8,83 +8,69 @@ const adminPathPrefix = "/admin";
 export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("access_token")?.value;
   const refreshToken = request.cookies.get("refresh_token")?.value;
+
   let isAuthenticated = false;
   let userRole: string | null = null;
 
   const path = request.nextUrl.pathname;
+  const response = NextResponse.next(); // Always use this base response
 
   try {
     if (accessToken) {
-      try {
-        const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN as string);
-        const { payload } = await jwtVerify(accessToken as string, secret);
+      const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN!);
+      const { payload } = await jwtVerify(accessToken, secret);
+      userRole = payload.role as string;
+      isAuthenticated = true;
+    } else if (refreshToken) {
+      // Attempt token refresh
+      const refreshEndpoint =
+        process.env.NEXT_PUBLIC_ENV === "production"
+          ? "https://backend-server-554347060569.asia-southeast1.run.app/api/v1/refresh-token"
+          : "http://localhost:8080/api/v1/refresh-token";
 
+      const refreshRes = await fetch(refreshEndpoint, {
+        method: "GET",
+        headers: {
+          Cookie: `refresh_token=${refreshToken}`,
+        },
+        credentials: "include",
+      });
+
+      if (refreshRes.ok) {
+        const data = await refreshRes.json();
+
+        const accessTokenExpire = parseInt(process.env.ACCESS_TOKEN_EXPIRE || "1200", 10);
+        const refreshTokenExpire = parseInt(process.env.REFRESH_TOKEN_EXPIRE || "30", 10);
+
+        // Re-set both cookies
+        response.cookies.set("access_token", data.accessToken, {
+          httpOnly: true,
+          sameSite: "none",
+          secure: true,
+          path: "/",
+          maxAge: accessTokenExpire * 60 * 60,
+        });
+
+        response.cookies.set("refresh_token", data.refreshToken, {
+          httpOnly: true,
+          sameSite: "none",
+          secure: true,
+          path: "/",
+          maxAge: refreshTokenExpire * 24 * 60 * 60,
+        });
+
+        const secret = new TextEncoder().encode(process.env.ACCESS_TOKEN!);
+        const { payload } = await jwtVerify(data.accessToken, secret);
         userRole = payload.role as string;
         isAuthenticated = true;
-      } catch (error) {
-        if (refreshToken) {
-          try {
-            const response = await fetch(
-              `${process.env.NEXT_PUBLIC_ENV === "production"
-                ? "https://backend-server-554347060569.asia-southeast1.run.app/api/v1/refresh-token"
-                : "http://localhost:8080/api/v1/refresh-token"
-              }`,
-              {
-                method: "GET",
-                headers: {
-                  Cookie: `refresh_token=${refreshToken}`,
-                  "Content-Type": "application/json",
-                },
-                credentials: "include",
-              }
-            );
-
-            if (!response.ok) {
-              throw new Error("Failed to refresh token");
-            }
-
-            const data = await response.json();
-            const nextResponse = NextResponse.next(); // ✅ FIXED: Use `NextResponse.next()` instead of redirecting to the same path
-
-            const accessTokenExpire = parseInt(process.env.ACCESS_TOKEN_EXPIRE || "1200", 10);
-            const refreshTokenExpire = parseInt(process.env.REFRESH_TOKEN_EXPIRE || "1200", 10);
-
-            nextResponse.cookies.set("access_token", data.accessToken, {
-              expires: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000),
-              maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
-              httpOnly: true,
-              sameSite: "none", // Use 'none' for cross-site requests
-              secure: true,     // Set to true for HTTPS in production
-              path: "/"
-
-            });
-
-            nextResponse.cookies.set("refresh_token", data.refreshToken, {
-              expires: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000),
-              httpOnly: true,
-              sameSite: "none", // Use 'none' for cross-site requests
-              secure: true,     // Set to true for HTTPS in production
-              path: "/"
-
-            });
-
-            if (authPaths.includes(path)) {
-              return nextResponse;
-            }
-
-            return nextResponse; // ✅ FIXED: No unnecessary redirects
-          } catch (refreshError) {
-            isAuthenticated = false;
-          }
-        }
-        isAuthenticated = false;
       }
     }
-  } catch (error) {
+  } catch (err) {
+    console.error("Middleware error:", err);
     isAuthenticated = false;
   }
 
-  // Admin route handling
+  // Routing Logic
   if (path.startsWith(adminPathPrefix)) {
     if (!isAuthenticated || userRole !== "admin") {
       return NextResponse.redirect(new URL("/", request.url));
@@ -94,12 +80,12 @@ export async function middleware(request: NextRequest) {
   } else if (!isAuthenticated && !authPaths.includes(path)) {
     const signinUrl = new URL("/login", request.url);
     signinUrl.searchParams.set("redirectTo", path);
-
     return NextResponse.redirect(signinUrl);
   }
 
-  return NextResponse.next();
+  return response;
 }
+
 
 export const config = {
   matcher: [
