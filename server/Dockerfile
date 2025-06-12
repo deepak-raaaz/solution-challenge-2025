@@ -31,9 +31,6 @@ COPY --from=builder --chown=appuser:nodejs /app/dist ./dist
 COPY --from=builder --chown=appuser:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=appuser:nodejs /app/package.json ./package.json
 
-# Copy .env file (if needed at runtime, though Cloud Run uses --set-env-vars)
-COPY --from=builder --chown=appuser:nodejs /app/.env ./.env
-
 USER appuser
 
 EXPOSE 8080
