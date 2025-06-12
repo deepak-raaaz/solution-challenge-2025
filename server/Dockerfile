@@ -29,6 +29,8 @@ RUN adduser --system --uid 1001 appuser
 COPY --from=builder --chown=appuser:nodejs /app/dist ./dist
 COPY --from=builder --chown=appuser:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=appuser:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=appuser:nodejs /app/.env ./.env
+COPY --from=builder --chown=appuser:nodejs /app/views ./views
 
 USER appuser
 
