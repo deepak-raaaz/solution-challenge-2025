@@ -1,5 +1,5 @@
 # Base image
-FROM node:20-alpine AS base
+FROM node:18-alpine AS base
 
 # Install dependencies
 FROM base AS deps
@@ -35,4 +35,4 @@ USER appuser
 
 EXPOSE 8080
 
-CMD ["npm", "start"]
+CMD ["npm", "start", "preview", "--host", "0.0.0.0", "--port", "8080"]
