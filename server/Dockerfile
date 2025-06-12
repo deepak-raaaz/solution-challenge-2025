@@ -34,4 +34,4 @@ USER appuser
 
 EXPOSE 8080
 
-CMD ["npm", "start", "preview", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["npm", "start"]
