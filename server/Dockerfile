@@ -31,6 +31,9 @@ COPY --from=builder --chown=appuser:nodejs /app/dist ./dist
 COPY --from=builder --chown=appuser:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=appuser:nodejs /app/package.json ./package.json
 
+# Copy service account key file if it exists
+COPY --from=builder --chown=appuser:nodejs /app/service-account-key.json ./service-account-key.json 2>/dev/null || :
+
 USER appuser
 
 EXPOSE 8080
