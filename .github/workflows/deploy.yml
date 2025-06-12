@@ -79,7 +79,7 @@ jobs:
       - name: Create .env and Build Docker Image
         run: |
           cat << EOF > .env
-          PORT=8082
+          PORT="8080"
           ORIGIN="${{ secrets.ORIGIN }}"
           FRONTEND_HOST="${{ secrets.FRONTEND_HOST }}"
           NODE_ENV="${{ secrets.NODE_ENV }}"
