@@ -56,7 +56,7 @@ export async function middleware(request: NextRequest) {
               httpOnly: false,
               sameSite: "none",
               secure: true,
-              ...(process.env.NEXT_PUBLIC_ENV === "production" && { domain: "student-ui-554347060569.asia-southeast1.run.app" }),
+             
             });
 
             nextResponse.cookies.set("refresh_token", data.refreshToken, {
@@ -65,7 +65,7 @@ export async function middleware(request: NextRequest) {
               httpOnly: false,
               sameSite: "none",
               secure: true,
-              ...(process.env.NEXT_PUBLIC_ENV === "production" && { domain: "student-ui-554347060569.asia-southeast1.run.app" }),
+             
             });
 
             if (authPaths.includes(path)) {

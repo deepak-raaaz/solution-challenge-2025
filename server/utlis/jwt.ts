@@ -10,7 +10,7 @@ interface ITokenOptions{
     sameSite:"lax" | "strict" | "none" | undefined ;
     secure?:boolean;
     hostOnly?:boolean;
-    domain?:string;
+    
 }
 
  const accessTokenExpire = parseInt(
@@ -28,7 +28,7 @@ export const accessTokenOptions: ITokenOptions = {
     sameSite: "none",
     hostOnly: false,
     secure: true,
-    ...(process.env.NODE_ENV === "production" && { domain: "student-ui-554347060569.asia-southeast1.run.app" }),
+    
 };
 
 export const refreshTokenOptions: ITokenOptions = {
@@ -38,7 +38,7 @@ export const refreshTokenOptions: ITokenOptions = {
     sameSite: "none",
     hostOnly: false,
     secure: true,
-    ...(process.env.NODE_ENV === "production" && { domain: "student-ui-554347060569.asia-southeast1.run.app" }),
+    
 };
 
 export const sendToken = (user: IUser, statusCode: number, res:Response) =>{
