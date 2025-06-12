@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  deploy-student-ui:
+  deploy-frontend:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -51,13 +51,12 @@ jobs:
         run: |
           gcloud run deploy student-ui \
             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/student-ui \
-            --timeout=600s \
             --region asia-southeast1 \
             --platform managed \
             --allow-unauthenticated \
             --set-env-vars "NEXT_PUBLIC_SERVER_URI=${{ secrets.NEXT_PUBLIC_SERVER_URI }},ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }},NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }},NEXT_PUBLIC_ENV=${{ secrets.NEXT_PUBLIC_ENV }}"
 
-  deploy-server:
+  deploy-backend:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -76,25 +75,56 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Build Docker Image
+      - name: Create .env and Build Docker Image
         run: |
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/server .
+          cat << EOF > .env
+          PORT=8080
+          ORIGIN="${{ secrets.ORIGIN }}"
+          FRONTEND_HOST="${{ secrets.FRONTEND_HOST }}"
+          NODE_ENV="${{ secrets.NODE_ENV }}"
+          DB_URL="${{ secrets.DB_URL }}"
+          CLOUD_NAME="${{ secrets.CLOUD_NAME }}"
+          CLOUD_API_KEY="${{ secrets.CLOUD_API_KEY }}"
+          CLOUD_SECRET_KEY="${{ secrets.CLOUD_SECRET_KEY }}"
+          REDIS_URL="${{ secrets.REDIS_URL }}"
+          ACTIVATION_SECRET="${{ secrets.ACTIVATION_SECRET }}"
+          ACCESS_TOKEN="${{ secrets.ACCESS_TOKEN }}"
+          REFRESH_TOKEN="${{ secrets.REFRESH_TOKEN }}"
+          ACCESS_TOKEN_EXPIRE="${{ secrets.ACCESS_TOKEN_EXPIRE }}"
+          REFRESH_TOKEN_EXPIRE="${{ secrets.REFRESH_TOKEN_EXPIRE }}"
+          SMTP_HOST="${{ secrets.SMTP_HOST }}"
+          SMTP_PORT="${{ secrets.SMTP_PORT }}"
+          SMTP_SERVICE="${{ secrets.SMTP_SERVICE }}"
+          SMTP_MAIL="${{ secrets.SMTP_MAIL }}"
+          SMTP_PASSWORD="${{ secrets.SMTP_PASSWORD }}"
+          GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}"
+          GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
+          GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
+          YOUTUBE_API_KEY="${{ secrets.YOUTUBE_API_KEY }}"
+          GOOGLE_SEARCH_API_KEY="${{ secrets.GOOGLE_SEARCH_API_KEY }}"
+          GOOGLE_SEARCH_CX="${{ secrets.GOOGLE_SEARCH_CX }}"
+          GOOGLE_CLOUD_API_KEY="${{ secrets.GOOGLE_CLOUD_API_KEY }}"
+          GOOGLE_CLOUD_PROJECT="${{ secrets.GOOGLE_CLOUD_PROJECT }}"
+          GOOGLE_APPLICATION_CREDENTIALS="${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}"
+          GCS_BUCKET_NAME="${{ secrets.GCS_BUCKET_NAME }}"
+          GOOGLE_API_KEY="${{ secrets.GOOGLE_API_KEY }}"
+          GOOGLE_CSE_ID="${{ secrets.GOOGLE_CSE_ID }}"
+          EOF
+          cat .env || echo "Failed to create .env"
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/backend-server .
         env:
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Push Docker Image
         run: |
           gcloud auth configure-docker gcr.io
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/server
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/backend-server
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy server \
-            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/server \
+          gcloud run deploy backend-server \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/backend-server \
             --region asia-southeast1 \
             --platform managed \
             --allow-unauthenticated \
-            --timeout=3600s \
-            --service-account=554347060569-compute@developer.gserviceaccount.com \
-            --set-startup-probe 'tcp-socket=8080,timeout-seconds=10,period-seconds=10,failure-threshold=30' \
-            --set-env-vars "ORIGIN=${{ secrets.ORIGIN }},FRONTEND_HOST=${{ secrets.FRONTEND_HOST }},NODE_ENV=${{ secrets.NODE_ENV }},DB_URL=${{ secrets.DB_URL }},CLOUD_NAME=${{ secrets.CLOUD_NAME }},CLOUD_API_KEY=${{ secrets.CLOUD_API_KEY }},CLOUD_SECRET_KEY=${{ secrets.CLOUD_SECRET_KEY }},REDIS_URL=${{ secrets.REDIS_URL }},ACTIVATION_SECRET=${{ secrets.ACTIVATION_SECRET }},ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }},REFRESH_TOKEN=${{ secrets.REFRESH_TOKEN }},ACCESS_TOKEN_EXPIRE=${{ secrets.ACCESS_TOKEN_EXPIRE }},REFRESH_TOKEN_EXPIRE=${{ secrets.REFRESH_TOKEN_EXPIRE }},SMTP_HOST=${{ secrets.SMTP_HOST }},SMTP_PORT=${{ secrets.SMTP_PORT }},SMTP_SERVICE=${{ secrets.SMTP_SERVICE }},SMTP_MAIL=${{ secrets.SMTP_MAIL }},SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }},GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }},GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }},GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }},YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }},GOOGLE_SEARCH_API_KEY=${{ secrets.GOOGLE_SEARCH_API_KEY }},GOOGLE_SEARCH_CX=${{ secrets.GOOGLE_SEARCH_CX }},GOOGLE_CLOUD_API_KEY=${{ secrets.GOOGLE_CLOUD_API_KEY }},GOOGLE_CLOUD_PROJECT=${{ secrets.GOOGLE_CLOUD_PROJECT }},GCS_BUCKET_NAME=${{ secrets.GCS_BUCKET_NAME }},GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }},GOOGLE_CSE_ID=${{ secrets.GOOGLE_CSE_ID }}"
+            --set-env-vars "ORIGIN=${{ secrets.ORIGIN }},FRONTEND_HOST=${{ secrets.FRONTEND_HOST }},NODE_ENV=${{ secrets.NODE_ENV }},DB_URL=${{ secrets.DB_URL }},CLOUD_NAME=${{ secrets.CLOUD_NAME }},CLOUD_API_KEY=${{ secrets.CLOUD_API_KEY }},CLOUD_SECRET_KEY=${{ secrets.CLOUD_SECRET_KEY }},REDIS_URL=${{ secrets.REDIS_URL }},ACTIVATION_SECRET=${{ secrets.ACTIVATION_SECRET }},ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }},REFRESH_TOKEN=${{ secrets.REFRESH_TOKEN }},ACCESS_TOKEN_EXPIRE=${{ secrets.ACCESS_TOKEN_EXPIRE }},REFRESH_TOKEN_EXPIRE=${{ secrets.REFRESH_TOKEN_EXPIRE }},SMTP_HOST=${{ secrets.SMTP_HOST }},SMTP_PORT=${{ secrets.SMTP_PORT }},SMTP_SERVICE=${{ secrets.SMTP_SERVICE }},SMTP_MAIL=${{ secrets.SMTP_MAIL }},SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }},GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }},GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }},GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }},YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }},GOOGLE_SEARCH_API_KEY=${{ secrets.GOOGLE_SEARCH_API_KEY }},GOOGLE_SEARCH_CX=${{ secrets.GOOGLE_SEARCH_CX }},GOOGLE_CLOUD_API_KEY=${{ secrets.GOOGLE_CLOUD_API_KEY }},GOOGLE_CLOUD_PROJECT=${{ secrets.GOOGLE_CLOUD_PROJECT }},GOOGLE_APPLICATION_CREDENTIALS=${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }},GCS_BUCKET_NAME=${{ secrets.GCS_BUCKET_NAME }},GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }},GOOGLE_CSE_ID=${{ secrets.GOOGLE_CSE_ID }}"
