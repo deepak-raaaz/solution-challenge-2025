@@ -106,7 +106,7 @@ const MyLearningRoadmap: React.FC = () => {
                                     </div>
                                     <button
                                         className="w-full px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-200"
-                                        onClick={() => handleNavigate(`/roadmap/${roadmap.roadmapId}`)}
+                                        onClick={() => handleNavigate(`/learning-roadmap/${roadmap.roadmapId}`)}
                                         aria-label={`Continue learning ${roadmap.title}`}
                                     >
                                         Continue Learning

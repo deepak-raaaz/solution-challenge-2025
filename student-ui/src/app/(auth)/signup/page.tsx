@@ -84,7 +84,7 @@ const Page = (props: Props) => {
     const searchParams = new URLSearchParams(window.location.search);
     const redirectTo = searchParams.get("redirectTo") || "/";
   
-    document.cookie = `redirectTo=${redirectTo}; path=/; domain=.run.app; samesite=none; secure`;
+    document.cookie = `redirectTo=${redirectTo}; path=/; domain=.d4deepak.com; samesite=none; secure`;
   
     const authWindow = window.open("https://eduai-server.d4deepak.com/auth/google",
      "_blank", "width=500,height=600");

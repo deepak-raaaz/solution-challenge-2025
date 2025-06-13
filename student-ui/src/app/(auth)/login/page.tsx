@@ -7,11 +7,12 @@ import * as Yup from "yup";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useLoginMutation, useRegisterMutation } from "@/redux/features/auth/authApi";
 import { Bounce, toast } from "react-toastify";
 import { useTheme } from "next-themes";
 import { ImSpinner2 } from "react-icons/im";
+import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 
 type Props = {};
 
@@ -24,9 +25,14 @@ const schema = Yup.object().shape({
 
 const Page = (props: Props) => {
   const  theme  = "dark";
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect") || "/";
 
   const [login, { data, isSuccess, error, isLoading }] =
     useLoginMutation();
+
+    const { refetch } = useLoadUserQuery({}, { refetchOnMountOrArgChange: true });
 
   useEffect(() => {
     if (isSuccess) {
@@ -43,7 +49,8 @@ const Page = (props: Props) => {
         transition: Bounce,
       });
 
-      redirect("/");
+      refetch();
+      router.push(redirectUrl);
     }
     if (error) {
       if ("data" in error) {
@@ -83,7 +90,7 @@ const Page = (props: Props) => {
     const searchParams = new URLSearchParams(window.location.search);
     const redirectTo = searchParams.get("redirectTo") || "/";
   
-    document.cookie = `redirectTo=${redirectTo}; path=/; domain=.run.app; samesite=none; secure`;
+    document.cookie = `redirectTo=${redirectTo}; path=/; domain=.d4deepak.com; samesite=none; secure`;
   
     const authWindow = window.open("https://eduai-server.d4deepak.com/auth/google",
      "_blank", "width=500,height=600");
