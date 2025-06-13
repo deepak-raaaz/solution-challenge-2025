@@ -27,7 +27,7 @@ const Page = (props: Props) => {
   const  theme  = "dark";
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get("redirect") || "/";
+  const redirectUrl = searchParams.get("redirectTo") || "/dashboard";
 
   const [login, { data, isSuccess, error, isLoading }] =
     useLoginMutation();
