@@ -9,7 +9,8 @@ interface ITokenOptions{
     httpOnly:boolean;
     sameSite:"lax" | "strict" | "none" | undefined ;
     secure?:boolean;
-    path: string
+    hostOnly?:boolean;
+    domain?:string;
 }
 
  const accessTokenExpire = parseInt(
@@ -23,22 +24,24 @@ const refreshTokenExpire = parseInt(
 export const accessTokenOptions: ITokenOptions = {
     expires: new Date(Date.now() + accessTokenExpire * 60 * 60 * 1000),
     maxAge: accessTokenExpire * 60 * 60 * 1000,
-    httpOnly: true,
-    sameSite: "none", // Use 'none' for cross-site requests
-    secure: true,     // Set to true for HTTPS in production
-    path: "/"
+    httpOnly: false,
+    sameSite: "none",
+    hostOnly: false,
+    secure: true,
+    ...(process.env.NODE_ENV === "production" && { domain: ".d4deepak.com" }),
 };
 
 export const refreshTokenOptions: ITokenOptions = {
     expires: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000),
     maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
-    httpOnly: true,
-    sameSite: "none", // Use 'none' for cross-site requests
-    secure: true,     // Set to true for HTTPS in production
-    path: "/"
+    httpOnly: false,
+    sameSite: "none",
+    hostOnly: false,
+    secure: true,
+    ...(process.env.NODE_ENV === "production" && { domain: ".d4deepak.com" }),
 };
 
-export const sendToken = (user: any, statusCode: number, res:Response) =>{
+export const sendToken = (user: IUser, statusCode: number, res:Response) =>{
     const accessToken = user.SignAcessToken();
     const refreshToken = user.SignRefreshToken();
 
@@ -51,15 +54,9 @@ export const sendToken = (user: any, statusCode: number, res:Response) =>{
     res.cookie("access_token",accessToken,accessTokenOptions);
     res.cookie("refresh_token",refreshToken,refreshTokenOptions);
 
-    const userData = {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-    }
     res.status(statusCode).json({
         success:true,
-        userData,
+        user,
         accessToken
     })
 }

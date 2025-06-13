@@ -53,7 +53,7 @@ app.get(
   "/auth/google/callback",
   passport.authenticate("google", {
     session: false,
-    failureRedirect: `${process.env.FRONTEND_HOST}/signin`,
+    failureRedirect: `${process.env.FRONTEND_HOST}/login`,
   }),
   function (req, res) {
     const { user, accessToken, refreshToken } = req.user as any;

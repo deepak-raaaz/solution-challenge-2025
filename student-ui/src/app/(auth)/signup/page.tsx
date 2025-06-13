@@ -86,7 +86,7 @@ const Page = (props: Props) => {
   
     document.cookie = `redirectTo=${redirectTo}; path=/; domain=.run.app; samesite=none; secure`;
   
-    const authWindow = window.open("https://backend-server-554347060569.asia-southeast1.run.app/auth/google",
+    const authWindow = window.open("https://eduai-server.d4deepak.com/auth/google",
      "_blank", "width=500,height=600");
   
     window.addEventListener("message", (event) => {
