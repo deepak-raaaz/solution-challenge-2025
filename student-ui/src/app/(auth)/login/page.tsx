@@ -27,7 +27,7 @@ const Page = (props: Props) => {
   const  theme  = "dark";
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get("redirectTo") || "/dashboard";
+  const redirectUrl = decodeURIComponent(searchParams.get("redirectTo") || "/dashboard")
 
   const [login, { data, isSuccess, error, isLoading }] =
     useLoginMutation();
@@ -50,7 +50,12 @@ const Page = (props: Props) => {
       });
 
       refetch();
-      router.push(redirectUrl);
+      
+      // Validate redirectUrl to ensure it's a valid path
+      const isValidPath = redirectUrl.startsWith("/") && !redirectUrl.includes("..");
+      const safeRedirectUrl = isValidPath ? redirectUrl : "/dashboard";
+
+      router.push(safeRedirectUrl);
     }
     if (error) {
       if ("data" in error) {
@@ -88,9 +93,9 @@ const Page = (props: Props) => {
 
   const handleGoogleSignin = () => {
     const searchParams = new URLSearchParams(window.location.search);
-    const redirectTo = searchParams.get("redirectTo") || "/";
-  
-    document.cookie = `redirectTo=${redirectTo}; path=/; domain=.d4deepak.com; samesite=none; secure`;
+    const redirectTo = decodeURIComponent(searchParams.get("redirectTo") || "/");
+
+    document.cookie = `redirectTo=${encodeURIComponent(redirectTo)}; path=/; domain=.d4deepak.com; samesite=none; secure`;
   
     const authWindow = window.open("https://eduai-server.d4deepak.com/auth/google",
      "_blank", "width=500,height=600");
