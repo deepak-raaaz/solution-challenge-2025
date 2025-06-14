@@ -2,6 +2,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useMyRoadmapQuery } from '@/redux/features/api/generate/generateApi';
+import Loader from '@/components/shared/loader';
 
 // Interface for roadmap data
 interface Roadmap {
@@ -54,7 +55,7 @@ const MyLearningRoadmap: React.FC = () => {
     ];
 
     if (isLoading) {
-        return <div className="min-h-screen py-20 text-gray-100 text-center text-xl">Loading...</div>;
+        return <Loader/>;
     }
 
     if (error || !data?.data) {

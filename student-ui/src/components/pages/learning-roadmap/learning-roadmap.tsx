@@ -7,6 +7,7 @@ import { DiscussionGroups } from './discussion-group';
 import { QuickActions } from './quick-actions';
 import { QuickStats } from './quick-starts';
 import { useLearningRoadmapQuery } from '@/redux/features/api/generate/generateApi';
+import Loader from '@/components/shared/loader';
 
 // Interfaces
 export interface Module {
@@ -104,7 +105,7 @@ export const getResourceIcon = (type: string) => {
 const LearningRoadmap: React.FC<LearningRoadmapProps> = ({ roadmapId }) => {
   const { data, isLoading, error } = useLearningRoadmapQuery(roadmapId);
 
-  if (isLoading) return <div className="text-gray-100">Loading...</div>;
+  if (isLoading) return <Loader/>;
   if (error || !data?.data) return <div className="text-red-500">Error loading roadmap</div>;
 
   const roadmapData = data.data;

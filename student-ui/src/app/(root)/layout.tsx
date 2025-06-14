@@ -8,6 +8,7 @@ import BottomNavbar from "@/components/shared/bottom-navbar/bottom-navbar";
 import MobileNav from "@/components/shared/mobile-nav/mobile-nav";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 import DesktopNavbar from "@/components/shared/nav-bar/desktop-navbar";
+import Loader from "@/components/shared/loader";
 const Layout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     AOS.init({
@@ -25,7 +26,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const { isLoading } = useLoadUserQuery({});
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader/>}>
 
       <div className="flex">
         <Sidebar />

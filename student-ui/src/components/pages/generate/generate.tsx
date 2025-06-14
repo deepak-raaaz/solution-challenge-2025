@@ -80,7 +80,7 @@ const Generate: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen dark:text-white flex items-center justify-center py-20">
+    <div className="min-h-screen dark:text-white flex items-center justify-center ">
       <div className="max-container py-20 max-md:py-0">
         <div className="flex flex-col items-center justify-center text-center space-y-4 max-sm:space-y-2">
           <h1 className="text-4xl md:text-6xl font-medium font-pp-neue-montreal tracking-wide bg-gradient-to-b from-blue-300 py-1 to-blue-500 bg-clip-text text-transparent">

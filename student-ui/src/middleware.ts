@@ -122,7 +122,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/", request.url));
     }
   } else if (isAuthenticated && authPaths.includes(path)) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   } else if (!isAuthenticated && !authPaths.includes(path)) {
     const signinUrl = new URL("/login", request.url);
     signinUrl.searchParams.set("redirectTo", path); // Store the previous path

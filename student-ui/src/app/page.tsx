@@ -8,12 +8,14 @@ import HowItWorksSection from '@/components/pages/home/how-it-works-section'
 import ImpactSection from '@/components/pages/home/impact-section'
 import CTASection from '@/components/pages/home/cta-section'
 import Navbar from '@/components/shared/nav-bar/nav-bar'
+import Generate from '@/components/pages/generate/generate'
 
 const Page = () => {
   return (
     <>
     <Navbar />
-    <HeroSection />
+    <Generate/>
+    {/* <HeroSection /> */}
     <AboutSection />
     <ProblemSection />
     <SolutionSection />

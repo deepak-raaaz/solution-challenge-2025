@@ -1,11 +1,13 @@
 "use client"
-import { DM_Sans} from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { useEffect } from "react";
 import { Providers } from "./Provider";
 import { ToastContainer } from "react-toastify";
+import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
+import Loader from "@/components/shared/loader";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -41,11 +43,18 @@ export default function RootLayout({
         className={`${dmSans.variable}  antialiased `}
       >
         <Providers>
-
-       {children}
-       <ToastContainer />
+          <Custom>
+            {children}
+          </Custom>
+          <ToastContainer />
         </Providers>
       </body>
     </html>
   );
 }
+
+
+const Custom: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isLoading } = useLoadUserQuery({});
+  return <>{isLoading ? <Loader /> : <>{children}</>}</>;
+};

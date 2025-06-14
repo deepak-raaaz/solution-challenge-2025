@@ -8,9 +8,11 @@ import { usePathname } from "next/navigation";
 import { ThemeAnimationType, useModeAnimation } from "react-theme-switch-animation";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import UserAuth from "@/hooks/userAuth";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Navbar() {
+  const isLogin = UserAuth();
   const navRef = useRef(null);
   const pathname = usePathname();
   const { ref, toggleSwitchTheme, isDarkMode } = useModeAnimation({
@@ -104,9 +106,8 @@ export default function Navbar() {
           <li className="group relative">
             <Link
               href="/"
-              className={`flex items-center gap-2 ${
-                pathname === "/" ? "active-link" : ""
-              }`}
+              className={`flex items-center gap-2 ${pathname === "/" ? "active-link" : ""
+                }`}
             >
               {pathname === "/" && (
                 <span className="w-2 h-2 bg-highlight rounded-full"></span>
@@ -124,9 +125,8 @@ export default function Navbar() {
           <li className="group relative">
             <Link
               href="/about"
-              className={`flex items-center gap-2 ${
-                pathname === "/about" ? "active-link" : ""
-              }`}
+              className={`flex items-center gap-2 ${pathname === "/about" ? "active-link" : ""
+                }`}
             >
               {pathname === "/about" && (
                 <span className="w-2 h-2 bg-highlight rounded-full"></span>
@@ -144,9 +144,8 @@ export default function Navbar() {
           <li className="group relative">
             <Link
               href="/how-it-works"
-              className={`flex items-center gap-2 ${
-                pathname === "/how-it-works" ? "active-link" : ""
-              }`}
+              className={`flex items-center gap-2 ${pathname === "/how-it-works" ? "active-link" : ""
+                }`}
             >
               {pathname === "/how-it-works" && (
                 <span className="w-2 h-2 bg-highlight rounded-full"></span>
@@ -164,9 +163,8 @@ export default function Navbar() {
           <li className="group relative">
             <Link
               href="/resources"
-              className={`flex items-center gap-2 ${
-                pathname === "/resources" ? "active-link" : ""
-              }`}
+              className={`flex items-center gap-2 ${pathname === "/resources" ? "active-link" : ""
+                }`}
             >
               {pathname === "/resources" && (
                 <span className="w-2 h-2 bg-highlight rounded-full"></span>
@@ -183,7 +181,7 @@ export default function Navbar() {
           </li>
         </ul>
         <div className="flex items-center justify-center gap-4">
-          <button
+          {/* <button
             ref={ref}
             onClick={toggleSwitchTheme}
             className="inline-flex items-center justify-center whitespace-nowrap text-sm font-semibold ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-11 w-11 relative rounded-full border border-bg-700 bg-backdrop text-text-primary backdrop-blur-md transition-all active:scale-90 sm:h-10 sm:w-10 sm:border-none sm:bg-transparent sm:shadow-none sm:backdrop-blur-none"
@@ -241,9 +239,13 @@ export default function Navbar() {
               </svg>
             </div>
             <span className="sr-only">Toggle theme</span>
-          </button>
-          <Link href="/login" className="!cursor-pointer">
-            <Button className="rounded-full font-semibold cursor-pointer">Get Started</Button>
+          </button> */}
+          <Link href={isLogin ? "/dashboard" : "/login"} className="!cursor-pointer">
+            <Button className="rounded-full font-semibold cursor-pointer">
+              {
+                isLogin ? "Dashboard" : "Get Started"
+              }
+            </Button>
           </Link>
         </div>
       </nav>
