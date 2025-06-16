@@ -66,7 +66,7 @@ app.get(
     // Ensure redirect URL points to frontend (localhost:3000)
     if (!redirectUrl.startsWith("http")) {
      
-      redirectUrl = `${process.env.FRONTEND_HOST}${decodeURIComponent(redirectUrl)}`;
+      redirectUrl = `https://eduai.d4deepak.com${decodeURIComponent(redirectUrl)}`;
   
     }
     // redirectUrl = `${process.env.FRONTEND_HOST}${decodeURIComponent(redirectUrl)}`;
