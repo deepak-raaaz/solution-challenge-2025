@@ -13,6 +13,7 @@ import { Bounce, toast } from "react-toastify";
 import { useTheme } from "next-themes";
 import { ImSpinner2 } from "react-icons/im";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
+import UserAuth from "@/hooks/userAuth";
 
 type Props = {};
 
@@ -24,7 +25,7 @@ const schema = Yup.object().shape({
 });
 
 const Page = (props: Props) => {
-  const  theme  = "dark";
+  const theme = "dark";
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = decodeURIComponent(searchParams.get("redirectTo") || "/dashboard")
@@ -32,7 +33,13 @@ const Page = (props: Props) => {
   const [login, { data, isSuccess, error, isLoading }] =
     useLoginMutation();
 
-    const { refetch } = useLoadUserQuery({}, { refetchOnMountOrArgChange: true });
+  const { refetch } = useLoadUserQuery({}, { refetchOnMountOrArgChange: true });
+  const isLogin = UserAuth();
+  if (isLogin) {
+    const isValidPath = redirectUrl.startsWith("/") && !redirectUrl.includes("..");
+    const safeRedirectUrl = isValidPath ? redirectUrl : "/dashboard";
+    router.push(safeRedirectUrl);
+  }
 
   useEffect(() => {
     if (isSuccess) {
@@ -50,11 +57,11 @@ const Page = (props: Props) => {
       });
 
       refetch();
-      
+
       // Validate redirectUrl to ensure it's a valid path
       const isValidPath = redirectUrl.startsWith("/") && !redirectUrl.includes("..");
       const safeRedirectUrl = isValidPath ? redirectUrl : "/dashboard";
-      
+
 
       router.push(safeRedirectUrl);
     }
@@ -84,7 +91,7 @@ const Page = (props: Props) => {
       const data = {
         email,
         password,
-        role:"user"
+        role: "user"
       };
       await login(data);
     },
@@ -97,10 +104,10 @@ const Page = (props: Props) => {
     const redirectTo = decodeURIComponent(searchParams.get("redirectTo") || "/");
 
     document.cookie = `redirectTo=${encodeURIComponent(redirectTo)}; path=/; domain=.d4deepak.com; samesite=none; secure`;
-  
+
     const authWindow = window.open("https://eduai-server.d4deepak.com/auth/google",
-     "_blank", "width=500,height=600");
-  
+      "_blank", "width=500,height=600");
+
     window.addEventListener("message", (event) => {
       if (event.data?.success) {
         authWindow?.close();
@@ -108,7 +115,7 @@ const Page = (props: Props) => {
       }
     }, { once: true });
   };
-  
+
   return (
     <div className="min-h-screen max-w-screen-xl mx-auto flex justify-center items-center">
       <div className="max-w-[420px] bg-[#131920] rounded-xl p-10 w-full ">
@@ -142,9 +149,8 @@ const Page = (props: Props) => {
               type="email"
               onChange={handleChange}
               id="email"
-              className={`${
-                errors.email && touched.email && "border-red-500"
-              } my-1 bg-transparent focus-visible:ring-slate-500`}
+              className={`${errors.email && touched.email && "border-red-500"
+                } my-1 bg-transparent focus-visible:ring-slate-500`}
             />
             {errors.email && touched.email && (
               <span className="text-red-500 text-sm block">{errors.email}</span>
@@ -162,9 +168,8 @@ const Page = (props: Props) => {
               type="password"
               onChange={handleChange}
               id="password"
-              className={`${
-                errors.password && touched.password && "border-red-500"
-              } my-1 bg-transparent focus-visible:ring-slate-500`}
+              className={`${errors.password && touched.password && "border-red-500"
+                } my-1 bg-transparent focus-visible:ring-slate-500`}
             />
             {errors.password && touched.password && (
               <span className="text-red-500 text-sm block">
