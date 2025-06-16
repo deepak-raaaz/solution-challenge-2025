@@ -58,12 +58,14 @@ const Page = (props: Props) => {
 
       refetch();
 
-      // Validate redirectUrl to ensure it's a valid path
       const isValidPath = redirectUrl.startsWith("/") && !redirectUrl.includes("..");
       const safeRedirectUrl = isValidPath ? redirectUrl : "/dashboard";
+      console.log("Redirecting to:", safeRedirectUrl);
 
-
-      router.push(safeRedirectUrl);
+      // Delay redirect to ensure router readiness
+      setTimeout(() => {
+        router.push(safeRedirectUrl);
+      }, 100);
     }
     if (error) {
       if ("data" in error) {
