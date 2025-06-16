@@ -36,7 +36,7 @@ const Page = (props: Props) => {
 
   useEffect(() => {
     if (isSuccess) {
-      const message = data?.message || "Sign in successful";
+      const message = data?.message || "Login in successful";
       toast.success(message, {
         position: "top-right",
         autoClose: 5000,
@@ -54,6 +54,7 @@ const Page = (props: Props) => {
       // Validate redirectUrl to ensure it's a valid path
       const isValidPath = redirectUrl.startsWith("/") && !redirectUrl.includes("..");
       const safeRedirectUrl = isValidPath ? redirectUrl : "/dashboard";
+      
 
       router.push(safeRedirectUrl);
     }

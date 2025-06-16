@@ -156,7 +156,7 @@ export default function Playlists() {
   }, [data, error]);
 
   return (
-    <section id="playlist-browser" className="min-h-screen p-6 max-lg:py-20 max-lg:px-4 ">
+    <section id="playlist-browser" className="min-h-screen p-6 py-20 max-lg:px-4 ">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-4 text-gray-100">Playlist Browser</h1>

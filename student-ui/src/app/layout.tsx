@@ -8,6 +8,7 @@ import { Providers } from "./Provider";
 import { ToastContainer } from "react-toastify";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 import Loader from "@/components/shared/loader";
+import { Toaster } from "@/components/ui/sonner";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -46,6 +47,7 @@ export default function RootLayout({
           <Custom>
             {children}
           </Custom>
+          <Toaster />
           <ToastContainer />
         </Providers>
       </body>

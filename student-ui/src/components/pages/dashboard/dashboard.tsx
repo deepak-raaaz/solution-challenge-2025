@@ -27,7 +27,7 @@ export default function Dashboard() {
     <section id="home" className="min-h-screen  text-[#E6E6E6] p-6 py-20 max-md:px-4">
       <div className="max-w-7xl mx-auto">
         <WelcomeBanner onStartLearning={() => handleSectionChange('create-start')} />
-         <PendingAssessment/>
+        <PendingAssessment />
         <PlaylistSection onViewAll={() => handleSectionChange('playlists')} />
         <GamificationSection
           onLeaderboardClick={() => handleSectionChange('leaderboard')}

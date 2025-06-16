@@ -56,7 +56,7 @@ const Profile: FC = () => {
   };
 
   return (
-    <section id="profile-management" className="min-h-screen  p-6 max-lg:px-4 max-lg:py-20">
+    <section id="profile-management" className="min-h-screen  p-6 max-lg:px-4 py-20">
       <ProfileHeader onExportProfile={handleExportProfile} onOpenSettingsModal={() => setIsSettingsModalOpen(true)} />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <ProfileOverview

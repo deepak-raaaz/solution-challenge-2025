@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 const PendingAssessment: React.FC = () => {
   const [showCard, setShowCard] = useState(true);
@@ -11,7 +12,7 @@ const PendingAssessment: React.FC = () => {
 
   return (
     <div
-      className="relative p-6 rounded-xl border-2 "
+      className="relative p-6 max-lg:p-4 rounded-xl border-1 border-gray-700/40 bg-gray-800/20 my-4"
 
     >
       <div className="relative z-10">
@@ -45,101 +46,62 @@ const PendingAssessment: React.FC = () => {
             </div>
           </div>
 
-          {/* Dismiss button */}
-          <button
-            className="p-2 rounded-lg hover:bg-neutral-700/50 transition-colors"
-            onClick={() => setShowCard(false)}
-            aria-label="Dismiss assessment card"
-          >
-            <svg
-              className="w-5 h-5"
-              style={{ color: '#E6E6E6' }}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+          
         </div>
 
         {/* Playlist Details */}
-        <div className="mb-6">
-          <div className="flex items-center space-x-4 mb-4">
-            <div
-              className="w-16 h-16 rounded-lg overflow-hidden"
-            >
-              <img
-                src="https://placehold.co/64x64/1E90FF/FFFFFF?text=ML"
-                alt="Machine Learning"
-                width={64}
-                height={64}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-1" style={{ color: '#E6E6E6' }}>
-                Machine Learning Basics
-              </h4>
-              <p className="text-sm opacity-75 mb-2" style={{ color: '#E6E6E6' }}>
-                You started an assessment for this playlist. Complete it to tailor your learning path!
-              </p>
-              <div className="flex items-center space-x-2">
-                <span
-                  className="text-xs px-2 py-1 rounded-full"
-                  style={{ backgroundColor: '#1E90FF', color: 'white' }}
-                >
-                  Beginner
-                </span>
-                <span className="text-xs opacity-75" style={{ color: '#E6E6E6' }}>
-                  15 modules • 8 hours
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium" style={{ color: '#E6E6E6' }}>
-                Assessment Progress
-              </span>
-              <span className="text-sm font-medium" style={{ color: '#1E90FF' }}>
-                50% complete
-              </span>
-            </div>
-            <div className="w-full h-2 rounded-full" style={{ backgroundColor: '#0E1217' }}>
+        <div className="">
+          <div className="flex items-end justify-between space-x-4 max-lg:flex-col max-lg:items-start max-lg:space-y-4">
+            <div className="flex items-center space-x-4">
               <div
-                className="h-2 rounded-full transition-all duration-500"
-                style={{ backgroundColor: '#1E90FF', width: '50%' }}
-              />
+                className="w-16 h-16 rounded-lg overflow-hidden aspect-square"
+              >
+                <img
+                  src="https://placehold.co/64x64/1E90FF/FFFFFF?text=ML"
+                  alt="Machine Learning"
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className=''>
+                <h4 className="text-lg font-semibold mb-1" style={{ color: '#E6E6E6' }}>
+                  Machine Learning Basics
+                </h4>
+                <p className="text-sm opacity-75 mb-2" style={{ color: '#E6E6E6' }}>
+                  You started an assessment for this playlist. Complete it to tailor your learning path!
+                </p>
+                <div className="flex items-center space-x-2">
+                  <span
+                    className="text-xs px-2 py-1 rounded-full"
+                    style={{ backgroundColor: '#1E90FF', color: 'white' }}
+                  >
+                    Beginner
+                  </span>
+                  <span className="text-xs opacity-75" style={{ color: '#E6E6E6' }}>
+                    15 modules • 8 hours
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex  flex-col sm:flex-row gap-3 max-lg:w-full max-lg: justify-end">
+              <Button>
+                Continue Assessment
+              </Button>
+              <Button
+                variant="secondary"
+              >
+                Remind Me Later
+              </Button>
             </div>
           </div>
+
+
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link
-            href="/create/assessment"
-            className="flex-1 px-6 py-3 rounded-lg font-semibold text-center transition-all duration-200 hover:scale-105 hover:shadow-lg"
-            style={{ backgroundColor: '#1E90FF', color: 'white' }}
-          >
-            Continue Assessment
-          </Link>
-          <button
-            className="flex-1 px-6 py-3 rounded-lg font-semibold border-2 transition-all duration-200 hover:bg-neutral-700/50"
-            style={{ color: '#E6E6E6', borderColor: '#E6E6E6' }}
-            onClick={() => setShowCard(false)}
-            aria-label="Remind me later"
-          >
-            Remind Me Later
-          </button>
-        </div>
       </div>
     </div>
   );
